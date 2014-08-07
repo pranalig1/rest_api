@@ -7,13 +7,13 @@ namespace RestApiTest
 {  
     class Program
     {
-        const string ACCOUNT_NAME = "test";
+        const string ACCOUNT_NAME = "testaccount";
 
         static void Main(string[] args)
         {
             try
             {
-                NetworkCredential userCredentials = new NetworkCredential("test", "test");
+                NetworkCredential userCredentials = new NetworkCredential("username", "password");
                 WitRestClient client = new WitRestClient(ACCOUNT_NAME, userCredentials);
 
                 //ReadAndUpdateWorkItem(client, 4);
@@ -63,7 +63,7 @@ namespace RestApiTest
             newWi.SetFieldValue("System.Reason", "New");
             newWi.SetFieldValue("System.AreaPath", "Agile32");
             newWi.SetFieldValue("System.IterationPath", "Agile32\\Iteration 1");
-            newWi.SetFieldValue("Microsoft.VSTS.Common.ActivatedBy", "Oleg");
+            newWi.SetFieldValue("Microsoft.VSTS.Common.ActivatedBy", "UserName");
             newWi = client.CreateWorkItem(newWi).Result;
         }
 

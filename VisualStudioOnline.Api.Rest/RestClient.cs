@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace VisualStudioOnline.Api.Rest
 {
+    /// <summary>
+    /// Base class for TFS subsystem REST API client
+    /// </summary>
     public abstract class RestClient
     {
         private const string API_ROOT_URL = "https://{0}.visualstudio.com/DefaultCollection/_apis/{1}/{2}?{3}";
@@ -23,16 +26,6 @@ namespace VisualStudioOnline.Api.Rest
             get;
         }
 
-        private string ConstructUrl(string path)
-        {
-            return ConstructUrl(path, new Dictionary<string, string>());
-        }
-
-        private string ConstructUrl(string path, IDictionary<string, string> arguments)
-        {
-            arguments.Add("api-version", API_VERSION);
-            return string.Format(API_ROOT_URL, _accountName, SubSystemName, path, string.Join("&", arguments.Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value))));
-        }
 
         public RestClient(string accountName, NetworkCredential userCredential)
         {
@@ -107,8 +100,22 @@ namespace VisualStudioOnline.Api.Rest
 
             return client;
         }
+
+        private string ConstructUrl(string path)
+        {
+            return ConstructUrl(path, new Dictionary<string, string>());
+        }
+
+        private string ConstructUrl(string path, IDictionary<string, string> arguments)
+        {
+            arguments.Add("api-version", API_VERSION);
+            return string.Format(API_ROOT_URL, _accountName, SubSystemName, path, string.Join("&", arguments.Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value))));
+        }
     }
 
+    /// <summary>
+    /// HttpClient extensions
+    /// </summary>
     public static class HttpClientExtensions
     {
         public async static Task<HttpResponseMessage> PatchAsync(this HttpClient client, string requestUri, HttpContent content)

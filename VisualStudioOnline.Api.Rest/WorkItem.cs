@@ -1,131 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace VisualStudioOnline.Api.Rest
 {
-    //public class WorkItem_1
-    //{
-    //    private Dictionary<string, Field_1> _fields = new Dictionary<string, Field_1>();
-    //    private List<Link> _links = new List<Link>();
-
-    //    [JsonProperty(PropertyName = "fields")]
-    //    public IEnumerable<Field_1> Fields
-    //    {
-    //        get
-    //        {
-    //            return _fields.Select(f => f.Value);
-    //        }
-    //        set
-    //        { }
-    //    }
-
-    //    [JsonProperty(PropertyName = "links")]
-    //    public List<Link> Links
-    //    {
-    //        get
-    //        {
-    //            return _links;
-    //        }
-    //        set
-    //        { }
-    //    }
-
-    //    [JsonIgnore]
-    //    public string Title
-    //    {
-    //        get
-    //        {
-    //            return GetFieldValue("System.Title");
-    //        }
-    //        set
-    //        {
-    //            SetField("System.Title", value);
-    //        }
-    //    }
-
-    //    [JsonIgnore]
-    //    public string WorkItemType
-    //    {
-    //        get
-    //        {
-    //            return GetFieldValue("System.WorkItemType");
-    //        }
-    //        set
-    //        {
-    //            SetField("System.WorkItemType", value);
-    //        }
-    //    }
-
-    //    [JsonIgnore]
-    //    public string State
-    //    {
-    //        get
-    //        {
-    //            return GetFieldValue("System.State");
-    //        }
-    //        set
-    //        {
-    //            SetField("System.State", value);
-    //        }
-    //    }
-
-    //    [JsonIgnore]
-    //    public string Reason
-    //    {
-    //        get
-    //        {
-    //            return GetFieldValue("System.Reason");
-    //        }
-    //        set
-    //        {
-    //            SetField("System.Reason", value);
-    //        }
-    //    }
-
-    //    [JsonIgnore]
-    //    public string AreaPath
-    //    {
-    //        get
-    //        {
-    //            return GetFieldValue("System.AreaPath");
-    //        }
-    //        set
-    //        {
-    //            SetField("System.AreaPath", value);
-    //        }
-    //    }
-
-    //    [JsonIgnore]
-    //    public string IterationPath
-    //    {
-    //        get
-    //        {
-    //            return GetFieldValue("System.IterationPath");
-    //        }
-    //        set
-    //        {
-    //            SetField("System.IterationPath", value);
-    //        }
-    //    }
-
-    //    public WorkItem_1()
-    //    {
-    //    }
-
-    //    public WorkItem_1(string type, string title)
-    //    {
-    //        WorkItemType = type;
-    //        Title = title;
-    //    }
-
-
-    //    public string GetFieldValue(string name)
-    //    {
-    //        return GetField(name) != null ? GetField(name).Value : null;
-    //    }
-    //}
-
+    [DebuggerDisplay("{Source.Id} -> {Target.Id}")]
     public class Link
     {
         [JsonProperty(PropertyName = "linkType")]
@@ -144,6 +24,7 @@ namespace VisualStudioOnline.Api.Rest
         public WorkItem Source { get; set; }
     }
 
+    [DebuggerDisplay("{ReferenceName}")]
     public class FieldMetadata
     {
         [JsonProperty(PropertyName = "id")]
@@ -156,6 +37,7 @@ namespace VisualStudioOnline.Api.Rest
         public string Name { get; set; }
     }
 
+    [DebuggerDisplay("{Metadata.ReferenceName}={Value}")]
     public class Field
     {
         [JsonProperty(PropertyName = "field")]
@@ -165,6 +47,7 @@ namespace VisualStudioOnline.Api.Rest
         public string Value { get; set; }
     }
 
+    [DebuggerDisplay("{Id}")]
     public class WorkItem
     {
         public WorkItem()
