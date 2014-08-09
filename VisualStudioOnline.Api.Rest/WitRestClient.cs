@@ -148,5 +148,26 @@ namespace VisualStudioOnline.Api.Rest
             JsonConvert.PopulateObject(response, query);
             return query;
         }
+
+        /// <summary>
+        /// Delete a query / query folder
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<string> DeleteQuery(Query query)
+        {
+            return await DeleteResponse(string.Format("queries/{0}", query.Id));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<string> DownloadAttachment(string attachmentId)
+        {
+            string response = await GetResponse(string.Format("attachments/{0}", attachmentId), new Dictionary<string, string>());            
+            return response;
+        }
     }
 }

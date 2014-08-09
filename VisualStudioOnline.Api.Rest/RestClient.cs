@@ -43,7 +43,7 @@ namespace VisualStudioOnline.Api.Rest
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new Exception(string.Format("Request failed: {0}", responseBody));
+                        throw new Exception(string.Format("GET request failed: {0}", responseBody));
                     }
 
                     return responseBody;
@@ -63,7 +63,7 @@ namespace VisualStudioOnline.Api.Rest
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new Exception(string.Format("Request failed: {0}", responseBody));
+                        throw new Exception(string.Format("POST request failed: {0}", responseBody));
                     }
 
                     return responseBody;
@@ -83,7 +83,25 @@ namespace VisualStudioOnline.Api.Rest
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new Exception(string.Format("Request failed: {0}", responseBody));
+                        throw new Exception(string.Format("PATCH request failed: {0}", responseBody));
+                    }
+
+                    return responseBody;
+                }
+            }
+        }
+
+        protected async Task<string> DeleteResponse(string path)
+        {
+            using (HttpClient client = GetHttpClient())
+            {
+                using (HttpResponseMessage response = client.DeleteAsync(ConstructUrl(path)).Result)
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new Exception(string.Format("DELETE request failed: {0}", responseBody));
                     }
 
                     return responseBody;

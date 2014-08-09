@@ -1,9 +1,16 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace VisualStudioOnline.Api.Rest
 {
+    public enum QueryType
+    {
+        query,
+        folder
+    }
+
     [DebuggerDisplay("{Name}")]
     public class Project
     {
@@ -33,8 +40,9 @@ namespace VisualStudioOnline.Api.Rest
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; }
+        public QueryType Type { get; set; }
 
         [JsonProperty(PropertyName = "count")]
         public int Count { get; set; }
