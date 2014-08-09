@@ -16,10 +16,12 @@ namespace RestApiTest
                 NetworkCredential userCredentials = new NetworkCredential("username", "password");
                 WitRestClient client = new WitRestClient(ACCOUNT_NAME, userCredentials);
 
+                //TestReadWorkItems(client, 1);
                 //ReadAndUpdateWorkItem(client, 4);
                 //TestGetQueries(client, "Agile32");
                 //TestGetQueryAndUpdate(client, "dd442eb1-b79f-4766-a846-20e280aaf5b8");
-                TestCreateQuery(client, "5fee6ef8-24ca-4fe5-aace-24789c6ff56a");
+                var query = TestCreateQuery(client, "5fee6ef8-24ca-4fe5-aace-24789c6ff56a");
+                var r = client.DeleteQuery(query).Result;
             }
             catch (Exception ex)
             {
@@ -27,7 +29,7 @@ namespace RestApiTest
             }
         }
 
-        private static void TestCreateQuery(WitRestClient client, string parentId)
+        private static Query TestCreateQuery(WitRestClient client, string parentId)
         {
             var query = new Query();
             query.Name = "REST_" + DateTime.Now.Ticks.ToString();
@@ -38,8 +40,10 @@ namespace RestApiTest
             var queryFolder = new Query();
             queryFolder.Name = "REST_" + DateTime.Now.Ticks.ToString();
             queryFolder.ParentId = parentId;
-            queryFolder.Type = "folder";
+            queryFolder.Type = QueryType.folder;
             queryFolder = client.CreateQuery(queryFolder).Result;
+
+            return queryFolder;
         }
 
         private static void TestGetQueries(WitRestClient client, string projectName)
