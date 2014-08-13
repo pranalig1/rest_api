@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RestAPI")]
+[assembly: AssemblyTitle("VisualStudioOnline.Api.Rest.Test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("RestAPI")]
+[assembly: AssemblyProduct("VisualStudioOnline.Api.Rest.Test")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("3601c4b6-8cfc-4f32-88f5-73750a8140e4")]
+[assembly: Guid("81ba0d7a-a93f-49b2-a430-f32206b82067")]
 
 // Version information for an assembly consists of the following four values:
 //

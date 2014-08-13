@@ -5,6 +5,53 @@ using System.Linq;
 
 namespace VisualStudioOnline.Api.Rest
 {
+    [DebuggerDisplay("{Id}")]
+    public class WorkItemReference
+    {
+        [JsonProperty(PropertyName = "id")]
+        public int Id { get; set; }
+
+        [JsonProperty(PropertyName = "url")]
+        public string Url { get; set; }
+
+        [JsonProperty(PropertyName = "webUrl")]
+        public string WebUrl { get; set; }
+    }
+
+    [DebuggerDisplay("{Type}")]
+    public class ResourceLink
+    {
+        [JsonProperty(PropertyName = "resourceId")]
+        public int ResourceId { get; set; }
+
+        [JsonProperty(PropertyName = "type")]
+        public string Type { get; set; }
+
+        [JsonProperty(PropertyName = "location")]
+        public string Location { get; set; }
+
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "creationDate")]
+        public string CreationDate { get; set; }
+
+        [JsonProperty(PropertyName = "lastModifiedDate")]
+        public string LastModifiedDate { get; set; }
+
+        [JsonProperty(PropertyName = "length")]
+        public int Length { get; set; }
+
+        [JsonProperty(PropertyName = "url")]
+        public string Url { get; set; }
+
+        [JsonProperty(PropertyName = "linkType")]
+        public WorkItemReference source { get; set; }
+
+        [JsonProperty(PropertyName = "comment")]
+        public string Comment { get; set; }
+    }
+
     [DebuggerDisplay("{Source.Id} -> {Target.Id}")]
     public class Link
     {
@@ -54,6 +101,7 @@ namespace VisualStudioOnline.Api.Rest
         {
             Fields = new List<Field>();
             Links = new List<Link>();
+            ResourceLinks = new List<ResourceLink>();
         }
 
         [JsonProperty(PropertyName = "id")]
@@ -70,10 +118,28 @@ namespace VisualStudioOnline.Api.Rest
 
         [JsonProperty(PropertyName = "updatesUrl")]
         public string UpdatesUrl { get; set; }
-        
+
+        [JsonProperty(PropertyName = "fields")]
         public List<Field> Fields { get; set; }
 
+        [JsonProperty(PropertyName = "links")]
         public List<Link> Links { get; set; }
+
+        [JsonProperty(PropertyName = "resourceLinks")]
+        public List<ResourceLink> ResourceLinks { get; set; }
+
+        [JsonIgnore]
+        public string this[string refName]
+        {
+            get
+            {
+                return GetFieldValue(refName);
+            }
+            set
+            {
+                SetFieldValue(refName, value);
+            }
+        }
 
         public Field GetField(string refName)
         {
