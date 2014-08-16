@@ -47,22 +47,50 @@ namespace VisualStudioOnline.Api.Rest.Test
         [TestMethod]
         public void TestCreateAndUpdateWorkItem()
         {
-            var workItem = new WorkItem();
-            workItem["System.WorkItemType"] = "Bug";
-            workItem["System.Title"] = "REST: " + DateTime.Now.ToString();
-            workItem["System.State"] = "Active";
-            workItem["System.Reason"] = "New";
-            workItem["System.AreaPath"] = Settings.Default.ProjectName;
-            workItem["System.IterationPath"] = string.Format("{0}\\Iteration 1", Settings.Default.ProjectName);
-            workItem["Microsoft.VSTS.Common.ActivatedBy"] = Settings.Default.DefaultUser;
+            var bug = CreateBug();
+            var task = CreateTask();
 
-            workItem = _client.CreateWorkItem(workItem).Result;
+            WorkItemCollection workItems = _client.GetWorkItems(new int[] { bug.Id }, WitRestClient.WorkItemExpandOptions.all).Result;
 
-            WorkItemCollection workItems = _client.GetWorkItems(new int[] { workItem.Id }, WitRestClient.WorkItemExpandOptions.all).Result;
+            bug = _client.GetWorkItem(workItems.WorkItems[0].Id, WitRestClient.WorkItemExpandOptions.all).Result;
+            bug["System.Title"] = "REST: " + DateTime.Now.ToString();
+            bug.Links.Add(new Link() { Comment = DateTime.Now.ToString(), Source = bug, Target = task, LinkType = "System.LinkTypes.Dependency-Forward" });
+            bug = _client.UpdateWorkItem(bug).Result;
 
-            workItem = _client.GetWorkItem(workItems.WorkItems[0].Id, WitRestClient.WorkItemExpandOptions.all).Result;
-            workItem["System.Title"] = "REST: " + DateTime.Now.ToString();
-            workItem = _client.UpdateWorkItem(workItem).Result;
+            bug.Links[0].Comment = DateTime.Now.ToString();
+            bug.Links[0].UpdateType = LinkUpdateType.update;
+            bug = _client.UpdateWorkItem(bug).Result;
+
+            bug.Links[0].UpdateType = LinkUpdateType.delete;
+            bug = _client.UpdateWorkItem(bug).Result;
+        }
+
+        private WorkItem CreateBug()
+        {
+            var bug = new WorkItem();
+            bug["System.WorkItemType"] = "Bug";
+            bug["System.Title"] = "REST: " + DateTime.Now.ToString();
+            bug["System.State"] = "Active";
+            bug["System.Reason"] = "New";
+            bug["System.AreaPath"] = Settings.Default.ProjectName;
+            bug["System.IterationPath"] = string.Format("{0}\\Iteration 1", Settings.Default.ProjectName);
+            bug["Microsoft.VSTS.Common.ActivatedBy"] = Settings.Default.DefaultUser;
+
+            return  _client.CreateWorkItem(bug).Result;
+        }
+
+        private WorkItem CreateTask()
+        {
+            var task = new WorkItem();
+            task["System.WorkItemType"] = "Task";
+            task["System.Title"] = "REST: " + DateTime.Now.ToString();
+            task["System.State"] = "New";
+            task["System.Reason"] = "New";
+            task["System.AreaPath"] = Settings.Default.ProjectName;
+            task["System.IterationPath"] = string.Format("{0}\\Iteration 1", Settings.Default.ProjectName);
+            //bug["Microsoft.VSTS.Common.ActivatedBy"] = Settings.Default.DefaultUser;
+
+            return _client.CreateWorkItem(task).Result;
         }
     }
 }

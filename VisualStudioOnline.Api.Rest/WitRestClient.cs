@@ -169,5 +169,26 @@ namespace VisualStudioOnline.Api.Rest
             string response = await GetResponse(string.Format("attachments/{0}", attachmentId), new Dictionary<string, string>());            
             return response;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="area"></param>
+        /// <param name="fileName"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public async Task<ResourceLink> UploadAttachment(string projectName, string area, string fileName, string content)
+        {
+            var arguments = new Dictionary<string, string>() 
+            { 
+                { "project", projectName },
+                { "area", area },
+                { "fileName", fileName }
+            };
+
+            string response = await PostResponse("attachments", content);
+            return JsonConvert.DeserializeObject<ResourceLink>(response);
+        }
     }
 }

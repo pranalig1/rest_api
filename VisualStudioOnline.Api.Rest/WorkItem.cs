@@ -1,10 +1,18 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
 namespace VisualStudioOnline.Api.Rest
 {
+    public enum LinkUpdateType
+    {
+        add,
+        delete,
+        update
+    }
+
     [DebuggerDisplay("{Id}")]
     public class WorkItemReference
     {
@@ -69,6 +77,15 @@ namespace VisualStudioOnline.Api.Rest
 
         [JsonProperty(PropertyName = "source")]
         public WorkItem Source { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonProperty(PropertyName = "updateType")]
+        public LinkUpdateType UpdateType { get; set; }
+
+        public Link()
+        {
+            UpdateType = LinkUpdateType.add;
+        }
     }
 
     [DebuggerDisplay("{ReferenceName}")]
