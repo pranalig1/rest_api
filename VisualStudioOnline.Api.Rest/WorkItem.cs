@@ -26,7 +26,7 @@ namespace VisualStudioOnline.Api.Rest
         public string WebUrl { get; set; }
     }
 
-    [DebuggerDisplay("{Type}")]
+    [DebuggerDisplay("{Location}")]
     public class ResourceLink
     {
         [JsonProperty(PropertyName = "resourceId")]
@@ -53,11 +53,16 @@ namespace VisualStudioOnline.Api.Rest
         [JsonProperty(PropertyName = "url")]
         public string Url { get; set; }
 
-        [JsonProperty(PropertyName = "linkType")]
-        public WorkItemReference source { get; set; }
+        [JsonProperty(PropertyName = "source")]
+        public WorkItemReference Source { get; set; }
 
         [JsonProperty(PropertyName = "comment")]
         public string Comment { get; set; }
+
+        public ResourceLink()
+        {
+            Type = "attachment";
+        }
     }
 
     [DebuggerDisplay("{Source.Id} -> {Target.Id}")]
@@ -75,9 +80,15 @@ namespace VisualStudioOnline.Api.Rest
         [JsonProperty(PropertyName = "target")]
         public WorkItem Target { get; set; }
 
+        [JsonProperty(PropertyName = "targetWorkItemId")]
+        public int TargetId { get; set; }
+
         [JsonProperty(PropertyName = "source")]
         public WorkItem Source { get; set; }
 
+        [JsonProperty(PropertyName = "sourceWorkItemId")]
+        public int SourceId { get; set; }
+        
         [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty(PropertyName = "updateType")]
         public LinkUpdateType UpdateType { get; set; }

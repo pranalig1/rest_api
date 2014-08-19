@@ -51,13 +51,13 @@ namespace VisualStudioOnline.Api.Rest
             }
         }
 
-        protected async Task<string> PostResponse(string path, object content)
+        protected async Task<string> PostResponse(string path, IDictionary<string, string> arguments, object content)
         {            
             var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
 
             using (HttpClient client = GetHttpClient())
             {
-                using (HttpResponseMessage response = client.PostAsync(ConstructUrl(path), httpContent).Result)
+                using (HttpResponseMessage response = client.PostAsync(ConstructUrl(path, arguments), httpContent).Result)
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
 

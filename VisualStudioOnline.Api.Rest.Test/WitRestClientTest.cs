@@ -53,6 +53,7 @@ namespace VisualStudioOnline.Api.Rest.Test
             WorkItemCollection workItems = _client.GetWorkItems(new int[] { bug.Id }, WitRestClient.WorkItemExpandOptions.all).Result;
 
             bug = _client.GetWorkItem(workItems.WorkItems[0].Id, WitRestClient.WorkItemExpandOptions.all).Result;
+
             bug["System.Title"] = "REST: " + DateTime.Now.ToString();
             bug.Links.Add(new Link() { Comment = DateTime.Now.ToString(), Source = bug, Target = task, LinkType = "System.LinkTypes.Dependency-Forward" });
             bug = _client.UpdateWorkItem(bug).Result;
@@ -63,6 +64,22 @@ namespace VisualStudioOnline.Api.Rest.Test
 
             bug.Links[0].UpdateType = LinkUpdateType.delete;
             bug = _client.UpdateWorkItem(bug).Result;
+        }
+
+        [TestMethod]
+        public void TestUploadDownloadAttachments()
+        {
+            var bug = CreateBug();
+            var resourceLink = _client.UploadAttachment(Settings.Default.ProjectName, bug["System.AreaPath"], "Test.txt", "Hello world").Result;
+            
+            resourceLink.Name = "TestFile";
+            resourceLink.Comment = DateTime.Now.ToString();
+            bug.ResourceLinks.Add(resourceLink);
+            bug = _client.UpdateWorkItem(bug).Result;
+
+            bug = _client.GetWorkItem(bug.Id, WitRestClient.WorkItemExpandOptions.all).Result;
+
+            string content = _client.DownloadAttachment(bug.ResourceLinks[0].Location).Result;
         }
 
         private WorkItem CreateBug()
@@ -88,7 +105,6 @@ namespace VisualStudioOnline.Api.Rest.Test
             task["System.Reason"] = "New";
             task["System.AreaPath"] = Settings.Default.ProjectName;
             task["System.IterationPath"] = string.Format("{0}\\Iteration 1", Settings.Default.ProjectName);
-            //bug["Microsoft.VSTS.Common.ActivatedBy"] = Settings.Default.DefaultUser;
 
             return _client.CreateWorkItem(task).Result;
         }

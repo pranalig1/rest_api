@@ -44,7 +44,7 @@ namespace VisualStudioOnline.Api.Rest
         /// <returns></returns>
         public async Task<WorkItem> CreateWorkItem(WorkItem workItem)
         {
-            string response = await PostResponse("workitems", workItem);
+            string response = await PostResponse("workitems", new Dictionary<string, string>(), workItem);
             JsonConvert.PopulateObject(response, workItem);
             return workItem;
         }
@@ -88,8 +88,20 @@ namespace VisualStudioOnline.Api.Rest
         /// <returns></returns>
         public async Task<WorkItem> UpdateWorkItem(WorkItem workItem)
         {
+            workItem.Links.ForEach(l => 
+                {
+                    l.SourceId = l.Source.Id;
+                    l.TargetId = l.Target.Id;
+                    l.Source = null;
+                    l.Target = null;
+                });
+
             string response = await PatchResponse(string.Format("workitems/{0}", workItem.Id), workItem);
+            
+            workItem.Links.Clear();
+            workItem.ResourceLinks.Clear();
             JsonConvert.PopulateObject(response, workItem);
+            
             return workItem;
         }
 
@@ -132,7 +144,7 @@ namespace VisualStudioOnline.Api.Rest
         /// <returns></returns>
         public async Task<Query> CreateQuery(Query query)
         {
-            string response = await PostResponse("queries", query);
+            string response = await PostResponse("queries", new Dictionary<string, string>(), query);
             JsonConvert.PopulateObject(response, query);
             return query;
         }
@@ -187,7 +199,7 @@ namespace VisualStudioOnline.Api.Rest
                 { "fileName", fileName }
             };
 
-            string response = await PostResponse("attachments", content);
+            string response = await PostResponse("attachments", arguments, content);
             return JsonConvert.DeserializeObject<ResourceLink>(response);
         }
     }
