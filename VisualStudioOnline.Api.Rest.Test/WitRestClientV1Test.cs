@@ -66,6 +66,8 @@ namespace VisualStudioOnline.Api.Rest.Test
             bug = _client.UpdateWorkItem(bug).Result;
 
             var bugInitialRevision = _client.GetWorkItemRevision(bug.Id, 1).Result;
+            var allBugUpdates = _client.GetWorkItemUpdates(bug.Id).Result;
+            var bugInitialUpdate = _client.GetWorkItemUpdate(bug.Id, 1).Result;
         }
 
         [TestMethod]

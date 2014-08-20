@@ -59,6 +59,10 @@ namespace VisualStudioOnline.Api.Rest
         [JsonProperty(PropertyName = "comment")]
         public string Comment { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonProperty(PropertyName = "updateType")]
+        public LinkUpdateType UpdateType { get; set; }
+
         public ResourceLink()
         {
             Type = "attachment";
@@ -103,7 +107,7 @@ namespace VisualStudioOnline.Api.Rest
     public class FieldMetadata
     {
         [JsonProperty(PropertyName = "id")]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         [JsonProperty(PropertyName = "refName")]
         public string ReferenceName { get; set; }
@@ -202,5 +206,52 @@ namespace VisualStudioOnline.Api.Rest
 
         [JsonProperty(PropertyName = "value")]
         public List<WorkItem> WorkItems { get; set; }
+    }
+
+    [DebuggerDisplay("{Field.ReferenceName}: {OriginalValue} -> {UpdatedValue}")]
+    public class FieldUpdate
+    {
+        [JsonProperty(PropertyName = "field")]
+        public FieldMetadata Field { get; set; }
+
+        [JsonProperty(PropertyName = "originalValue")]
+        public object OriginalValue { get; set; }
+
+        [JsonProperty(PropertyName = "updatedValue")]
+        public object UpdatedValue { get; set; }
+    }
+
+    [DebuggerDisplay("{Id} Rev:{Rev}")]
+    public class WorkItemUpdate
+    {
+        [JsonProperty(PropertyName = "url")]
+        public string Url { get; set; }
+
+        [JsonProperty(PropertyName = "revisionUrl")]
+        public string RevisionUrl { get; set; }
+
+        [JsonProperty(PropertyName = "id")]
+        public int Id { get; set; }
+
+        [JsonProperty(PropertyName = "rev")]
+        public int Rev { get; set; }
+
+        [JsonProperty(PropertyName = "fields")]
+        public List<FieldUpdate> FieldUpdates { get; set; }
+
+        [JsonProperty(PropertyName = "linkUpdates")]
+        public List<Link> LinkUpdates { get; set; }
+
+        [JsonProperty(PropertyName = "resourceLinkUpdates")]
+        public List<ResourceLink> ResourceLinkUpdates { get; set; }
+    }
+
+    public class WorkItemUpdateCollection
+    {
+        [JsonProperty(PropertyName = "count")]
+        public int Count { get; set; }
+
+        [JsonProperty(PropertyName = "value")]
+        public List<WorkItemUpdate> Updates { get; set; }
     }
 }
