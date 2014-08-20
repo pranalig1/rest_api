@@ -56,8 +56,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="WitRestClientTest.cs" />
+    <Compile Include="WitRestClientV1Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WitRestClientV2Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VisualStudioOnline.Api.Rest\VisualStudioOnline.Api.Rest.csproj">

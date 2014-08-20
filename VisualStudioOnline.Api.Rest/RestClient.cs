@@ -16,10 +16,11 @@ namespace VisualStudioOnline.Api.Rest
     public abstract class RestClient
     {
         private const string API_ROOT_URL = "https://{0}.visualstudio.com/DefaultCollection/_apis/{1}/{2}?{3}";
-        private const string API_VERSION = "1.0-preview.1";
+        //private const string API_VERSION = "1.0-preview.1";
 
         protected string _accountName;
         private NetworkCredential _userCredential;
+        private string _apiVersion;
 
         protected abstract string SubSystemName
         {
@@ -27,10 +28,11 @@ namespace VisualStudioOnline.Api.Rest
         }
 
 
-        public RestClient(string accountName, NetworkCredential userCredential)
+        public RestClient(string accountName, NetworkCredential userCredential, string apiVersion)
         {
             _accountName = accountName;
             _userCredential = userCredential;
+            _apiVersion = apiVersion;
         }
 
         protected async Task<string> GetResponse(string path, IDictionary<string, string> arguments)
@@ -126,7 +128,7 @@ namespace VisualStudioOnline.Api.Rest
 
         private string ConstructUrl(string path, IDictionary<string, string> arguments)
         {
-            arguments.Add("api-version", API_VERSION);
+            arguments.Add("api-version", _apiVersion);
             return string.Format(API_ROOT_URL, _accountName, SubSystemName, path, string.Join("&", arguments.Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value))));
         }
     }

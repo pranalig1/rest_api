@@ -9,7 +9,7 @@ namespace VisualStudioOnline.Api.Rest
     /// <summary>
     /// WIT REST API client
     /// </summary>
-    public class WitRestClient : RestClient
+    public class WitRestClientV1 : RestClient
     {
         public enum QueryExpandOptions
         { 
@@ -33,7 +33,8 @@ namespace VisualStudioOnline.Api.Rest
             get { return "wit"; }
         }
 
-        public WitRestClient(string accountName, NetworkCredential userCredential) : base(accountName, userCredential)
+        public WitRestClientV1(string accountName, NetworkCredential userCredential)
+            : base(accountName, userCredential, "1.0-preview.1")
         {
         }
 
@@ -60,6 +61,18 @@ namespace VisualStudioOnline.Api.Rest
             var arguments = new Dictionary<string, string>() { { "$expand", options.ToString() } };
 
             string response = await GetResponse(string.Format("workitems/{0}", workItemId), arguments);
+            return JsonConvert.DeserializeObject<WorkItem>(response);
+        }
+
+        /// <summary>
+        /// Get work item revision
+        /// </summary>
+        /// <param name="workItemId"></param>
+        /// <param name="revisionId"></param>
+        /// <returns></returns>
+        public async Task<WorkItem> GetWorkItemRevision(int workItemId, int revisionId)
+        {
+            string response = await GetResponse(string.Format("workitems/{0}/revisions/{1}", workItemId, revisionId), new Dictionary<string, string>());
             return JsonConvert.DeserializeObject<WorkItem>(response);
         }
 

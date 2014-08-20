@@ -49,7 +49,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Query.cs" />
     <Compile Include="RestClient.cs" />
-    <Compile Include="WitRestClient.cs" />
+    <Compile Include="WitRestClientV1.cs" />
+    <Compile Include="WitRestClientV2.cs" />
     <Compile Include="WorkItem.cs" />
   </ItemGroup>
   <ItemGroup>

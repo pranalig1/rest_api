@@ -7,21 +7,21 @@ using VisualStudioOnline.Api.Rest.Test.Properties;
 namespace VisualStudioOnline.Api.Rest.Test
 {
     [TestClass]
-    public class WitRestClientTest
+    public class WitRestClientV1Test
     {
-        private WitRestClient _client;
+        private WitRestClientV1 _client;
 
         [TestInitialize]
         public void Initialize()
         {
-            _client = new WitRestClient(Settings.Default.AccountName,
+            _client = new WitRestClientV1(Settings.Default.AccountName,
                 new NetworkCredential(Settings.Default.UserName, Settings.Default.Password));
         }
 
         [TestMethod]
         public void TestCreateAndUpdateQuery()
         {
-            QueryCollection queryHierarchy = _client.GetQueries(Settings.Default.ProjectName, null, WitRestClient.QueryExpandOptions.all).Result;
+            QueryCollection queryHierarchy = _client.GetQueries(Settings.Default.ProjectName, null, WitRestClientV1.QueryExpandOptions.all).Result;
             var sharedQueriesFolder = queryHierarchy.Queries[1];
 
             Query queryFolder = _client.CreateQuery(new Query()
@@ -50,9 +50,9 @@ namespace VisualStudioOnline.Api.Rest.Test
             var bug = CreateBug();
             var task = CreateTask();
 
-            WorkItemCollection workItems = _client.GetWorkItems(new int[] { bug.Id }, WitRestClient.WorkItemExpandOptions.all).Result;
+            WorkItemCollection workItems = _client.GetWorkItems(new int[] { bug.Id }, WitRestClientV1.WorkItemExpandOptions.all).Result;
 
-            bug = _client.GetWorkItem(workItems.WorkItems[0].Id, WitRestClient.WorkItemExpandOptions.all).Result;
+            bug = _client.GetWorkItem(workItems.WorkItems[0].Id, WitRestClientV1.WorkItemExpandOptions.all).Result;
 
             bug["System.Title"] = "REST: " + DateTime.Now.ToString();
             bug.Links.Add(new Link() { Comment = DateTime.Now.ToString(), Source = bug, Target = task, LinkType = "System.LinkTypes.Dependency-Forward" });
@@ -64,6 +64,8 @@ namespace VisualStudioOnline.Api.Rest.Test
 
             bug.Links[0].UpdateType = LinkUpdateType.delete;
             bug = _client.UpdateWorkItem(bug).Result;
+
+            var bugInitialRevision = _client.GetWorkItemRevision(bug.Id, 1).Result;
         }
 
         [TestMethod]
@@ -77,7 +79,7 @@ namespace VisualStudioOnline.Api.Rest.Test
             bug.ResourceLinks.Add(resourceLink);
             bug = _client.UpdateWorkItem(bug).Result;
 
-            bug = _client.GetWorkItem(bug.Id, WitRestClient.WorkItemExpandOptions.all).Result;
+            bug = _client.GetWorkItem(bug.Id, WitRestClientV1.WorkItemExpandOptions.all).Result;
 
             string content = _client.DownloadAttachment(bug.ResourceLinks[0].Location).Result;
         }
