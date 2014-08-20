@@ -172,18 +172,30 @@ namespace VisualStudioOnline.Api.Rest
         }
 
         /// <summary>
-        /// 
+        /// Download work item attachment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
         public async Task<string> DownloadAttachment(string attachmentId)
         {
-            string response = await GetResponse(string.Format("attachments/{0}", attachmentId), new Dictionary<string, string>());            
-            return response;
+            return await GetResponse(string.Format("attachments/{0}", attachmentId), new Dictionary<string, string>());            
         }
 
         /// <summary>
-        /// 
+        /// Upload binary attachment
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="area"></param>
+        /// <param name="fileName"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public async Task<ResourceLink> UploadAttachment(string projectName, string area, string fileName, byte[] content)
+        {
+            return await UploadAttachment(projectName, area, fileName, Convert.ToBase64String(content));
+        }
+
+        /// <summary>
+        /// Upload text attachment
         /// </summary>
         /// <param name="projectName"></param>
         /// <param name="area"></param>
