@@ -214,6 +214,35 @@ namespace VisualStudioOnline.Api.Rest
         }
 
         /// <summary>
+        /// Get query results
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<QueryResult> GetQueryResult(Query query)
+        {
+            var arguments = new Dictionary<string, string>();
+            if (query.Project != null) { arguments.Add("project", query.Project.Name); }
+
+            string response = await PostResponse("queryresults", arguments, new { id = query.Id });
+            return JsonConvert.DeserializeObject<QueryResult>(response);
+        }
+
+        /// <summary>
+        /// Get query results
+        /// </summary>
+        /// <param name="queryText"></param>
+        /// <param name="project"></param>
+        /// <returns></returns>
+        public async Task<QueryResult> GetQueryResult(string queryText, string project = null)
+        {
+            var arguments = new Dictionary<string, string>();
+            if (project != null) { arguments.Add("project", project); }
+
+            string response = await PostResponse("queryresults", arguments, new { wiql = queryText });
+            return JsonConvert.DeserializeObject<QueryResult>(response);
+        }
+
+        /// <summary>
         /// Download work item attachment
         /// </summary>
         /// <param name="query"></param>

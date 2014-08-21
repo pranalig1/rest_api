@@ -41,6 +41,9 @@ namespace VisualStudioOnline.Api.Rest.Test
             query.Name = "REST_" + DateTime.Now.Ticks.ToString();
             query = _client.UpdateQuery(query).Result;
 
+            var queryResults = _client.GetQueryResult(query).Result;
+            queryResults = _client.GetQueryResult("select System.Id from workitems").Result;
+
             string result = _client.DeleteQuery(queryFolder).Result;
         }
 

@@ -80,4 +80,30 @@ namespace VisualStudioOnline.Api.Rest
         [JsonProperty(PropertyName = "value")]
         public List<Query> Queries { get; set; }
     }
+
+    [DebuggerDisplay("{SourceId}")]
+    public class Result
+    {
+        [JsonProperty(PropertyName = "sourceId")]
+        public int SourceId { get; set; }
+
+        [JsonProperty(PropertyName = "targetId")]
+        public int TargetId { get; set; }
+
+        [JsonProperty(PropertyName = "linkType")]
+        public string LinkType { get; set; }
+    }
+
+    [DebuggerDisplay("AsOf: {AsOf}")]
+    public class QueryResult
+    {
+        [JsonProperty(PropertyName = "asOf")]
+        public string AsOf { get; set; }
+
+        [JsonProperty(PropertyName = "query")]
+        public Query Query { get; set; }
+
+        [JsonProperty(PropertyName = "results")]
+        public List<Result> Results { get; set; }
+    }
 }
