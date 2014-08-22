@@ -20,5 +20,8 @@
     <Setting Name="ProjectId" Type="System.String" Scope="User">
       <Value Profile="(Default)">00000000-0000-0000-0000-000000000000</Value>
     </Setting>
+    <Setting Name="AccessToken" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TestToken</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

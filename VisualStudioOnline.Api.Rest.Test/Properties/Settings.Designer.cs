@@ -34,6 +34,20 @@ namespace VisualStudioOnline.Api.Rest.Test.Properties {
                 this["AccountName"] = value;
             }
         }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TestToken")]
+        public string AccessToken
+        {
+            get
+            {
+                return ((string)(this["AccessToken"]));
+            }
+            set
+            {
+                this["AccessToken"] = value;
+            }
+        }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
