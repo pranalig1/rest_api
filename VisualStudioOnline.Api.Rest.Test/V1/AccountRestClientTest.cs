@@ -13,7 +13,7 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
         [TestInitialize]
         public void Initialize()
         {
-            _client = new AccountRestClient(new NetworkCredential(Settings.Default.UserName, Settings.Default.Password));
+            _client = new AccountRestClient(Settings.Default.AccessToken);
         }
 
         [TestMethod]

@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HttpRequestHeaderFilter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="V1\AccountRestClient.cs" />
     <Compile Include="V1\Model\Account.cs" />

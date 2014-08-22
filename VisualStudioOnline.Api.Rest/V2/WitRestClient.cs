@@ -13,7 +13,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         }
 
         public WitRestClient(string accountName, NetworkCredential userCredential)
-            : base(accountName, userCredential, "1.0-preview.2")
+            : base(accountName, new BasicAuthenticationFilter(userCredential), "1.0-preview.2")
         {
         }
     }

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -18,7 +17,7 @@ namespace VisualStudioOnline.Api.Rest
         protected const string ACCOUNT_ROOT_URL = "https://{0}.visualstudio.com/DefaultCollection";
 
         private string _rootUrl;
-        private NetworkCredential _userCredential;
+        private IHttpRequestHeaderFilter _authProvider;
         private string _apiVersion;
 
         protected abstract string SubSystemName
@@ -26,10 +25,10 @@ namespace VisualStudioOnline.Api.Rest
             get;
         }
 
-        public RestClient(string rootUrl, NetworkCredential userCredential, string apiVersion)
+        public RestClient(string rootUrl, IHttpRequestHeaderFilter authProvider, string apiVersion)
         {
             _rootUrl = string.Format("{0}/_apis/{1}", rootUrl, SubSystemName);
-            _userCredential = userCredential;
+            _authProvider = authProvider;
             _apiVersion = apiVersion;
         }
 
@@ -123,9 +122,7 @@ namespace VisualStudioOnline.Api.Rest
         {
             var client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                    Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", _userCredential.UserName, _userCredential.Password))));
-
+            _authProvider.ProcessHeaders(client.DefaultRequestHeaders);
             return client;
         }
 

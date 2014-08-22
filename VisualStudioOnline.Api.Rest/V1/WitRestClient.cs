@@ -34,7 +34,7 @@ namespace VisualStudioOnline.Api.Rest.V1
         }
 
         public WitRestClient(string accountName, NetworkCredential userCredential)
-            : base(string.Format(ACCOUNT_ROOT_URL, accountName), userCredential, "1.0-preview.1")
+            : base(string.Format(ACCOUNT_ROOT_URL, accountName), new BasicAuthenticationFilter(userCredential), "1.0-preview.1")
         {
         }
 
