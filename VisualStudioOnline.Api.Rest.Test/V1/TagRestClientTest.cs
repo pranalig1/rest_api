@@ -1,18 +1,19 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net;
 using VisualStudioOnline.Api.Rest.Test.Properties;
+using VisualStudioOnline.Api.Rest.V1;
 
-namespace VisualStudioOnline.Api.Rest.Test
+namespace VisualStudioOnline.Api.Rest.Test.V1
 {
     [TestClass]
-    public class TagRestClientV1Test
+    public class TagRestClientTest
     {
-        private TagRestClientV1 _client;
+        private TagRestClient _client;
 
         [TestInitialize]
         public void Initialize()
         {
-            _client = new TagRestClientV1(Settings.Default.AccountName,
+            _client = new TagRestClient(Settings.Default.AccountName,
                 new NetworkCredential(Settings.Default.UserName, Settings.Default.Password));
         }
 

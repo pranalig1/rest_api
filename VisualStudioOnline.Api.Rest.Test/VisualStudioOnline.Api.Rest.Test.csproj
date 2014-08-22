@@ -56,10 +56,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="TagRestClientV1Test.cs" />
-    <Compile Include="WitRestClientV1Test.cs" />
+    <Compile Include="V1\AccountRestClientTest.cs" />
+    <Compile Include="V1\TagRestClientTest.cs" />
+    <Compile Include="V1\WitRestClientTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WitRestClientV2Test.cs" />
+    <Compile Include="V2\WitRestClientTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VisualStudioOnline.Api.Rest\VisualStudioOnline.Api.Rest.csproj">

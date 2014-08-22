@@ -47,13 +47,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Query.cs" />
+    <Compile Include="V1\AccountRestClient.cs" />
+    <Compile Include="V1\Model\Account.cs" />
+    <Compile Include="V1\Model\Query.cs" />
     <Compile Include="RestClient.cs" />
-    <Compile Include="Tag.cs" />
-    <Compile Include="TagRestClientV1.cs" />
-    <Compile Include="WitRestClientV1.cs" />
-    <Compile Include="WitRestClientV2.cs" />
-    <Compile Include="WorkItem.cs" />
+    <Compile Include="V1\Model\Tag.cs" />
+    <Compile Include="V1\TagRestClient.cs" />
+    <Compile Include="V1\WitRestClient.cs" />
+    <Compile Include="V2\WitRestClient.cs" />
+    <Compile Include="V1\Model\WorkItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

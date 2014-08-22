@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace VisualStudioOnline.Api.Rest
+namespace VisualStudioOnline.Api.Rest.V2
 {
-    public class WitRestClientV2 : RestClient
+    public class WitRestClient : RestClient
     {
         protected override string SubSystemName
         {
             get { return "wit"; }
         }
 
-        public WitRestClientV2(string accountName, NetworkCredential userCredential)
+        public WitRestClient(string accountName, NetworkCredential userCredential)
             : base(accountName, userCredential, "1.0-preview.2")
         {
         }

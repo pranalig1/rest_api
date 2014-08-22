@@ -15,10 +15,9 @@ namespace VisualStudioOnline.Api.Rest
     /// </summary>
     public abstract class RestClient
     {
-        private const string API_ROOT_URL = "https://{0}.visualstudio.com/DefaultCollection/_apis/{1}/{2}?{3}";
-        //private const string API_VERSION = "1.0-preview.1";
+        protected const string ACCOUNT_ROOT_URL = "https://{0}.visualstudio.com/DefaultCollection";
 
-        protected string _accountName;
+        private string _rootUrl;
         private NetworkCredential _userCredential;
         private string _apiVersion;
 
@@ -27,12 +26,16 @@ namespace VisualStudioOnline.Api.Rest
             get;
         }
 
-
-        public RestClient(string accountName, NetworkCredential userCredential, string apiVersion)
+        public RestClient(string rootUrl, NetworkCredential userCredential, string apiVersion)
         {
-            _accountName = accountName;
+            _rootUrl = string.Format("{0}/_apis/{1}", rootUrl, SubSystemName);
             _userCredential = userCredential;
             _apiVersion = apiVersion;
+        }
+
+        protected async Task<string> GetResponse(string path)
+        {
+            return await GetResponse(path, new Dictionary<string, string>());
         }
 
         protected async Task<string> GetResponse(string path, IDictionary<string, string> arguments)
@@ -51,6 +54,11 @@ namespace VisualStudioOnline.Api.Rest
                     return responseBody;
                 }
             }
+        }
+
+        protected async Task<string> PostResponse(string path, object content)
+        {
+            return await PostResponse(path, new Dictionary<string, string>(), content);
         }
 
         protected async Task<string> PostResponse(string path, IDictionary<string, string> arguments, object content)
@@ -129,7 +137,16 @@ namespace VisualStudioOnline.Api.Rest
         private string ConstructUrl(string path, IDictionary<string, string> arguments)
         {
             arguments.Add("api-version", _apiVersion);
-            return string.Format(API_ROOT_URL, _accountName, SubSystemName, path, string.Join("&", arguments.Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value))));
+
+            StringBuilder resultUrl = new StringBuilder(_rootUrl);
+
+            if(!string.IsNullOrEmpty(path))
+            {
+                resultUrl.AppendFormat("/{0}", path);
+            }
+
+            resultUrl.AppendFormat("?{0}", string.Join("&", arguments.Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value))));
+            return resultUrl.ToString();
         }
     }
 

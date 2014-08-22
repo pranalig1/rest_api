@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace VisualStudioOnline.Api.Rest
+namespace VisualStudioOnline.Api.Rest.V1
 {
     /// <summary>
     /// Tagging REST API client
     /// </summary>
-    public class TagRestClientV1 : RestClient
+    public class TagRestClient : RestClient
     {
         protected override string SubSystemName
         {
@@ -18,8 +18,8 @@ namespace VisualStudioOnline.Api.Rest
             }
         }
 
-        public TagRestClientV1(string accountName, NetworkCredential userCredential)
-            : base(accountName, userCredential, "1.0-preview.1")
+        public TagRestClient(string accountName, NetworkCredential userCredential)
+            : base(string.Format(ACCOUNT_ROOT_URL, accountName), userCredential, "1.0-preview.1")
         {
         }
 
@@ -45,7 +45,7 @@ namespace VisualStudioOnline.Api.Rest
         /// <returns></returns>
         public async Task<Tag> GetTag(string scopeId, string nameOrId)
         {
-            string response = await GetResponse(string.Format("scopes/{0}/tags/{1}", scopeId, nameOrId), new Dictionary<string, string>());
+            string response = await GetResponse(string.Format("scopes/{0}/tags/{1}", scopeId, nameOrId));
             return JsonConvert.DeserializeObject<Tag>(response);
         }
 

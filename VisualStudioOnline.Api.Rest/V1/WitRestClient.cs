@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace VisualStudioOnline.Api.Rest
+namespace VisualStudioOnline.Api.Rest.V1
 {
     /// <summary>
     /// WIT REST API client
     /// </summary>
-    public class WitRestClientV1 : RestClient
+    public class WitRestClient : RestClient
     {
         public enum QueryExpandOptions
         { 
@@ -33,8 +33,8 @@ namespace VisualStudioOnline.Api.Rest
             get { return "wit"; }
         }
 
-        public WitRestClientV1(string accountName, NetworkCredential userCredential)
-            : base(accountName, userCredential, "1.0-preview.1")
+        public WitRestClient(string accountName, NetworkCredential userCredential)
+            : base(string.Format(ACCOUNT_ROOT_URL, accountName), userCredential, "1.0-preview.1")
         {
         }
 
@@ -45,7 +45,7 @@ namespace VisualStudioOnline.Api.Rest
         /// <returns></returns>
         public async Task<WorkItem> CreateWorkItem(WorkItem workItem)
         {
-            string response = await PostResponse("workitems", new Dictionary<string, string>(), workItem);
+            string response = await PostResponse("workitems", workItem);
             JsonConvert.PopulateObject(response, workItem);
             return workItem;
         }
@@ -72,7 +72,7 @@ namespace VisualStudioOnline.Api.Rest
         /// <returns></returns>
         public async Task<WorkItem> GetWorkItemRevision(int workItemId, int revisionId)
         {
-            string response = await GetResponse(string.Format("workitems/{0}/revisions/{1}", workItemId, revisionId), new Dictionary<string, string>());
+            string response = await GetResponse(string.Format("workitems/{0}/revisions/{1}", workItemId, revisionId));
             return JsonConvert.DeserializeObject<WorkItem>(response);
         }
 
@@ -101,7 +101,7 @@ namespace VisualStudioOnline.Api.Rest
         /// <returns></returns>
         public async Task<WorkItemUpdate> GetWorkItemUpdate(int workItemId, int revisionId)
         {
-            string response = await GetResponse(string.Format("workitems/{0}/updates/{1}", workItemId, revisionId), new Dictionary<string, string>());
+            string response = await GetResponse(string.Format("workitems/{0}/updates/{1}", workItemId, revisionId));
             return JsonConvert.DeserializeObject<WorkItemUpdate>(response);
         }
 
@@ -249,7 +249,7 @@ namespace VisualStudioOnline.Api.Rest
         /// <returns></returns>
         public async Task<string> DownloadAttachment(string attachmentId)
         {
-            return await GetResponse(string.Format("attachments/{0}", attachmentId), new Dictionary<string, string>());            
+            return await GetResponse(string.Format("attachments/{0}", attachmentId));            
         }
 
         /// <summary>
