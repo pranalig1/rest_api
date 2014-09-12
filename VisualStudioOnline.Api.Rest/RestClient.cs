@@ -27,21 +27,21 @@ namespace VisualStudioOnline.Api.Rest
 
         public RestClient(string rootUrl, IHttpRequestHeaderFilter authProvider, string apiVersion)
         {
-            _rootUrl = string.Format("{0}/_apis/{1}", rootUrl, SubSystemName);
+            _rootUrl = rootUrl;
             _authProvider = authProvider;
             _apiVersion = apiVersion;
         }
 
-        protected async Task<string> GetResponse(string path)
+        protected async Task<string> GetResponse(string path, string projectName = null)
         {
-            return await GetResponse(path, new Dictionary<string, string>());
+            return await GetResponse(path, new Dictionary<string, string>(), projectName);
         }
 
-        protected async Task<string> GetResponse(string path, IDictionary<string, string> arguments)
+        protected async Task<string> GetResponse(string path, IDictionary<string, string> arguments, string projectName = null)
         {
             using (HttpClient client = GetHttpClient())
             {
-                using (HttpResponseMessage response = client.GetAsync(ConstructUrl(path, arguments)).Result)
+                using (HttpResponseMessage response = client.GetAsync(ConstructUrl(projectName, path, arguments)).Result)
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -55,18 +55,18 @@ namespace VisualStudioOnline.Api.Rest
             }
         }
 
-        protected async Task<string> PostResponse(string path, object content)
+        protected async Task<string> PostResponse(string path, object content, string projectName = null)
         {
-            return await PostResponse(path, new Dictionary<string, string>(), content);
+            return await PostResponse(path, new Dictionary<string, string>(), content, projectName);
         }
 
-        protected async Task<string> PostResponse(string path, IDictionary<string, string> arguments, object content)
+        protected async Task<string> PostResponse(string path, IDictionary<string, string> arguments, object content, string projectName = null)
         {            
             var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
 
             using (HttpClient client = GetHttpClient())
             {
-                using (HttpResponseMessage response = client.PostAsync(ConstructUrl(path, arguments), httpContent).Result)
+                using (HttpResponseMessage response = client.PostAsync(ConstructUrl(projectName, path, arguments), httpContent).Result)
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -80,13 +80,13 @@ namespace VisualStudioOnline.Api.Rest
             }
         }
 
-        protected async Task<string> PatchResponse(string path, object content)
+        protected async Task<string> PatchResponse(string path, object content, string projectName = null)
         {
             var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
 
             using (HttpClient client = GetHttpClient())
             {
-                using (HttpResponseMessage response = client.PatchAsync(ConstructUrl(path), httpContent).Result)
+                using (HttpResponseMessage response = client.PatchAsync(ConstructUrl(projectName, path), httpContent).Result)
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -100,11 +100,11 @@ namespace VisualStudioOnline.Api.Rest
             }
         }
 
-        protected async Task<string> DeleteResponse(string path)
+        protected async Task<string> DeleteResponse(string path, string projectName = null)
         {
             using (HttpClient client = GetHttpClient())
             {
-                using (HttpResponseMessage response = client.DeleteAsync(ConstructUrl(path)).Result)
+                using (HttpResponseMessage response = client.DeleteAsync(ConstructUrl(projectName, path)).Result)
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -126,16 +126,19 @@ namespace VisualStudioOnline.Api.Rest
             return client;
         }
 
-        private string ConstructUrl(string path)
+        private string ConstructUrl(string projectName, string path)
         {
-            return ConstructUrl(path, new Dictionary<string, string>());
+            return ConstructUrl(projectName, path, new Dictionary<string, string>());
         }
 
-        private string ConstructUrl(string path, IDictionary<string, string> arguments)
+        private string ConstructUrl(string projectName, string path, IDictionary<string, string> arguments)
         {
             arguments.Add("api-version", _apiVersion);
 
-            StringBuilder resultUrl = new StringBuilder(_rootUrl);
+            StringBuilder resultUrl = new StringBuilder(
+                string.IsNullOrEmpty(projectName) ? 
+                string.Format("{0}/_apis/{1}", _rootUrl, SubSystemName) :
+                string.Format("{0}/{1}/_apis/{2}", _rootUrl, projectName, SubSystemName));
 
             if(!string.IsNullOrEmpty(path))
             {

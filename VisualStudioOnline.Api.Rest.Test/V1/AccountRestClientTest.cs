@@ -23,7 +23,7 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
         }
 
         [TestMethod]
-        public void TestGetAccoun()
+        public void TestGetAccount()
         {
             var account = _client.GetAccount(Settings.Default.AccountName).Result;
         }

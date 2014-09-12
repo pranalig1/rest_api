@@ -22,7 +22,7 @@ namespace VisualStudioOnline.Api.Rest.Test
         public void TestCreateAndUpdateQuery()
         {
             QueryCollection queryHierarchy = _client.GetQueries(Settings.Default.ProjectName, null, WitRestClient.QueryExpandOptions.all).Result;
-            var sharedQueriesFolder = queryHierarchy.Queries[1];
+            var sharedQueriesFolder = queryHierarchy.Queries[0];
 
             Query queryFolder = _client.CreateQuery(new Query()
                 {
