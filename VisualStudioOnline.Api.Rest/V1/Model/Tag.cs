@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace VisualStudioOnline.Api.Rest
+namespace VisualStudioOnline.Api.Rest.V1.Model
 {
     public class TagCollection
     {

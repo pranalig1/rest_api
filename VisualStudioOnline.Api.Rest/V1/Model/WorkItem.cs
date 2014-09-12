@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace VisualStudioOnline.Api.Rest
+namespace VisualStudioOnline.Api.Rest.V1.Model
 {
     public enum LinkUpdateType
     {

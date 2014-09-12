@@ -1,9 +1,23 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace VisualStudioOnline.Api.Rest.V2.Model
 {
+    public enum FieldType
+    {
+        boolean,
+        dateTime,
+        @double,
+        history,
+        html,
+        integer,
+        plainText,
+        @string,
+        treePath                        
+    }
+
     [DebuggerDisplay("{ReferenceName}")]
     public class Field
     {
@@ -15,6 +29,22 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "url")]
         public string Url { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonProperty(PropertyName = "type")]
+        public FieldType Type { get; set; }
+
+        [JsonProperty(PropertyName = "readOnly")]
+        public bool ReadOnly { get; set; }
+    }
+
+    public class FieldCollection
+    {
+        [JsonProperty(PropertyName = "count")]
+        public int Count { get; set; }
+
+        [JsonProperty(PropertyName = "value")]
+        public List<Field> Fields { get; set; }
     }
 
     [DebuggerDisplay("{Field.ReferenceName}")]

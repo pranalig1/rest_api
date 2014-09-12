@@ -18,6 +18,13 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
         }
 
         [TestMethod]
+        public void TestGetFields()
+        {
+            var fields = _client.GetFields().Result;
+            var field = _client.GetField(fields.Fields[0].ReferenceName).Result;
+        }
+
+        [TestMethod]
         public void TestGetWorkItemTypeCategories()
         {
             var workItemTypeCategories = _client.GetWorkItemTypeCategories(Settings.Default.ProjectName).Result;

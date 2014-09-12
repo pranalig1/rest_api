@@ -19,6 +19,27 @@ namespace VisualStudioOnline.Api.Rest.V2
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<FieldCollection> GetFields()
+        {
+            string response = await GetResponse("fields");
+            return JsonConvert.DeserializeObject<FieldCollection>(response);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
+        public async Task<Field> GetField(string fieldName)
+        {
+            string response = await GetResponse(string.Format("fields/{0}", fieldName));
+            return JsonConvert.DeserializeObject<Field>(response);
+        }
+
+        /// <summary>
         /// Get work item type categories for a project
         /// </summary>
         /// <param name="projectName"></param>

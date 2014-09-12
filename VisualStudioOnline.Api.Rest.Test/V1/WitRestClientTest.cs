@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using VisualStudioOnline.Api.Rest.Test.Properties;
 using VisualStudioOnline.Api.Rest.V1;
+using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.Test
 {

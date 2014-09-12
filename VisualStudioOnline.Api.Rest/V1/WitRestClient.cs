@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.V1
 {
