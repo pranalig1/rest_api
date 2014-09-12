@@ -24,5 +24,17 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
 
             var workItemType = _client.GetWorkItemType(Settings.Default.ProjectName, workItemTypes.Types[0].Name).Result;
         }
+
+        [TestMethod]
+        public void TestGetClassificationNodes()
+        {
+            var nodes = _client.GetClassificationNodes(Settings.Default.ProjectName).Result;
+
+            var rootArea = _client.GetAreaNode(Settings.Default.ProjectName, 5).Result;
+            var rootIteration = _client.GetIterationNode(Settings.Default.ProjectName, 5).Result;
+
+            var iteration1 = _client.GetIterationNode(Settings.Default.ProjectName, "Iteration 1").Result;
+            var area1 = _client.GetAreaNode(Settings.Default.ProjectName, "Area 1").Result;
+        }
     }
 }
