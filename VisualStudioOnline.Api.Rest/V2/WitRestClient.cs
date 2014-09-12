@@ -19,6 +19,29 @@ namespace VisualStudioOnline.Api.Rest.V2
         }
 
         /// <summary>
+        /// Get work item type categories for a project
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <returns></returns>
+        public async Task<WorkItemTypeCategoryCollection> GetWorkItemTypeCategories(string projectName)
+        {
+            string response = await GetResponse("workitemtypecategories", projectName);
+            return JsonConvert.DeserializeObject<WorkItemTypeCategoryCollection>(response);
+        }
+
+        /// <summary>
+        /// Get work item type category for a project
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="categoryName"></param>
+        /// <returns></returns>
+        public async Task<WorkItemTypeCategory> GetWorkItemTypeCategory(string projectName, string categoryName)
+        {
+            string response = await GetResponse(string.Format("workitemtypecategories/{0}", categoryName), projectName);
+            return JsonConvert.DeserializeObject<WorkItemTypeCategory>(response);
+        }
+
+        /// <summary>
         /// Get work item types for the project
         /// </summary>
         /// <param name="projectName"></param>

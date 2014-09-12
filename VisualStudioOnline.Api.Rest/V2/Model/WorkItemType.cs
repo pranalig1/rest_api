@@ -54,4 +54,32 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         [JsonProperty(PropertyName = "value")]
         public List<WorkItemType> Types { get; set; }
     }
+
+    [DebuggerDisplay("{Name}")]
+    public class WorkItemTypeCategory
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "referenceName")]
+        public string ReferenceName { get; set; }
+
+        [JsonProperty(PropertyName = "defaultWorkItemType")]
+        public WorkItemType DefaultWorkItemType { get; set; }
+
+        [JsonProperty(PropertyName = "workItemTypes")]
+        public List<WorkItemType> workItemTypes { get; set; }
+
+        [JsonProperty(PropertyName = "url")]
+        public string Url { get; set; }
+    }
+
+    public class WorkItemTypeCategoryCollection
+    {
+        [JsonProperty(PropertyName = "count")]
+        public int Count { get; set; }
+
+        [JsonProperty(PropertyName = "value")]
+        public List<WorkItemTypeCategory> Categories { get; set; }
+    }
 }

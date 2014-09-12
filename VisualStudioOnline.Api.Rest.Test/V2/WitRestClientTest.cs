@@ -18,10 +18,16 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
         }
 
         [TestMethod]
+        public void TestGetWorkItemTypeCategories()
+        {
+            var workItemTypeCategories = _client.GetWorkItemTypeCategories(Settings.Default.ProjectName).Result;
+            var workItemTypeCategory = _client.GetWorkItemTypeCategory(Settings.Default.ProjectName, workItemTypeCategories.Categories[0].ReferenceName).Result;
+        }
+
+        [TestMethod]
         public void TestGetWorkItemTypes()
         {
             var workItemTypes = _client.GetWorkItemTypes(Settings.Default.ProjectName).Result;
-
             var workItemType = _client.GetWorkItemType(Settings.Default.ProjectName, workItemTypes.Types[0].Name).Result;
         }
 
