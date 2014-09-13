@@ -22,6 +22,27 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// 
         /// </summary>
         /// <returns></returns>
+        public async Task<WorkItemRelationTypeCollection> GetWorkItemRelationTypes()
+        {
+            string response = await GetResponse("workitemrelationtypes");
+            return JsonConvert.DeserializeObject<WorkItemRelationTypeCollection>(response);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
+        public async Task<WorkItemRelationType> GetWorkItemRelationType(string relationName)
+        {
+            string response = await GetResponse(string.Format("workitemrelationtypes/{0}", relationName));
+            return JsonConvert.DeserializeObject<WorkItemRelationType>(response);
+        }
+
+        /// <summary>
+        /// Get collection fields
+        /// </summary>
+        /// <returns></returns>
         public async Task<FieldCollection> GetFields()
         {
             string response = await GetResponse("fields");
@@ -29,7 +50,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         }
 
         /// <summary>
-        /// 
+        /// Get specific field
         /// </summary>
         /// <param name="fieldName"></param>
         /// <returns></returns>

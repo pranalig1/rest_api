@@ -18,6 +18,13 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
         }
 
         [TestMethod]
+        public void TestGetRelationTypes()
+        {
+            var relations = _client.GetWorkItemRelationTypes().Result;
+            var relation = _client.GetWorkItemRelationType(relations.Relations[0].ReferenceName).Result;
+        }
+
+        [TestMethod]
         public void TestGetFields()
         {
             var fields = _client.GetFields().Result;
