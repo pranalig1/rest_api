@@ -56,5 +56,12 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
             var iteration1 = _client.GetIterationNode(Settings.Default.ProjectName, "Iteration 1").Result;
             var area1 = _client.GetAreaNode(Settings.Default.ProjectName, "Area 1").Result;
         }
+
+        [TestMethod]
+        public void TestGetWorkItemHistory()
+        {
+            var history = _client.GetWorkItemHistory(Settings.Default.WorkItemId).Result;
+            var revHistory = _client.GetWorkItemRevisionHistory(Settings.Default.WorkItemId, Settings.Default.WorkItemRevision).Result;
+        }
     }
 }

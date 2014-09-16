@@ -19,7 +19,36 @@ namespace VisualStudioOnline.Api.Rest.V2
         }
 
         /// <summary>
-        /// 
+        /// Get work item history comments
+        /// </summary>
+        /// <param name="workitemId"></param>
+        /// <param name="top"></param>
+        /// <param name="skip"></param>
+        /// <returns></returns>
+        public async Task<HistoryCommentCollection> GetWorkItemHistory(int workitemId, int? top = null, int? skip = null)
+        {
+            var arguments = new Dictionary<string, string>();
+            if (top.HasValue) { arguments.Add("$top", top.Value.ToString()); }
+            if (skip.HasValue) { arguments.Add("$skip", skip.Value.ToString()); }
+
+            string response = await GetResponse(string.Format("workitems/{0}/history", workitemId), arguments);
+            return JsonConvert.DeserializeObject<HistoryCommentCollection>(response);
+        }
+
+        /// <summary>
+        /// Get work item revision history comment
+        /// </summary>
+        /// <param name="workitemId"></param>
+        /// <param name="revision"></param>
+        /// <returns></returns>
+        public async Task<HistoryComment> GetWorkItemRevisionHistory(int workitemId, int revision)
+        {
+            string response = await GetResponse(string.Format("workitems/{0}/history/{1}", workitemId, revision));
+            return JsonConvert.DeserializeObject<HistoryComment>(response);
+        }
+
+        /// <summary>
+        /// Get work item relation types
         /// </summary>
         /// <returns></returns>
         public async Task<WorkItemRelationTypeCollection> GetWorkItemRelationTypes()
@@ -29,7 +58,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         }
 
         /// <summary>
-        /// 
+        /// Get specific work item relation type
         /// </summary>
         /// <param name="fieldName"></param>
         /// <returns></returns>
