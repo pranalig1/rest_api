@@ -241,6 +241,35 @@ namespace VisualStudioOnline.Api.Rest.V2
             string response = await GetResponse(string.Format("workitems/{0}/revisions/{1}", workItemId, revision), arguments);
             return JsonConvert.DeserializeObject<WorkItem>(response);
         }
+
+        /// <summary>
+        /// Get work item updates
+        /// </summary>
+        /// <param name="workItemId"></param>
+        /// <param name="top"></param>
+        /// <param name="skip"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<WorkItemUpdate>> GetWorkItemUpdates(int workItemId, int? top = null, int? skip = null)
+        {
+            var arguments = new Dictionary<string, string>();
+            if (top.HasValue) { arguments.Add("$top", top.Value.ToString()); }
+            if (skip.HasValue) { arguments.Add("$skip", skip.Value.ToString()); }
+
+            string response = await GetResponse(string.Format("workitems/{0}/updates", workItemId), arguments);
+            return JsonConvert.DeserializeObject<JsonCollection<WorkItemUpdate>>(response);
+        }
+
+        /// <summary>
+        /// Get specific work item update
+        /// </summary>
+        /// <param name="workItemId"></param>
+        /// <param name="revisionId"></param>
+        /// <returns></returns>
+        public async Task<WorkItemUpdate> GetWorkItemUpdate(int workItemId, int revisionId)
+        {
+            string response = await GetResponse(string.Format("workitems/{0}/updates/{1}", workItemId, revisionId));
+            return JsonConvert.DeserializeObject<WorkItemUpdate>(response);
+        }
        
         private async Task<string> GetCssNode(string projectName, string nodePath, int? depth = null)
         {

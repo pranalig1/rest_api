@@ -72,5 +72,12 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
 
             var areaPath = revision.Fields["System.AreaPath"];
         }
+
+        [TestMethod]
+        public void TestGetWorkItemUpdates()
+        {
+            var updates = _client.GetWorkItemUpdates(Settings.Default.WorkItemId).Result;
+            var update = _client.GetWorkItemUpdate(Settings.Default.WorkItemId, Settings.Default.WorkItemRevision).Result;
+        }
     }
 }

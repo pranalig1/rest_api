@@ -13,7 +13,7 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         tree
     }
 
-    public class Attributes
+    public class RelationTypeAttributes
     {
         [JsonProperty(PropertyName = "usage")]
         public string Usage { get; set; }
@@ -48,7 +48,7 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         public string Name { get; set; }
 
         [JsonProperty(PropertyName = "attributes")]
-        public Attributes Attributes { get; set; }
+        public RelationTypeAttributes Attributes { get; set; }
     }
 
     [DebuggerDisplay("{Name}")]
@@ -77,6 +77,34 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         public DateTime RevisedDate { get; set; }
     }
 
+    [DebuggerDisplay("{Id:Name}")]
+    public class RelationAttributes
+    {
+        [JsonProperty(PropertyName = "authorizedDate")]
+        public DateTime AuthorizedDate { get; set; }
+
+        [JsonProperty(PropertyName = "id")]
+        public int Id { get; set; }
+
+        [JsonProperty(PropertyName = "resourceCreatedDate")]
+        public DateTime ResourceCreatedDate { get; set; }
+
+        [JsonProperty(PropertyName = "resourceModifiedDate")]
+        public DateTime ResourceModifiedDate { get; set; }
+
+        [JsonProperty(PropertyName = "revisedDate")]
+        public DateTime RevisedDate { get; set; }
+
+        [JsonProperty(PropertyName = "resourceSize")]
+        public int ResourceSize { get; set; }
+
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "isLocked")]
+        public bool? IsLocked { get; set; }
+    }
+
     [DebuggerDisplay("{Rel}")]
     public class WorkItemRelation : BaseObject
     {
@@ -84,11 +112,11 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         public string Rel { get; set; }
 
         [JsonProperty(PropertyName = "attributes")]
-        public Attributes Attributes { get; set; }
+        public RelationAttributes Attributes { get; set; }
     }
 
     [DebuggerDisplay("{Id:Rev}")]
-    public class WorkItem : BaseObject
+    public abstract class WorkItemCore : BaseObject
     {
         [JsonProperty(PropertyName = "id")]
         public int Id { get; set; }
@@ -98,8 +126,32 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "fields")]
         public dynamic Fields { get; set; }
-
+    }
+    
+    public class WorkItem : WorkItemCore
+    {
         [JsonProperty(PropertyName = "relations")]
         public List<WorkItemRelation> Relations { get; set; }
+    }
+
+    public class RelationChanges
+    {
+        [JsonProperty(PropertyName = "added")]
+        public List<WorkItemRelation> AddedRelations { get; set; }
+
+        [JsonProperty(PropertyName = "removed")]
+        public List<WorkItemRelation> RemovedRelations { get; set; }
+    }
+
+    public class WorkItemUpdate : WorkItemCore
+    {
+        [JsonProperty(PropertyName = "revisedBy")]
+        public User RevisedBy { get; set; }
+
+        [JsonProperty(PropertyName = "revisedDate")]
+        public DateTime RevisedDate { get; set; }
+
+        [JsonProperty(PropertyName = "relations")]
+        public RelationChanges Changes { get; set; }
     }
 }
