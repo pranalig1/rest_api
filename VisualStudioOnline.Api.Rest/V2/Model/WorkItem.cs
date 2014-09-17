@@ -39,7 +39,7 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
     }
 
     [DebuggerDisplay("{ReferenceName}")]
-    public class WorkItemRelationType
+    public class WorkItemRelationType : BaseObject
     {
         [JsonProperty(PropertyName = "referenceName")]
         public string ReferenceName { get; set; }
@@ -49,35 +49,20 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "attributes")]
         public Attributes Attributes { get; set; }
-
-        [JsonProperty(PropertyName = "url")]
-        public string Url { get; set; }
-    }
-
-    public class WorkItemRelationTypeCollection
-    {
-        [JsonProperty(PropertyName = "count")]
-        public int Count { get; set; }
-        
-        [JsonProperty(PropertyName = "value")]
-        public List<WorkItemRelationType> Relations { get; set; }
     }
 
     [DebuggerDisplay("{Name}")]
-    public class User
+    public class User : BaseObject
     {
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
 
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
-
-        [JsonProperty(PropertyName = "url")]
-        public string Url { get; set; }
     }
 
     [DebuggerDisplay("{Value}")]
-    public class HistoryComment
+    public class HistoryComment : BaseObject
     {
         [JsonProperty(PropertyName = "rev")]
         public int Rev { get; set; }
@@ -90,17 +75,31 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "revisedDate")]
         public DateTime RevisedDate { get; set; }
-
-        [JsonProperty(PropertyName = "url")]
-        public string Url { get; set; }
     }
 
-    public class HistoryCommentCollection
+    [DebuggerDisplay("{Rel}")]
+    public class WorkItemRelation : BaseObject
     {
-        [JsonProperty(PropertyName = "count")]
-        public int Count { get; set; }
+        [JsonProperty(PropertyName = "rel")]
+        public string Rel { get; set; }
 
-        [JsonProperty(PropertyName = "value")]
-        public List<HistoryComment> Comments { get; set; }
+        [JsonProperty(PropertyName = "attributes")]
+        public Attributes Attributes { get; set; }
+    }
+
+    [DebuggerDisplay("{Id:Rev}")]
+    public class WorkItem : BaseObject
+    {
+        [JsonProperty(PropertyName = "id")]
+        public int Id { get; set; }
+
+        [JsonProperty(PropertyName = "rev")]
+        public int Rev { get; set; }
+
+        [JsonProperty(PropertyName = "fields")]
+        public dynamic Fields { get; set; }
+
+        [JsonProperty(PropertyName = "relations")]
+        public List<WorkItemRelation> Relations { get; set; }
     }
 }

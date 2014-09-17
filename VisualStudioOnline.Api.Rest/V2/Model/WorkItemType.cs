@@ -19,7 +19,7 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
     }
 
     [DebuggerDisplay("{ReferenceName}")]
-    public class Field
+    public class Field : BaseObject
     {
         [JsonProperty(PropertyName = "referenceName")]
         public string ReferenceName { get; set; }
@@ -27,24 +27,12 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
-        [JsonProperty(PropertyName = "url")]
-        public string Url { get; set; }
-
         [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty(PropertyName = "type")]
         public FieldType Type { get; set; }
 
         [JsonProperty(PropertyName = "readOnly")]
         public bool ReadOnly { get; set; }
-    }
-
-    public class FieldCollection
-    {
-        [JsonProperty(PropertyName = "count")]
-        public int Count { get; set; }
-
-        [JsonProperty(PropertyName = "value")]
-        public List<Field> Fields { get; set; }
     }
 
     [DebuggerDisplay("{Field.ReferenceName}")]
@@ -58,7 +46,7 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
     }
 
     [DebuggerDisplay("{Name}")]
-    public class WorkItemType
+    public class WorkItemType : BaseObject
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
@@ -71,22 +59,10 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "fieldInstances")]
         public List<FieldInstance> Fields { get; set; }
-
-        [JsonProperty(PropertyName = "url")]
-        public string Url { get; set; }
-    }
-
-    public class WorkItemTypeCollection
-    {
-        [JsonProperty(PropertyName = "count")]
-        public int Count { get; set; }
-
-        [JsonProperty(PropertyName = "value")]
-        public List<WorkItemType> Types { get; set; }
     }
 
     [DebuggerDisplay("{Name}")]
-    public class WorkItemTypeCategory
+    public class WorkItemTypeCategory : BaseObject
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
@@ -99,17 +75,5 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "workItemTypes")]
         public List<WorkItemType> workItemTypes { get; set; }
-
-        [JsonProperty(PropertyName = "url")]
-        public string Url { get; set; }
-    }
-
-    public class WorkItemTypeCategoryCollection
-    {
-        [JsonProperty(PropertyName = "count")]
-        public int Count { get; set; }
-
-        [JsonProperty(PropertyName = "value")]
-        public List<WorkItemTypeCategory> Categories { get; set; }
     }
 }

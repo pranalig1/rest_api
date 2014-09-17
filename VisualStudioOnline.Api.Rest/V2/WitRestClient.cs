@@ -8,6 +8,13 @@ namespace VisualStudioOnline.Api.Rest.V2
 {
     public class WitRestClient : RestClient
     {
+        public enum RevisionExpandOptions
+        {
+            all,
+            relations,
+            none
+        }
+
         protected override string SubSystemName
         {
             get { return "wit"; }
@@ -25,14 +32,14 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <param name="top"></param>
         /// <param name="skip"></param>
         /// <returns></returns>
-        public async Task<HistoryCommentCollection> GetWorkItemHistory(int workitemId, int? top = null, int? skip = null)
+        public async Task<JsonCollection<HistoryComment>> GetWorkItemHistory(int workitemId, int? top = null, int? skip = null)
         {
             var arguments = new Dictionary<string, string>();
             if (top.HasValue) { arguments.Add("$top", top.Value.ToString()); }
             if (skip.HasValue) { arguments.Add("$skip", skip.Value.ToString()); }
 
             string response = await GetResponse(string.Format("workitems/{0}/history", workitemId), arguments);
-            return JsonConvert.DeserializeObject<HistoryCommentCollection>(response);
+            return JsonConvert.DeserializeObject<JsonCollection<HistoryComment>>(response);
         }
 
         /// <summary>
@@ -51,10 +58,10 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// Get work item relation types
         /// </summary>
         /// <returns></returns>
-        public async Task<WorkItemRelationTypeCollection> GetWorkItemRelationTypes()
+        public async Task<JsonCollection<WorkItemRelationType>> GetWorkItemRelationTypes()
         {
             string response = await GetResponse("workitemrelationtypes");
-            return JsonConvert.DeserializeObject<WorkItemRelationTypeCollection>(response);
+            return JsonConvert.DeserializeObject<JsonCollection<WorkItemRelationType>>(response);
         }
 
         /// <summary>
@@ -72,10 +79,10 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// Get collection fields
         /// </summary>
         /// <returns></returns>
-        public async Task<FieldCollection> GetFields()
+        public async Task<JsonCollection<Field>> GetFields()
         {
             string response = await GetResponse("fields");
-            return JsonConvert.DeserializeObject<FieldCollection>(response);
+            return JsonConvert.DeserializeObject<JsonCollection<Field>>(response);
         }
 
         /// <summary>
@@ -94,10 +101,10 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// </summary>
         /// <param name="projectName"></param>
         /// <returns></returns>
-        public async Task<WorkItemTypeCategoryCollection> GetWorkItemTypeCategories(string projectName)
+        public async Task<JsonCollection<WorkItemTypeCategory>> GetWorkItemTypeCategories(string projectName)
         {
             string response = await GetResponse("workitemtypecategories", projectName);
-            return JsonConvert.DeserializeObject<WorkItemTypeCategoryCollection>(response);
+            return JsonConvert.DeserializeObject<JsonCollection<WorkItemTypeCategory>>(response);
         }
 
         /// <summary>
@@ -117,10 +124,10 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// </summary>
         /// <param name="projectName"></param>
         /// <returns></returns>
-        public async Task<WorkItemTypeCollection> GetWorkItemTypes(string projectName)
+        public async Task<JsonCollection<WorkItemType>> GetWorkItemTypes(string projectName)
         {
             string response = await GetResponse("workitemtypes", projectName);
-            return JsonConvert.DeserializeObject<WorkItemTypeCollection>(response);
+            return JsonConvert.DeserializeObject<JsonCollection<WorkItemType>>(response);
         }
 
         /// <summary>
@@ -142,10 +149,10 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <param name="projectName"></param>
         /// <param name="depth"></param>
         /// <returns></returns>
-        public async Task<ClassificationNodeCollection> GetClassificationNodes(string projectName, int? depth = null)
+        public async Task<JsonCollection<ClassificationNode>> GetClassificationNodes(string projectName, int? depth = null)
         {
             string response = await GetCssNode(projectName, string.Empty, depth);
-            return JsonConvert.DeserializeObject<ClassificationNodeCollection>(response);
+            return JsonConvert.DeserializeObject<JsonCollection<ClassificationNode>>(response);
         }
 
         /// <summary>
@@ -200,6 +207,39 @@ namespace VisualStudioOnline.Api.Rest.V2
 
             string response = await GetCssNode(projectName, path, depth);
             return JsonConvert.DeserializeObject<ClassificationNode>(response);
+        }
+
+        /// <summary>
+        /// Get work item revisions
+        /// </summary>
+        /// <param name="workItemId"></param>
+        /// <param name="top"></param>
+        /// <param name="skip"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<WorkItem>> GetWorkItemRevisions(int workItemId, int? top = null, int? skip = null, RevisionExpandOptions options = RevisionExpandOptions.none)
+        {
+            var arguments = new Dictionary<string, string>() { {"$expand", options.ToString()} };
+            if (top.HasValue) { arguments.Add("$top", top.Value.ToString()); }
+            if (skip.HasValue) { arguments.Add("$skip", skip.Value.ToString()); }
+
+            string response = await GetResponse(string.Format("workitems/{0}/revisions", workItemId), arguments);
+            return JsonConvert.DeserializeObject<JsonCollection<WorkItem>>(response);
+        }
+
+        /// <summary>
+        /// Get work item revision
+        /// </summary>
+        /// <param name="workItemId"></param>
+        /// <param name="revision"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public async Task<WorkItem> GetWorkItemRevision(int workItemId, int revision, RevisionExpandOptions options = RevisionExpandOptions.none)
+        {
+            var arguments = new Dictionary<string, string>() { { "$expand", options.ToString() } };
+
+            string response = await GetResponse(string.Format("workitems/{0}/revisions/{1}", workItemId, revision), arguments);
+            return JsonConvert.DeserializeObject<WorkItem>(response);
         }
        
         private async Task<string> GetCssNode(string projectName, string nodePath, int? depth = null)

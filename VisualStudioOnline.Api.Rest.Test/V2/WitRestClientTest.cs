@@ -21,28 +21,28 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
         public void TestGetRelationTypes()
         {
             var relations = _client.GetWorkItemRelationTypes().Result;
-            var relation = _client.GetWorkItemRelationType(relations.Relations[0].ReferenceName).Result;
+            var relation = _client.GetWorkItemRelationType(relations.Items[0].ReferenceName).Result;
         }
 
         [TestMethod]
         public void TestGetFields()
         {
             var fields = _client.GetFields().Result;
-            var field = _client.GetField(fields.Fields[0].ReferenceName).Result;
+            var field = _client.GetField(fields.Items[0].ReferenceName).Result;
         }
 
         [TestMethod]
         public void TestGetWorkItemTypeCategories()
         {
             var workItemTypeCategories = _client.GetWorkItemTypeCategories(Settings.Default.ProjectName).Result;
-            var workItemTypeCategory = _client.GetWorkItemTypeCategory(Settings.Default.ProjectName, workItemTypeCategories.Categories[0].ReferenceName).Result;
+            var workItemTypeCategory = _client.GetWorkItemTypeCategory(Settings.Default.ProjectName, workItemTypeCategories.Items[0].ReferenceName).Result;
         }
 
         [TestMethod]
         public void TestGetWorkItemTypes()
         {
             var workItemTypes = _client.GetWorkItemTypes(Settings.Default.ProjectName).Result;
-            var workItemType = _client.GetWorkItemType(Settings.Default.ProjectName, workItemTypes.Types[0].Name).Result;
+            var workItemType = _client.GetWorkItemType(Settings.Default.ProjectName, workItemTypes.Items[0].Name).Result;
         }
 
         [TestMethod]
@@ -62,6 +62,15 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
         {
             var history = _client.GetWorkItemHistory(Settings.Default.WorkItemId).Result;
             var revHistory = _client.GetWorkItemRevisionHistory(Settings.Default.WorkItemId, Settings.Default.WorkItemRevision).Result;
+        }
+
+        [TestMethod]
+        public void TestGetWorkItemRevisions()
+        {
+            var revisions = _client.GetWorkItemRevisions(Settings.Default.WorkItemId, null, null, WitRestClient.RevisionExpandOptions.all).Result;
+            var revision = _client.GetWorkItemRevision(Settings.Default.WorkItemId, Settings.Default.WorkItemRevision).Result;
+
+            var areaPath = revision.Fields["System.AreaPath"];
         }
     }
 }
