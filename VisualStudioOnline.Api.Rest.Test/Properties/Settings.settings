@@ -23,5 +23,11 @@
     <Setting Name="AccessToken" Type="System.String" Scope="User">
       <Value Profile="(Default)">TestToken</Value>
     </Setting>
+    <Setting Name="WorkItemId" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="WorkItemRevision" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

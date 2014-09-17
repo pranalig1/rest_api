@@ -108,5 +108,35 @@ namespace VisualStudioOnline.Api.Rest.Test.Properties {
                 this["ProjectId"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int WorkItemId
+        {
+            get
+            {
+                return ((int)(this["WorkItemId"]));
+            }
+            set
+            {
+                this["WorkItemId"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int WorkItemRevision
+        {
+            get
+            {
+                return ((int)(this["WorkItemRevision"]));
+            }
+            set
+            {
+                this["WorkItemRevision"] = value;
+            }
+        }
     }
 }
