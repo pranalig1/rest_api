@@ -154,4 +154,11 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         [JsonProperty(PropertyName = "relations")]
         public RelationChanges Changes { get; set; }
     }
+
+    [DebuggerDisplay("{Id}")]
+    public class FileReference : BaseObject
+    {
+        [JsonProperty(PropertyName = "id")]
+        public string Id { get; set; }
+    }
 }

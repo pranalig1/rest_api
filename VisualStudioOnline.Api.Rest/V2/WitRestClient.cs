@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
@@ -269,6 +270,48 @@ namespace VisualStudioOnline.Api.Rest.V2
         {
             string response = await GetResponse(string.Format("workitems/{0}/updates/{1}", workItemId, revisionId));
             return JsonConvert.DeserializeObject<WorkItemUpdate>(response);
+        }
+
+        /// <summary>
+        /// Download work item attachment
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<string> DownloadAttachment(string attachmentId)
+        {
+            return await GetResponse(string.Format("attachments/{0}", attachmentId));
+        }
+
+        /// <summary>
+        /// Upload binary attachment
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="area"></param>
+        /// <param name="fileName"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public async Task<FileReference> UploadAttachment(string projectName, string area, string fileName, byte[] content)
+        {
+            return await UploadAttachment(fileName, Convert.ToBase64String(content));
+        }
+
+        /// <summary>
+        /// Upload text attachment
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="area"></param>
+        /// <param name="fileName"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public async Task<FileReference> UploadAttachment(string fileName, string content)
+        {
+            var arguments = new Dictionary<string, string>() 
+            { 
+                { "fileName", fileName }
+            };
+
+            string response = await PostResponse("attachments", arguments, content, null);
+            return JsonConvert.DeserializeObject<FileReference>(response);
         }
        
         private async Task<string> GetCssNode(string projectName, string nodePath, int? depth = null)

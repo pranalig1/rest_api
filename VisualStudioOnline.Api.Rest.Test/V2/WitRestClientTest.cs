@@ -79,5 +79,12 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
             var updates = _client.GetWorkItemUpdates(Settings.Default.WorkItemId).Result;
             var update = _client.GetWorkItemUpdate(Settings.Default.WorkItemId, Settings.Default.WorkItemRevision).Result;
         }
+
+        [TestMethod]
+        public void TestUploadDownloadAttachments()
+        {
+            var fileRef = _client.UploadAttachment("Test.txt", "Hello world").Result;
+            string content = _client.DownloadAttachment(fileRef.Id).Result;
+        }
     }
 }
