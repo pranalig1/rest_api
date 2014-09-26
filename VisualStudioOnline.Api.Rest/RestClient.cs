@@ -15,6 +15,8 @@ namespace VisualStudioOnline.Api.Rest
     public abstract class RestClient
     {
         protected const string ACCOUNT_ROOT_URL = "https://{0}.visualstudio.com/DefaultCollection";
+        protected const string JSON_MEDIA_TYPE = "application/json";
+        protected const string JSON_PATCH_MEDIA_TYPE = "application/json-patch+json";
 
         private string _rootUrl;
         private IHttpRequestHeaderFilter _authProvider;
@@ -60,9 +62,9 @@ namespace VisualStudioOnline.Api.Rest
             return await PostResponse(path, new Dictionary<string, string>(), content, projectName);
         }
 
-        protected async Task<string> PostResponse(string path, IDictionary<string, string> arguments, object content, string projectName = null)
+        protected async Task<string> PostResponse(string path, IDictionary<string, string> arguments, object content, string projectName = null, string mediaType = JSON_MEDIA_TYPE)
         {            
-            var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
+            var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, mediaType);
 
             using (HttpClient client = GetHttpClient())
             {
@@ -80,9 +82,9 @@ namespace VisualStudioOnline.Api.Rest
             }
         }
 
-        protected async Task<string> PatchResponse(string path, object content, string projectName = null)
+        protected async Task<string> PatchResponse(string path, object content, string projectName = null, string mediaType = JSON_PATCH_MEDIA_TYPE)
         {
-            var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
+            var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, mediaType);
 
             using (HttpClient client = GetHttpClient())
             {
@@ -118,10 +120,10 @@ namespace VisualStudioOnline.Api.Rest
             }
         }
 
-        private HttpClient GetHttpClient()
+        private HttpClient GetHttpClient(string mediaType = JSON_MEDIA_TYPE)
         {
             var client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
             _authProvider.ProcessHeaders(client.DefaultRequestHeaders);
             return client;
         }

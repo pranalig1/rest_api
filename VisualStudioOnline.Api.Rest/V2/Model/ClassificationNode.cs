@@ -11,18 +11,11 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         iteration,
     }
 
-    [DebuggerDisplay("{Href}")]
-    public class Self
-    {
-        [JsonProperty(PropertyName = "href")]
-        public string Href { get; set; }
-    }
-
     [DebuggerDisplay("{Self.Href}")]
-    public class Links
+    public class NodeReference
     {
         [JsonProperty(PropertyName = "self")]
-        public Self Self { get; set; }
+        public ObjectReference Self { get; set; }
     }
 
 
@@ -40,7 +33,7 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         public bool HasChildren { get; set; }
 
         [JsonProperty(PropertyName = "_links")]
-        public Links Links { get; set; }
+        public NodeReference References { get; set; }
 
         [JsonProperty(PropertyName = "children")]
         public List<ClassificationNode> Children { get; set; }

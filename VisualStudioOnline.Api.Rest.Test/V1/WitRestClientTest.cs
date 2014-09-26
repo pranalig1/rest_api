@@ -5,7 +5,7 @@ using VisualStudioOnline.Api.Rest.Test.Properties;
 using VisualStudioOnline.Api.Rest.V1;
 using VisualStudioOnline.Api.Rest.V1.Model;
 
-namespace VisualStudioOnline.Api.Rest.Test
+namespace VisualStudioOnline.Api.Rest.Test.V1
 {
     [TestClass]
     public class WitRestClientTest

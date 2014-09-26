@@ -8,8 +8,9 @@ using VisualStudioOnline.Api.Rest.V1.Model;
 namespace VisualStudioOnline.Api.Rest.V1
 {
     /// <summary>
-    /// WIT REST API client
+    /// WIT REST API client v.1.0-preview.1
     /// </summary>
+    [Obsolete("deprecated, use VisualStudioOnline.Api.Rest.V2.WitRestClient")]
     public class WitRestClient : RestClient
     {
         public enum QueryExpandOptions
@@ -139,7 +140,7 @@ namespace VisualStudioOnline.Api.Rest.V1
                     l.Target = null;
                 });
 
-            string response = await PatchResponse(string.Format("workitems/{0}", workItem.Id), workItem);
+            string response = await PatchResponse(string.Format("workitems/{0}", workItem.Id), workItem, null, JSON_MEDIA_TYPE);
             
             workItem.Links.Clear();
             workItem.ResourceLinks.Clear();
@@ -199,7 +200,7 @@ namespace VisualStudioOnline.Api.Rest.V1
         /// <returns></returns>
         public async Task<Query> UpdateQuery(Query query)
         {
-            string response = await PatchResponse(string.Format("queries/{0}", query.Id), query);
+            string response = await PatchResponse(string.Format("queries/{0}", query.Id), query, null, JSON_MEDIA_TYPE);
             JsonConvert.PopulateObject(response, query);
             return query;
         }

@@ -2,7 +2,10 @@
 using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 
 namespace VisualStudioOnline.Api.Rest.V2.Model
 {
@@ -11,6 +14,14 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         dependency,
         network,
         tree
+    }
+
+    public enum OperationType
+    {
+        add,
+        replace,
+        remove,
+        test
     }
 
     public class RelationTypeAttributes
@@ -103,6 +114,9 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "isLocked")]
         public bool? IsLocked { get; set; }
+
+        [JsonProperty(PropertyName = "comment")]
+        public string Comment { get; set; }
     }
 
     [DebuggerDisplay("{Rel}")]
@@ -123,15 +137,119 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "rev")]
         public int Rev { get; set; }
-
-        [JsonProperty(PropertyName = "fields")]
-        public dynamic Fields { get; set; }
     }
     
     public class WorkItem : WorkItemCore
     {
+        internal List<FieldUpdate> FieldUpdates = new List<FieldUpdate>();
+        internal List<RelationUpdate> RelationUpdates = new List<RelationUpdate>();
+
         [JsonProperty(PropertyName = "relations")]
-        public List<WorkItemRelation> Relations { get; set; }
+        public ObservableCollection<WorkItemRelation> Relations { get; set; }
+
+        [JsonProperty(PropertyName = "fields")]
+        public ObservableDictionary<string, object> Fields;
+
+        [JsonProperty(PropertyName = "_links")]
+        public WorkItemReference References;
+
+        public WorkItem()
+        {
+            Relations = new ObservableCollection<WorkItemRelation>();
+            Fields = new ObservableDictionary<string, object>();
+
+            //TODO
+            //Relations.CollectionChanged += OnRelations_CollectionChanged;
+            //Fields.CollectionChanged += OnFields_CollectionChanged;
+        }
+
+        private void OnFields_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add ||
+                e.Action == NotifyCollectionChangedAction.Remove ||
+                e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                foreach (KeyValuePair<string, object> newfield in e.NewItems)
+                {
+                    FieldUpdates.Add(new FieldUpdate(newfield.Key, newfield.Value /*TODO*/));
+                }
+
+                foreach (KeyValuePair<string, object> removedField in e.OldItems)
+                {
+                    FieldUpdates.Add(new FieldUpdate(removedField.Key, OperationType.remove));
+                }
+            }
+        }
+
+        private void OnRelations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add || 
+                e.Action == NotifyCollectionChangedAction.Remove || 
+                e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                foreach (WorkItemRelation newRelation in e.NewItems)
+                {
+                    var existingUpdate = RelationUpdates.FirstOrDefault(ru => ru.Value == newRelation);
+                    if (existingUpdate != null)
+                    {
+                        if (existingUpdate.Operation == OperationType.remove)
+                        {
+                            RelationUpdates.Remove(existingUpdate);
+                        }
+                    }
+                    else
+                    {
+                        RelationUpdates.Add(new RelationUpdate(newRelation, OperationType.add));
+                    }
+                }
+
+                foreach (WorkItemRelation oldRelation in e.OldItems)
+                {
+                    var existingUpdate = RelationUpdates.FirstOrDefault(ru => ru.Value == oldRelation);
+                    if (existingUpdate != null)
+                    {
+                        if (existingUpdate.Operation == OperationType.add)
+                        {
+                            RelationUpdates.Remove(existingUpdate);
+                        }
+                    }
+                    else
+                    {
+                        RelationUpdates.Add(new RelationUpdate(oldRelation, OperationType.remove));
+                    }
+                }
+            }
+            else if(e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                // Remove all links
+                RelationUpdates.Clear();
+                RelationUpdates.Add(new RelationUpdate() { Operation = OperationType.remove });                
+            }
+        }
+    }
+
+    public class WorkItemReference
+    {
+        [JsonProperty(PropertyName = "self")]
+        public ObjectReference Self { get; set; }
+
+        [JsonProperty(PropertyName = "workItemUpdates")]
+        public ObjectReference Updates { get; set; }
+
+        [JsonProperty(PropertyName = "workItemRevisions")]
+        public ObjectReference Revisions { get; set; }
+
+        [JsonProperty(PropertyName = "workItemHistory")]
+        public ObjectReference History { get; set; }
+
+        [JsonProperty(PropertyName = "html")]
+        public ObjectReference Html { get; set; }
+
+        [JsonProperty(PropertyName = "workItemType")]
+        public ObjectReference Type { get; set; }
+
+        [JsonProperty(PropertyName = "fields")]
+        public ObjectReference Fields { get; set; }
     }
 
     public class RelationChanges
@@ -153,6 +271,19 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "relations")]
         public RelationChanges Changes { get; set; }
+
+        [JsonProperty(PropertyName = "fields")]
+        public Dictionary<string, FieldChange> FieldChanges;
+    }
+
+    [DebuggerDisplay("{OldValue}->{NewValue}")]
+    public class FieldChange
+    {
+        [JsonProperty(PropertyName = "oldValue")]
+        public object OldValue { get; set; }
+
+        [JsonProperty(PropertyName = "newValue")]
+        public object NewValue { get; set; }
     }
 
     [DebuggerDisplay("{Id}")]
@@ -160,5 +291,55 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
     {
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
+    }
+
+    [DebuggerDisplay("{Path}")]
+    public class FieldUpdate
+    {
+        [JsonProperty(PropertyName = "op")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public OperationType Operation { get; set; }
+
+        [JsonProperty(PropertyName = "path")]
+        public string Path { get; set; }
+
+        [JsonProperty(PropertyName = "value")]
+        public object Value { get; set; }
+
+        public FieldUpdate()
+        {}
+
+        public FieldUpdate(string referenceName, object value, OperationType operation = OperationType.add)
+        {
+            Operation = operation;
+            Path = string.Format("/fields/{0}", referenceName);
+            Value = value;
+        }
+    }
+
+    [DebuggerDisplay("{Path}")]
+    public class RelationUpdate
+    {
+        [JsonProperty(PropertyName = "op")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public OperationType Operation { get; set; }
+
+        [JsonProperty(PropertyName = "path")]
+        public string Path { get; set; }
+
+        [JsonProperty(PropertyName = "value")]
+        public WorkItemRelation Value { get; set; }
+
+        public RelationUpdate()
+        {
+            Path = "/relations/-";
+        }
+
+        public RelationUpdate(WorkItemRelation value, OperationType operation)
+        {
+            Operation = operation;
+            Path = string.Format("/relations/{0}", value.Attributes.Id);
+            Value = value;
+        }
     }
 }

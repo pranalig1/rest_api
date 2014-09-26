@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Net;
 using VisualStudioOnline.Api.Rest.Test.Properties;
 using VisualStudioOnline.Api.Rest.V2;
+using VisualStudioOnline.Api.Rest.V2.Model;
 
 namespace VisualStudioOnline.Api.Rest.Test.V2
 {
@@ -85,6 +87,40 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
         {
             var fileRef = _client.UploadAttachment("Test.txt", "Hello world").Result;
             string content = _client.DownloadAttachment(fileRef.Id).Result;
+
+            //TODO: add attachment to WI
+
+            //TODO: remove attachment from WI
+        }
+
+        [TestMethod]
+        public void TestCreateAndUpdateWorkItem()
+        {
+            var defaultValues = _client.GetWorkItemTypeDefaultValues(Settings.Default.ProjectName, "Bug").Result;
+            var workItems = _client.GetWorkItems(new int[] { Settings.Default.WorkItemId }, WitRestClient.RevisionExpandOptions.all).Result;
+
+            var bug = new WorkItem();
+            bug.Fields["System.Title"] = "Test bug 2";
+            bug.Fields["System.History"] = DateTime.Now.ToString();
+            bug = _client.CreateWorkItem(Settings.Default.ProjectName, "Bug", bug).Result;
+
+            bug = _client.GetWorkItem(bug.Id, WitRestClient.RevisionExpandOptions.all).Result;
+            bug.Fields["System.Title"] = bug.Fields["System.Title"] + " (updated)";
+            bug.Fields["System.Tags"] = "SimpleTag";
+            bug.Relations.Add(new WorkItemRelation()
+                {
+                    Url = workItems[0].Url,
+                    Rel = "System.LinkTypes.Dependency-Forward",
+                    Attributes = new RelationAttributes() { Comment = "Hello world" }
+                });
+
+            bug = _client.UpdateWorkItem(bug).Result;
+
+            //TODO: update link
+
+            //TODO: remove link
+
+            //TODO: add hyperlink
         }
     }
 }

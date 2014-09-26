@@ -70,7 +70,7 @@ namespace VisualStudioOnline.Api.Rest.V1
         /// <returns></returns>
         public async Task<Tag> UpdateTag(string scopeId, Tag tag)
         {
-            string response = await PatchResponse(string.Format("scopes/{0}/tags/{1}", scopeId, tag.Id), tag);
+            string response = await PatchResponse(string.Format("scopes/{0}/tags/{1}", scopeId, tag.Id), tag, null, JSON_MEDIA_TYPE);
             JsonConvert.PopulateObject(response, tag);
             return tag;
         }

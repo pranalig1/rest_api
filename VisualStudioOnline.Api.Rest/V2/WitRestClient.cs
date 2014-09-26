@@ -7,6 +7,9 @@ using VisualStudioOnline.Api.Rest.V2.Model;
 
 namespace VisualStudioOnline.Api.Rest.V2
 {
+    /// <summary>
+    /// WIT REST API client v.1.0-preview.2
+    /// </summary>
     public class WitRestClient : RestClient
     {
         public enum RevisionExpandOptions
@@ -24,6 +27,95 @@ namespace VisualStudioOnline.Api.Rest.V2
         public WitRestClient(string accountName, NetworkCredential userCredential)
             : base(string.Format(ACCOUNT_ROOT_URL, accountName), new BasicAuthenticationFilter(userCredential), "1.0-preview.2")
         {
+        }
+
+        /// <summary>
+        /// Get the default values that will be filled in automatically when you create a new work item of a specific type.
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="workItemTypeName"></param>
+        /// <returns></returns>
+        public async Task<WorkItemTypeDefaults> GetWorkItemTypeDefaultValues(string projectName, string workItemTypeName)
+        {
+            string response = await GetResponse(string.Format("workitems/${0}", workItemTypeName), projectName);
+            return JsonConvert.DeserializeObject<WorkItemTypeDefaults>(response);
+        }
+
+       
+        /// <summary>
+        /// Create new work item
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="workItemTypeName"></param>
+        /// <param name="workItem"></param>
+        /// <returns></returns>
+        public async Task<WorkItem> CreateWorkItem(string projectName, string workItemTypeName, WorkItem workItem)
+        {
+            List<object> updateList = new List<object>();
+
+            updateList.AddRange(workItem.FieldUpdates);
+            updateList.AddRange(workItem.RelationUpdates);
+
+            string response = await PatchResponse(string.Format("workitems/${0}", workItemTypeName), updateList, projectName);
+            JsonConvert.PopulateObject(response, workItem);
+
+            workItem.FieldUpdates.Clear();
+            workItem.RelationUpdates.Clear();
+
+            return workItem;
+        }
+
+        /// <summary>
+        /// TODO: not working now
+        /// </summary>
+        /// <param name="workItem"></param>
+        /// <returns></returns>
+        public async Task<WorkItem> UpdateWorkItem(WorkItem workItem)
+        {
+            List<object> updateList = new List<object>();
+
+            updateList.AddRange(workItem.FieldUpdates);
+            updateList.AddRange(workItem.RelationUpdates);
+
+            string response = await PatchResponse(string.Format("workitems/{0}", workItem.Id), updateList);
+            JsonConvert.PopulateObject(response, workItem);
+
+            workItem.FieldUpdates.Clear();
+            workItem.RelationUpdates.Clear();
+
+            return workItem;
+        }
+
+        /// <summary>
+        /// Get work item by id
+        /// </summary>
+        /// <param name="workItemId"></param>
+        /// <param name="includeLinks"></param>
+        /// <returns></returns>
+        public async Task<WorkItem> GetWorkItem(int workItemId, RevisionExpandOptions options = RevisionExpandOptions.none)
+        {
+            var arguments = new Dictionary<string, string>() { { "$expand", options.ToString() } };
+
+            string response = await GetResponse(string.Format("workitems/{0}", workItemId), arguments);
+            return JsonConvert.DeserializeObject<WorkItem>(response);
+        }
+
+        /// <summary>
+        /// Get a list of work items by ids
+        /// </summary>
+        /// <param name="workItemIds"></param>
+        /// <param name="includeLinks"></param>
+        /// <param name="asOfDate"></param>
+        /// <param name="fields"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<WorkItem>> GetWorkItems(int[] workItemIds, RevisionExpandOptions options = RevisionExpandOptions.none, DateTime? asOfDate = null, string[] fields = null)
+        {
+            var arguments = new Dictionary<string, string>() { { "ids", string.Join(",", workItemIds) }, { "$expand", options.ToString() } };
+            if (asOfDate.HasValue) { arguments.Add("asof", asOfDate.Value.ToUniversalTime().ToString("u")); }
+            if (fields != null) { arguments.Add("fields", string.Join(",", fields)); }
+
+            string response = await GetResponse("workitems", arguments);
+            return JsonConvert.DeserializeObject<JsonCollection<WorkItem>>(response);
         }
 
         /// <summary>
