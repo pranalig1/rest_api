@@ -122,5 +122,31 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
 
             //TODO: add hyperlink
         }
+
+        [TestMethod]
+        public void TestCreateAndUpdateQueries()
+        {
+            var rootQueries = _client.GetQueries(Settings.Default.ProjectName).Result;
+            var sharedQueries = _client.GetQuery(Settings.Default.ProjectName, "Shared Queries", 2, WitRestClient.QueryExpandOptions.all).Result;
+
+            var newQuery = _client.CreateQuery(Settings.Default.ProjectName, 
+                "Shared Queries/Troubleshooting", 
+                string.Format("REST {0}", DateTime.Now.Ticks),
+                "select System.Id from Issue").Result;
+
+            newQuery.Name = newQuery.Name + "_Renamed";
+            newQuery.Wiql = "select System.Id, System.AssignedTo from Issue";
+            newQuery = _client.UpdateQuery(Settings.Default.ProjectName, newQuery).Result;
+            
+            string response = _client.DeleteQuery(Settings.Default.ProjectName, newQuery).Result;
+            newQuery = _client.UndeleteQuery(Settings.Default.ProjectName, newQuery).Result;
+            response = _client.DeleteQuery(Settings.Default.ProjectName, newQuery).Result;
+
+            var newFolder = _client.CreateQueryFolder(Settings.Default.ProjectName, "Shared Queries", "TestFolder").Result;
+
+            newFolder = _client.MoveQuery(Settings.Default.ProjectName, "Shared Queries/Troubleshooting", newFolder).Result;
+
+            response = _client.DeleteQuery(Settings.Default.ProjectName, newFolder).Result;
+        }
     }
 }

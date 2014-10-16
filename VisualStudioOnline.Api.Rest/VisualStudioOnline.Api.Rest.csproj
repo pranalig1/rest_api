@@ -57,6 +57,7 @@
     <Compile Include="V1\WitRestClient.cs" />
     <Compile Include="V2\Model\ClassificationNode.cs" />
     <Compile Include="V2\Model\Common.cs" />
+    <Compile Include="V2\Model\Query.cs" />
     <Compile Include="V2\Model\WorkItem.cs" />
     <Compile Include="V2\Model\WorkItemType.cs" />
     <Compile Include="V2\WitRestClient.cs" />

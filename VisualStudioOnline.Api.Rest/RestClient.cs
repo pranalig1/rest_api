@@ -84,11 +84,16 @@ namespace VisualStudioOnline.Api.Rest
 
         protected async Task<string> PatchResponse(string path, object content, string projectName = null, string mediaType = JSON_PATCH_MEDIA_TYPE)
         {
+            return await PatchResponse(path, new Dictionary<string, string>(), content, projectName, mediaType);
+        }
+
+        protected async Task<string> PatchResponse(string path, IDictionary<string, string> arguments, object content, string projectName = null, string mediaType = JSON_PATCH_MEDIA_TYPE)
+        {
             var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, mediaType);
 
             using (HttpClient client = GetHttpClient())
             {
-                using (HttpResponseMessage response = client.PatchAsync(ConstructUrl(projectName, path), httpContent).Result)
+                using (HttpResponseMessage response = client.PatchAsync(ConstructUrl(projectName, path, arguments), httpContent).Result)
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -135,7 +140,10 @@ namespace VisualStudioOnline.Api.Rest
 
         private string ConstructUrl(string projectName, string path, IDictionary<string, string> arguments)
         {
-            arguments.Add("api-version", _apiVersion);
+            if (!arguments.ContainsKey("api-version"))
+            {
+                arguments.Add("api-version", _apiVersion);
+            }
 
             StringBuilder resultUrl = new StringBuilder(
                 string.IsNullOrEmpty(projectName) ? 

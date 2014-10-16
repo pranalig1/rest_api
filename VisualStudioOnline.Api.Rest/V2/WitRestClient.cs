@@ -12,6 +12,13 @@ namespace VisualStudioOnline.Api.Rest.V2
     /// </summary>
     public class WitRestClient : RestClient
     {
+        public enum QueryExpandOptions
+        {
+            none,
+            all,
+            wiql,
+        }
+
         public enum RevisionExpandOptions
         {
             all,
@@ -405,7 +412,121 @@ namespace VisualStudioOnline.Api.Rest.V2
             string response = await PostResponse("attachments", arguments, content, null);
             return JsonConvert.DeserializeObject<FileReference>(response);
         }
-       
+
+      
+        /// <summary>
+        /// Get queries by folder path
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="folderPathOrId"></param>
+        /// <param name="depth"></param>
+        /// <param name="options"></param>
+        /// <param name="includeDeleted"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<Query>> GetQueries(string projectName, string folderPath = null, int? depth = null, QueryExpandOptions options = QueryExpandOptions.none, bool? includeDeleted = null)
+        {
+            var arguments = new Dictionary<string, string>() { { "$expand", options.ToString() } };
+            if (depth.HasValue) { arguments.Add("$depth", depth.Value.ToString()); }
+            if (includeDeleted.HasValue) { arguments.Add("$includeDeleted", includeDeleted.Value.ToString()); }
+
+            string response = await GetResponse(string.IsNullOrEmpty(folderPath) ? "queries" : string.Format("queries/{0}", folderPath), arguments, projectName);
+            return JsonConvert.DeserializeObject<JsonCollection<Query>>(response);
+        }
+
+        /// <summary>
+        /// Get query or query folder
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="folderPathOrId"></param>
+        /// <param name="depth"></param>
+        /// <param name="options"></param>
+        /// <param name="includeDeleted"></param>
+        /// <returns></returns>
+        public async Task<Query> GetQuery(string projectName, string folderPathOrId, int? depth = null, QueryExpandOptions options = QueryExpandOptions.none, bool? includeDeleted = null)
+        {
+            var arguments = new Dictionary<string, string>() { { "$expand", options.ToString() } };
+            if (depth.HasValue) { arguments.Add("$depth", depth.Value.ToString()); }
+            if (includeDeleted.HasValue) { arguments.Add("$includeDeleted", includeDeleted.Value.ToString()); }
+
+            string response = await GetResponse(string.Format("queries/{0}", folderPathOrId), arguments, projectName);
+            return JsonConvert.DeserializeObject<Query>(response);
+        }
+
+        /// <summary>
+        /// Create new query
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="parentPath"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<Query> CreateQuery(string projectName, string parentPath, string queryName, string queryText)
+        {
+            string response = await PostResponse(string.Format("queries/{0}", parentPath), new Dictionary<string, string>(), new { name = queryName, wiql = queryText }, projectName);
+            return JsonConvert.DeserializeObject<Query>(response);
+        }
+
+        /// <summary>
+        /// Create new query folder
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="parentPath"></param>
+        /// <param name="folderName"></param>
+        /// <returns></returns>
+        public async Task<Query> CreateQueryFolder(string projectName, string parentPath, string folderName)
+        {
+            string response = await PostResponse(string.Format("queries/{0}", parentPath), new Dictionary<string, string>(), new { name = folderName, isFolder = true }, projectName);
+            return JsonConvert.DeserializeObject<Query>(response);
+        }
+
+        /// <summary>
+        /// Update the existing query / query folder
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<Query> UpdateQuery(string projectName, Query query)
+        {
+            string response = await PatchResponse(string.Format("queries/{0}", query.Path), query, projectName, JSON_MEDIA_TYPE);
+            JsonConvert.PopulateObject(response, query);
+            return query;
+        }
+
+        /// <summary>
+        /// Move existing query / query folder
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="newPath"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<Query> MoveQuery(string projectName, string newPath, Query query)
+        {
+            string response = await PostResponse(string.Format("queries/{0}", newPath), new Dictionary<string, string>(), query, projectName);
+            JsonConvert.PopulateObject(response, query);
+            return query;
+        }
+
+        /// <summary>
+        /// Delete existing query / query folder
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<string> DeleteQuery(string projectName, Query query)
+        {
+            return await DeleteResponse(string.Format("queries/{0}", query.Path), projectName);
+        }
+
+        public async Task<Query> UndeleteQuery(string projectName, Query query, bool? undeleteDescendants = null)
+        {
+            var arguments = new Dictionary<string, string>();
+            if (undeleteDescendants.HasValue) { arguments.Add("$undeletedescendants", undeleteDescendants.Value.ToString()); }
+
+            string response = await PatchResponse(string.Format("queries/{0}", query.Id), arguments, new { isDeleted = false }, projectName, JSON_MEDIA_TYPE);
+            JsonConvert.PopulateObject(response, query);
+            return query;
+        }
+
+        #region Helper methods
         private async Task<string> GetCssNode(string projectName, string nodePath, int? depth = null)
         {
             var arguments = new Dictionary<string, string>();
@@ -417,5 +538,6 @@ namespace VisualStudioOnline.Api.Rest.V2
             string response = await GetResponse(path, arguments, projectName);
             return response;
         }
+        #endregion
     }
 }

@@ -30,6 +30,24 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
     {
         [JsonProperty(PropertyName = "url")]
         public string Url { get; set; }
+
+        public override int GetHashCode()
+        {
+            return Url != null ? Url.GetHashCode() : base.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as BaseObject;
+            if (other == null) return false;
+
+            return Url == other.Url;
+        }
+
+        public override string ToString()
+        {
+            return Url != null ? Url.ToString() : base.ToString();
+        }
     }
 
     [DebuggerDisplay("{Href}")]

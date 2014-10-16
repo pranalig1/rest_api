@@ -19,11 +19,11 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
     public enum OperationType
     {
         add,
-        replace,
         remove,
+        replace,        
         test
     }
-
+   
     public class RelationTypeAttributes
     {
         [JsonProperty(PropertyName = "usage")]
@@ -117,6 +117,19 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "comment")]
         public string Comment { get; set; }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode() ^ AuthorizedDate.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var attributes = obj as RelationAttributes;
+            if (attributes == null) return false;
+
+            return Id == attributes.Id && AuthorizedDate == attributes.AuthorizedDate;
+        }
     }
 
     [DebuggerDisplay("{Rel}")]
@@ -127,6 +140,19 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "attributes")]
         public RelationAttributes Attributes { get; set; }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode() ^ (Rel != null? Rel.GetHashCode() : 1) ^ (Attributes != null? Attributes.GetHashCode() : 1);
+        }
+
+        public override bool Equals(object obj)
+        {
+            var relation = obj as WorkItemRelation;
+            if (relation == null) return false;
+            
+            return relation.Rel == Rel && relation.Attributes == Attributes && base.Equals(obj);
+        }
     }
 
     [DebuggerDisplay("{Id:Rev}")]
@@ -169,14 +195,28 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
                 e.Action == NotifyCollectionChangedAction.Remove ||
                 e.Action == NotifyCollectionChangedAction.Replace)
             {
+                //TODO: NotifyCollectionChangedAction.Replace
+
                 foreach (KeyValuePair<string, object> newfield in e.NewItems)
                 {
-                    FieldUpdates.Add(new FieldUpdate(newfield.Key, newfield.Value /*TODO*/));
+                    var existingUpdate = FieldUpdates.FirstOrDefault(fu => fu.Name == newfield.Key);
+                    if (existingUpdate != null)
+                    {
+                        FieldUpdates.Remove(existingUpdate);
+                    }
+
+                    FieldUpdates.Add(new FieldUpdate(newfield.Key, newfield.Value, (OperationType)e.Action /*TODO*/));
                 }
 
                 foreach (KeyValuePair<string, object> removedField in e.OldItems)
                 {
-                    FieldUpdates.Add(new FieldUpdate(removedField.Key, OperationType.remove));
+                    var existingUpdate = FieldUpdates.FirstOrDefault(fu => fu.Name == removedField.Key);
+                    if (existingUpdate != null)
+                    {
+                        FieldUpdates.Remove(existingUpdate);
+                    }
+
+                    FieldUpdates.Add(new FieldUpdate(removedField.Key, (OperationType)e.Action /*TODO*/));
                 }
             }
         }
@@ -306,12 +346,16 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         [JsonProperty(PropertyName = "value")]
         public object Value { get; set; }
 
+        [JsonIgnore]
+        public string Name { get; set; }
+
         public FieldUpdate()
         {}
 
         public FieldUpdate(string referenceName, object value, OperationType operation = OperationType.add)
         {
             Operation = operation;
+            Name = referenceName;
             Path = string.Format("/fields/{0}", referenceName);
             Value = value;
         }
