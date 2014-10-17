@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -72,12 +73,39 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         public QueryReference References { get; set; }
     }
 
-    public class TestQuery
+    public class Column
     {
-        [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        public string referenceName { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+    }
 
-        [JsonProperty(PropertyName = "wiql")]
-        public string Wiql { get; set; }
+    [DebuggerDisplay("{QueryType}")]
+    public abstract class QueryResult
+    {
+        [JsonProperty(PropertyName = "queryType")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public QueryType QueryType { get; set; }
+
+        [JsonProperty(PropertyName = "asOf")]
+        public DateTime AsOf { get; set; }
+
+        [JsonProperty(PropertyName = "columns")]
+        public List<Field> Columns { get; set; }
+
+        [JsonProperty(PropertyName = "sortColumns")]
+        public List<SortColumn> SortColumns { get; set; }
+    }
+
+    public class FlatQueryResult : QueryResult
+    {
+        [JsonProperty(PropertyName = "workItems")]
+        public List<WorkItem> WorkItems { get; set; }
+    }
+
+    public class LinkQueryResult : QueryResult
+    {
+        [JsonProperty(PropertyName = "workItemRelations")]
+        public List<WorkItemRelation> Relations { get; set; }
     }
 }

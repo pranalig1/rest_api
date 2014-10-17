@@ -141,6 +141,12 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         [JsonProperty(PropertyName = "attributes")]
         public RelationAttributes Attributes { get; set; }
 
+        [JsonProperty(PropertyName = "source")]
+        public WorkItem Source { get; set; }
+
+        [JsonProperty(PropertyName = "target")]
+        public WorkItem Target { get; set; }
+
         public override int GetHashCode()
         {
             return base.GetHashCode() ^ (Rel != null? Rel.GetHashCode() : 1) ^ (Attributes != null? Attributes.GetHashCode() : 1);

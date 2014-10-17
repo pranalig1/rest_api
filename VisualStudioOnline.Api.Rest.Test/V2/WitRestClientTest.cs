@@ -139,6 +139,7 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
             newQuery = _client.UpdateQuery(Settings.Default.ProjectName, newQuery).Result;
             
             string response = _client.DeleteQuery(Settings.Default.ProjectName, newQuery).Result;
+            newQuery = _client.GetQuery(Settings.Default.ProjectName, newQuery.Id, null, WitRestClient.QueryExpandOptions.all, true).Result;
             newQuery = _client.UndeleteQuery(Settings.Default.ProjectName, newQuery).Result;
             response = _client.DeleteQuery(Settings.Default.ProjectName, newQuery).Result;
 
@@ -147,6 +148,28 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
             newFolder = _client.MoveQuery(Settings.Default.ProjectName, "Shared Queries/Troubleshooting", newFolder).Result;
 
             response = _client.DeleteQuery(Settings.Default.ProjectName, newFolder).Result;
+        }
+
+        [TestMethod]
+        public void TestRunQueries()
+        {
+            const string FLAT_QUERY = "select System.Id, System.AssignedTo from Issue";
+            var flatResult = _client.RunFlatQuery(Settings.Default.ProjectName, FLAT_QUERY).Result;
+
+            // Run one hop query
+            var linkResult = _client.RunLinkQuery(Settings.Default.ProjectName, "select System.Id from WorkItemLinks where ([Source].[System.WorkItemType] <> '' and [Source].[System.State] <> '') and ([System.Links.LinkType] <> '') and ([Target].[System.WorkItemType]<> '') order by System.Id mode(MayContain)").Result;
+
+            // Run tree query
+            var treeResult = _client.RunLinkQuery(Settings.Default.ProjectName, "select System.Id from WorkItemLinks where ([Source].[System.WorkItemType] <> '' and [Source].[System.State] <> '') and ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward') and ([Target].[System.WorkItemType] <> '') order by System.Id mode(Recursive)").Result;
+
+            var newQuery = _client.CreateQuery(Settings.Default.ProjectName,
+                "Shared Queries/Troubleshooting",
+                string.Format("REST {0}", DateTime.Now.Ticks),
+                FLAT_QUERY).Result;
+
+            var result = _client.RunFlatQuery(Settings.Default.ProjectName, newQuery).Result;
+
+            _client.DeleteQuery(Settings.Default.ProjectName, newQuery).Wait();
         }
     }
 }

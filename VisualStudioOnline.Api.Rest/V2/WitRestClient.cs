@@ -513,9 +513,27 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<string> DeleteQuery(string projectName, Query query)
         {
-            return await DeleteResponse(string.Format("queries/{0}", query.Path), projectName);
+            return await DeleteResponse(string.Format("queries/{0}", query.Id), projectName);
         }
 
+        /// <summary>
+        /// Delete existing query / query folder
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="queryPath"></param>
+        /// <returns></returns>
+        public async Task<string> DeleteQuery(string projectName, string queryPath)
+        {
+            return await DeleteResponse(string.Format("queries/{0}", queryPath), projectName);
+        }
+
+        /// <summary>
+        /// Undelete query / query folder
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="query"></param>
+        /// <param name="undeleteDescendants"></param>
+        /// <returns></returns>
         public async Task<Query> UndeleteQuery(string projectName, Query query, bool? undeleteDescendants = null)
         {
             var arguments = new Dictionary<string, string>();
@@ -524,6 +542,54 @@ namespace VisualStudioOnline.Api.Rest.V2
             string response = await PatchResponse(string.Format("queries/{0}", query.Id), arguments, new { isDeleted = false }, projectName, JSON_MEDIA_TYPE);
             JsonConvert.PopulateObject(response, query);
             return query;
+        }
+
+        /// <summary>
+        /// Run flat query
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="queryText"></param>
+        /// <returns></returns>
+        public async Task<FlatQueryResult> RunFlatQuery(string projectName, string queryText)
+        {
+            string response = await PostResponse("wiql", new { query = queryText }, projectName);
+            return JsonConvert.DeserializeObject<FlatQueryResult>(response);
+        }
+
+        /// <summary>
+        /// Run link query
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="queryText"></param>
+        /// <returns></returns>
+        public async Task<LinkQueryResult> RunLinkQuery(string projectName, string queryText)
+        {
+            string response = await PostResponse("wiql", new { query = queryText }, projectName);
+            return JsonConvert.DeserializeObject<LinkQueryResult>(response);
+        }
+
+        /// <summary>
+        /// Run flat query
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<FlatQueryResult> RunFlatQuery(string projectName, Query query)
+        {
+            string response = await GetResponse(string.Format("wiql/{0}", query.Id), new Dictionary<string, string>(), projectName);
+            return JsonConvert.DeserializeObject<FlatQueryResult>(response);
+        }
+
+        /// <summary>
+        /// Run link query
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<LinkQueryResult> RunLinkQuery(string projectName, Query query)
+        {
+            string response = await GetResponse(string.Format("wiql/{0}", query.Id), new Dictionary<string, string>(), projectName);
+            return JsonConvert.DeserializeObject<LinkQueryResult>(response);
         }
 
         #region Helper methods
