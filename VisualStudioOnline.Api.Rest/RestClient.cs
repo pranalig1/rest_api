@@ -36,10 +36,10 @@ namespace VisualStudioOnline.Api.Rest
 
         protected async Task<string> GetResponse(string path, string projectName = null)
         {
-            return await GetResponse(path, new Dictionary<string, string>(), projectName);
+            return await GetResponse(path, new Dictionary<string, object>(), projectName);
         }
 
-        protected async Task<string> GetResponse(string path, IDictionary<string, string> arguments, string projectName = null)
+        protected async Task<string> GetResponse(string path, IDictionary<string, object> arguments, string projectName = null)
         {
             using (HttpClient client = GetHttpClient())
             {
@@ -59,10 +59,10 @@ namespace VisualStudioOnline.Api.Rest
 
         protected async Task<string> PostResponse(string path, object content, string projectName = null)
         {
-            return await PostResponse(path, new Dictionary<string, string>(), content, projectName);
+            return await PostResponse(path, new Dictionary<string, object>(), content, projectName);
         }
 
-        protected async Task<string> PostResponse(string path, IDictionary<string, string> arguments, object content, string projectName = null, string mediaType = JSON_MEDIA_TYPE)
+        protected async Task<string> PostResponse(string path, IDictionary<string, object> arguments, object content, string projectName = null, string mediaType = JSON_MEDIA_TYPE)
         {            
             var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, mediaType);
 
@@ -84,10 +84,10 @@ namespace VisualStudioOnline.Api.Rest
 
         protected async Task<string> PatchResponse(string path, object content, string projectName = null, string mediaType = JSON_PATCH_MEDIA_TYPE)
         {
-            return await PatchResponse(path, new Dictionary<string, string>(), content, projectName, mediaType);
+            return await PatchResponse(path, new Dictionary<string, object>(), content, projectName, mediaType);
         }
 
-        protected async Task<string> PatchResponse(string path, IDictionary<string, string> arguments, object content, string projectName = null, string mediaType = JSON_PATCH_MEDIA_TYPE)
+        protected async Task<string> PatchResponse(string path, IDictionary<string, object> arguments, object content, string projectName = null, string mediaType = JSON_PATCH_MEDIA_TYPE)
         {
             var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, mediaType);
 
@@ -135,10 +135,10 @@ namespace VisualStudioOnline.Api.Rest
 
         private string ConstructUrl(string projectName, string path)
         {
-            return ConstructUrl(projectName, path, new Dictionary<string, string>());
+            return ConstructUrl(projectName, path, new Dictionary<string, object>());
         }
 
-        private string ConstructUrl(string projectName, string path, IDictionary<string, string> arguments)
+        private string ConstructUrl(string projectName, string path, IDictionary<string, object> arguments)
         {
             if (!arguments.ContainsKey("api-version"))
             {
@@ -155,7 +155,7 @@ namespace VisualStudioOnline.Api.Rest
                 resultUrl.AppendFormat("/{0}", path);
             }
 
-            resultUrl.AppendFormat("?{0}", string.Join("&", arguments.Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value))));
+            resultUrl.AppendFormat("?{0}", string.Join("&", arguments.Where(kvp => kvp.Value != null).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value))));
             return resultUrl.ToString();
         }
     }

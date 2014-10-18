@@ -33,11 +33,8 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
     }
 
     [DebuggerDisplay("{Name}")]
-    public class Query : BaseObject
+    public class Query : ObjectWithId<string>
     {
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
-
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
@@ -71,13 +68,6 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "_links")]
         public QueryReference References { get; set; }
-    }
-
-    public class Column
-    {
-        public string referenceName { get; set; }
-        public string name { get; set; }
-        public string url { get; set; }
     }
 
     [DebuggerDisplay("{QueryType}")]

@@ -50,6 +50,13 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         }
     }
 
+    [DebuggerDisplay("{Id}")]
+    public class ObjectWithId<T> : BaseObject
+    {
+        [JsonProperty(PropertyName = "id")]
+        public T Id { get; set; }
+    }
+
     [DebuggerDisplay("{Href}")]
     public class ObjectReference
     {

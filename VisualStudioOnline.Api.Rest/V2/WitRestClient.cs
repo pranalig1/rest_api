@@ -101,9 +101,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<WorkItem> GetWorkItem(int workItemId, RevisionExpandOptions options = RevisionExpandOptions.none)
         {
-            var arguments = new Dictionary<string, string>() { { "$expand", options.ToString() } };
-
-            string response = await GetResponse(string.Format("workitems/{0}", workItemId), arguments);
+            string response = await GetResponse(string.Format("workitems/{0}", workItemId), new Dictionary<string, object>() { { "$expand", options } });
             return JsonConvert.DeserializeObject<WorkItem>(response);
         }
 
@@ -117,7 +115,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<JsonCollection<WorkItem>> GetWorkItems(int[] workItemIds, RevisionExpandOptions options = RevisionExpandOptions.none, DateTime? asOfDate = null, string[] fields = null)
         {
-            var arguments = new Dictionary<string, string>() { { "ids", string.Join(",", workItemIds) }, { "$expand", options.ToString() } };
+            var arguments = new Dictionary<string, object>() { { "ids", string.Join(",", workItemIds) }, { "$expand", options.ToString() } };
             if (asOfDate.HasValue) { arguments.Add("asof", asOfDate.Value.ToUniversalTime().ToString("u")); }
             if (fields != null) { arguments.Add("fields", string.Join(",", fields)); }
 
@@ -134,11 +132,8 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<JsonCollection<HistoryComment>> GetWorkItemHistory(int workitemId, int? top = null, int? skip = null)
         {
-            var arguments = new Dictionary<string, string>();
-            if (top.HasValue) { arguments.Add("$top", top.Value.ToString()); }
-            if (skip.HasValue) { arguments.Add("$skip", skip.Value.ToString()); }
-
-            string response = await GetResponse(string.Format("workitems/{0}/history", workitemId), arguments);
+            string response = await GetResponse(string.Format("workitems/{0}/history", workitemId),
+                new Dictionary<string, object>() { { "$top", top }, {"$skip", skip } });
             return JsonConvert.DeserializeObject<JsonCollection<HistoryComment>>(response);
         }
 
@@ -319,11 +314,8 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<JsonCollection<WorkItem>> GetWorkItemRevisions(int workItemId, int? top = null, int? skip = null, RevisionExpandOptions options = RevisionExpandOptions.none)
         {
-            var arguments = new Dictionary<string, string>() { {"$expand", options.ToString()} };
-            if (top.HasValue) { arguments.Add("$top", top.Value.ToString()); }
-            if (skip.HasValue) { arguments.Add("$skip", skip.Value.ToString()); }
-
-            string response = await GetResponse(string.Format("workitems/{0}/revisions", workItemId), arguments);
+            string response = await GetResponse(string.Format("workitems/{0}/revisions", workItemId),
+                new Dictionary<string, object>() { { "$top", top }, { "$skip", skip }, { "$expand", options } });
             return JsonConvert.DeserializeObject<JsonCollection<WorkItem>>(response);
         }
 
@@ -336,9 +328,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<WorkItem> GetWorkItemRevision(int workItemId, int revision, RevisionExpandOptions options = RevisionExpandOptions.none)
         {
-            var arguments = new Dictionary<string, string>() { { "$expand", options.ToString() } };
-
-            string response = await GetResponse(string.Format("workitems/{0}/revisions/{1}", workItemId, revision), arguments);
+            string response = await GetResponse(string.Format("workitems/{0}/revisions/{1}", workItemId, revision), new Dictionary<string, object>() { { "$expand", options } });
             return JsonConvert.DeserializeObject<WorkItem>(response);
         }
 
@@ -351,11 +341,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<JsonCollection<WorkItemUpdate>> GetWorkItemUpdates(int workItemId, int? top = null, int? skip = null)
         {
-            var arguments = new Dictionary<string, string>();
-            if (top.HasValue) { arguments.Add("$top", top.Value.ToString()); }
-            if (skip.HasValue) { arguments.Add("$skip", skip.Value.ToString()); }
-
-            string response = await GetResponse(string.Format("workitems/{0}/updates", workItemId), arguments);
+            string response = await GetResponse(string.Format("workitems/{0}/updates", workItemId), new Dictionary<string, object>() { { "$top", top }, { "$skip", skip } });
             return JsonConvert.DeserializeObject<JsonCollection<WorkItemUpdate>>(response);
         }
 
@@ -389,7 +375,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <param name="fileName"></param>
         /// <param name="content"></param>
         /// <returns></returns>
-        public async Task<FileReference> UploadAttachment(string projectName, string area, string fileName, byte[] content)
+        public async Task<ObjectWithId<string>> UploadAttachment(string projectName, string area, string fileName, byte[] content)
         {
             return await UploadAttachment(fileName, Convert.ToBase64String(content));
         }
@@ -402,15 +388,10 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <param name="fileName"></param>
         /// <param name="content"></param>
         /// <returns></returns>
-        public async Task<FileReference> UploadAttachment(string fileName, string content)
+        public async Task<ObjectWithId<string>> UploadAttachment(string fileName, string content)
         {
-            var arguments = new Dictionary<string, string>() 
-            { 
-                { "fileName", fileName }
-            };
-
-            string response = await PostResponse("attachments", arguments, content, null);
-            return JsonConvert.DeserializeObject<FileReference>(response);
+            string response = await PostResponse("attachments", new Dictionary<string, object>() { { "fileName", fileName } }, content, null);
+            return JsonConvert.DeserializeObject<ObjectWithId<string>>(response);
         }
 
       
@@ -425,11 +406,9 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<JsonCollection<Query>> GetQueries(string projectName, string folderPath = null, int? depth = null, QueryExpandOptions options = QueryExpandOptions.none, bool? includeDeleted = null)
         {
-            var arguments = new Dictionary<string, string>() { { "$expand", options.ToString() } };
-            if (depth.HasValue) { arguments.Add("$depth", depth.Value.ToString()); }
-            if (includeDeleted.HasValue) { arguments.Add("$includeDeleted", includeDeleted.Value.ToString()); }
-
-            string response = await GetResponse(string.IsNullOrEmpty(folderPath) ? "queries" : string.Format("queries/{0}", folderPath), arguments, projectName);
+            string response = await GetResponse(string.IsNullOrEmpty(folderPath) ? "queries" : string.Format("queries/{0}", folderPath),
+                new Dictionary<string, object>() { { "$expand", options }, { "$depth", depth }, { "$includeDeleted", includeDeleted } }, 
+                projectName);
             return JsonConvert.DeserializeObject<JsonCollection<Query>>(response);
         }
 
@@ -444,11 +423,9 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<Query> GetQuery(string projectName, string folderPathOrId, int? depth = null, QueryExpandOptions options = QueryExpandOptions.none, bool? includeDeleted = null)
         {
-            var arguments = new Dictionary<string, string>() { { "$expand", options.ToString() } };
-            if (depth.HasValue) { arguments.Add("$depth", depth.Value.ToString()); }
-            if (includeDeleted.HasValue) { arguments.Add("$includeDeleted", includeDeleted.Value.ToString()); }
-
-            string response = await GetResponse(string.Format("queries/{0}", folderPathOrId), arguments, projectName);
+            string response = await GetResponse(string.Format("queries/{0}", folderPathOrId),
+                new Dictionary<string, object>() { { "$expand", options }, { "$depth", depth }, { "$includeDeleted", includeDeleted } }, 
+                projectName);
             return JsonConvert.DeserializeObject<Query>(response);
         }
 
@@ -461,7 +438,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<Query> CreateQuery(string projectName, string parentPath, string queryName, string queryText)
         {
-            string response = await PostResponse(string.Format("queries/{0}", parentPath), new Dictionary<string, string>(), new { name = queryName, wiql = queryText }, projectName);
+            string response = await PostResponse(string.Format("queries/{0}", parentPath), new Dictionary<string, object>(), new { name = queryName, wiql = queryText }, projectName);
             return JsonConvert.DeserializeObject<Query>(response);
         }
 
@@ -474,7 +451,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<Query> CreateQueryFolder(string projectName, string parentPath, string folderName)
         {
-            string response = await PostResponse(string.Format("queries/{0}", parentPath), new Dictionary<string, string>(), new { name = folderName, isFolder = true }, projectName);
+            string response = await PostResponse(string.Format("queries/{0}", parentPath), new Dictionary<string, object>(), new { name = folderName, isFolder = true }, projectName);
             return JsonConvert.DeserializeObject<Query>(response);
         }
 
@@ -500,7 +477,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<Query> MoveQuery(string projectName, string newPath, Query query)
         {
-            string response = await PostResponse(string.Format("queries/{0}", newPath), new Dictionary<string, string>(), query, projectName);
+            string response = await PostResponse(string.Format("queries/{0}", newPath), new Dictionary<string, object>(), query, projectName);
             JsonConvert.PopulateObject(response, query);
             return query;
         }
@@ -536,10 +513,9 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<Query> UndeleteQuery(string projectName, Query query, bool? undeleteDescendants = null)
         {
-            var arguments = new Dictionary<string, string>();
-            if (undeleteDescendants.HasValue) { arguments.Add("$undeletedescendants", undeleteDescendants.Value.ToString()); }
-
-            string response = await PatchResponse(string.Format("queries/{0}", query.Id), arguments, new { isDeleted = false }, projectName, JSON_MEDIA_TYPE);
+            string response = await PatchResponse(string.Format("queries/{0}", query.Id),
+                new Dictionary<string, object>() { { "$undeletedescendants", undeleteDescendants } },
+                new { isDeleted = false }, projectName, JSON_MEDIA_TYPE);
             JsonConvert.PopulateObject(response, query);
             return query;
         }
@@ -576,7 +552,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<FlatQueryResult> RunFlatQuery(string projectName, Query query)
         {
-            string response = await GetResponse(string.Format("wiql/{0}", query.Id), new Dictionary<string, string>(), projectName);
+            string response = await GetResponse(string.Format("wiql/{0}", query.Id), new Dictionary<string, object>(), projectName);
             return JsonConvert.DeserializeObject<FlatQueryResult>(response);
         }
 
@@ -588,20 +564,17 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<LinkQueryResult> RunLinkQuery(string projectName, Query query)
         {
-            string response = await GetResponse(string.Format("wiql/{0}", query.Id), new Dictionary<string, string>(), projectName);
+            string response = await GetResponse(string.Format("wiql/{0}", query.Id), new Dictionary<string, object>(), projectName);
             return JsonConvert.DeserializeObject<LinkQueryResult>(response);
         }
 
         #region Helper methods
         private async Task<string> GetCssNode(string projectName, string nodePath, int? depth = null)
         {
-            var arguments = new Dictionary<string, string>();
-            if (depth.HasValue) { arguments.Add("$depth", depth.Value.ToString()); }
-
             string path = "classificationnodes";
             if (!string.IsNullOrEmpty(nodePath)) { path = string.Format("{0}/{1}", path, nodePath); }
 
-            string response = await GetResponse(path, arguments, projectName);
+            string response = await GetResponse(path, new Dictionary<string, object>() { { "$depth", depth.Value } }, projectName);
             return response;
         }
         #endregion

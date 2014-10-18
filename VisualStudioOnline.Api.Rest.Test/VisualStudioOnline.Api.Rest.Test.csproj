@@ -61,6 +61,7 @@
     <Compile Include="V1\TagRestClientTest.cs" />
     <Compile Include="V1\WitRestClientTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="V2\ProjectRestClientTest.cs" />
     <Compile Include="V2\WitRestClientTest.cs" />
   </ItemGroup>
   <ItemGroup>

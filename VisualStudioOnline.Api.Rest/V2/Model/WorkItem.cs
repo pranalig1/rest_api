@@ -63,11 +63,8 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
     }
 
     [DebuggerDisplay("{Name}")]
-    public class User : BaseObject
+    public class User : ObjectWithId<string>
     {
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
-
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
     }
@@ -162,11 +159,8 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
     }
 
     [DebuggerDisplay("{Id:Rev}")]
-    public abstract class WorkItemCore : BaseObject
+    public abstract class WorkItemCore : ObjectWithId<int>
     {
-        [JsonProperty(PropertyName = "id")]
-        public int Id { get; set; }
-
         [JsonProperty(PropertyName = "rev")]
         public int Rev { get; set; }
     }
@@ -330,13 +324,6 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "newValue")]
         public object NewValue { get; set; }
-    }
-
-    [DebuggerDisplay("{Id}")]
-    public class FileReference : BaseObject
-    {
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
     }
 
     [DebuggerDisplay("{Path}")]

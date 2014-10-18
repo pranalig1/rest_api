@@ -32,9 +32,7 @@ namespace VisualStudioOnline.Api.Rest.V1
         /// <returns></returns>
         public async Task<TagCollection> GetTagList(string scopeId, bool includeInactive = false)
         {
-            var arguments = new Dictionary<string, string>() { { "includeInactive", includeInactive.ToString() } };
-
-            string response = await GetResponse(string.Format("scopes/{0}/tags", scopeId), arguments);
+            string response = await GetResponse(string.Format("scopes/{0}/tags", scopeId), new Dictionary<string, object>() { { "includeInactive", includeInactive } });
             return JsonConvert.DeserializeObject<TagCollection>(response);
         }
 
@@ -58,7 +56,7 @@ namespace VisualStudioOnline.Api.Rest.V1
         /// <returns></returns>
         public async Task<Tag> CreateTag(string scopeId, string name)
         {
-            string response = await PostResponse(string.Format("scopes/{0}/tags", scopeId), new Dictionary<string, string>(), new Tag() { Name = name });
+            string response = await PostResponse(string.Format("scopes/{0}/tags", scopeId), new Dictionary<string, object>(), new Tag() { Name = name });
             return JsonConvert.DeserializeObject<Tag>(response);
         }
 
