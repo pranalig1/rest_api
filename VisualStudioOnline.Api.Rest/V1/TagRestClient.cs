@@ -19,8 +19,8 @@ namespace VisualStudioOnline.Api.Rest.V1
             }
         }
 
-        public TagRestClient(string accountName, NetworkCredential userCredential)
-            : base(string.Format(ACCOUNT_ROOT_URL, accountName), new BasicAuthenticationFilter(userCredential), "1.0-preview.1")
+        public TagRestClient(string accountName, NetworkCredential userCredential, string collectionName = DEFAULT_COLLECTION)
+            : base(string.Format(ACCOUNT_ROOT_URL, accountName, collectionName), new BasicAuthenticationFilter(userCredential), "1.0-preview.1")
         {
         }
 

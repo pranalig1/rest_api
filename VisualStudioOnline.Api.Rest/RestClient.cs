@@ -14,7 +14,8 @@ namespace VisualStudioOnline.Api.Rest
     /// </summary>
     public abstract class RestClient
     {
-        protected const string ACCOUNT_ROOT_URL = "https://{0}.visualstudio.com/DefaultCollection";
+        protected const string ACCOUNT_ROOT_URL = "https://{0}.visualstudio.com/{1}";
+        protected const string DEFAULT_COLLECTION = "DefaultCollection";
         protected const string JSON_MEDIA_TYPE = "application/json";
         protected const string JSON_PATCH_MEDIA_TYPE = "application/json-patch+json";
 
