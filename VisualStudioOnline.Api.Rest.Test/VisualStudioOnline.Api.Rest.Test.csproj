@@ -58,6 +58,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="V1\AccountRestClientTest.cs" />
+    <Compile Include="V1\ProjectRestClientTest.cs" />
     <Compile Include="V1\TagRestClientTest.cs" />
     <Compile Include="V1\WitRestClientTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

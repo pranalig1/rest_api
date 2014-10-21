@@ -53,10 +53,12 @@
     <Compile Include="V1\Model\Query.cs" />
     <Compile Include="RestClient.cs" />
     <Compile Include="V1\Model\Tag.cs" />
+    <Compile Include="V1\Model\Team.cs" />
+    <Compile Include="V1\ProjectRestClient.cs" />
     <Compile Include="V1\TagRestClient.cs" />
     <Compile Include="V1\WitRestClient.cs" />
     <Compile Include="V2\Model\ClassificationNode.cs" />
-    <Compile Include="V2\Model\Common.cs" />
+    <Compile Include="Common.cs" />
     <Compile Include="V2\Model\Project.cs" />
     <Compile Include="V2\Model\Query.cs" />
     <Compile Include="V2\Model\WorkItem.cs" />

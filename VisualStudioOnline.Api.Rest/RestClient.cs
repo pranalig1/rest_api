@@ -50,7 +50,7 @@ namespace VisualStudioOnline.Api.Rest
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new Exception(string.Format("GET request failed: {0}", responseBody));
+                        throw JsonConvert.DeserializeObject<VsoException>(responseBody);
                     }
 
                     return responseBody;
@@ -75,7 +75,7 @@ namespace VisualStudioOnline.Api.Rest
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new Exception(string.Format("POST request failed: {0}", responseBody));
+                        throw JsonConvert.DeserializeObject<VsoException>(responseBody);
                     }
 
                     return responseBody;
@@ -100,7 +100,7 @@ namespace VisualStudioOnline.Api.Rest
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new Exception(string.Format("PATCH request failed: {0}", responseBody));
+                        throw JsonConvert.DeserializeObject<VsoException>(responseBody);
                     }
 
                     return responseBody;
@@ -118,7 +118,7 @@ namespace VisualStudioOnline.Api.Rest
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new Exception(string.Format("DELETE request failed: {0}", responseBody));
+                        throw JsonConvert.DeserializeObject<VsoException>(responseBody);
                     }
 
                     return responseBody;
@@ -177,5 +177,32 @@ namespace VisualStudioOnline.Api.Rest
 
             return await client.SendAsync(request);
         }
+    }
+
+    [JsonObject(MemberSerialization.OptIn)]
+    public class VsoException : Exception
+    {
+        [JsonProperty(PropertyName = "$id")]
+        public int Id { get; set; }
+
+        [JsonProperty(PropertyName = "innerException")]
+        public object ServerInnerException { get; set; }
+
+        [JsonProperty(PropertyName = "message")]
+        public string ErrorMessage { get; set; }
+
+        public override string Message { get { return ErrorMessage; } }
+
+        [JsonProperty(PropertyName = "typeName")]
+        public string TypeName { get; set; }
+
+        [JsonProperty(PropertyName = "typeKey")]
+        public string TypeKey { get; set; }
+
+        [JsonProperty(PropertyName = "errorCode")]
+        public int ErrorCode { get; set; }
+
+        [JsonProperty(PropertyName = "eventId")]
+        public int EventId { get; set; }
     }
 }

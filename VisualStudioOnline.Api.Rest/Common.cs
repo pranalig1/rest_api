@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 
-namespace VisualStudioOnline.Api.Rest.V2.Model
+namespace VisualStudioOnline.Api.Rest
 {
     public class JsonCollection<T> where T : class
     {
