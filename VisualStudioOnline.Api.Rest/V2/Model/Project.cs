@@ -77,4 +77,28 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         public Team DefaultTeam { get; set; }
     }
 
+    public class TeamProjectCollectionReference
+    {
+        [JsonProperty(PropertyName = "self")]
+        public ObjectReference Self { get; set; }
+
+        [JsonProperty(PropertyName = "web")]
+        public ObjectReference Web { get; set; }
+    }
+
+    [DebuggerDisplay("{Name}")]
+    public class TeamProjectCollection : ObjectWithId<string>
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "description")]
+        public string Description { get; set; }
+
+        [JsonProperty(PropertyName = "state")]
+        public string State { get; set; }
+
+        [JsonProperty(PropertyName = "_links")]
+        public TeamProjectCollectionReference References { get; set; }
+    }
 }
