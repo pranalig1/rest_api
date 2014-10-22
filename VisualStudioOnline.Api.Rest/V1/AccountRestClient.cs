@@ -8,7 +8,7 @@ namespace VisualStudioOnline.Api.Rest.V1
     /// <summary>
     /// Account REST API client
     /// </summary>
-    public class AccountRestClient : RestClient
+    public class AccountRestClient : RestClientV1
     {
         private const string VSSPS_ROOT_URL = "https://app.vssps.visualstudio.com";
         
@@ -21,9 +21,8 @@ namespace VisualStudioOnline.Api.Rest.V1
         }
 
          public AccountRestClient(string authToken)
-            : base(VSSPS_ROOT_URL, new OAuthFilter(authToken), "1.0-preview.1")
-        {
-        }
+            : base(VSSPS_ROOT_URL, new OAuthFilter(authToken))
+        { }
 
         /// <summary>
         /// Get account list for current user

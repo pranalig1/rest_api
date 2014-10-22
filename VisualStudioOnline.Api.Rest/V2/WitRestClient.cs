@@ -10,7 +10,7 @@ namespace VisualStudioOnline.Api.Rest.V2
     /// <summary>
     /// WIT REST API client v.1.0-preview.2
     /// </summary>
-    public class WitRestClient : RestClient
+    public class WitRestClient : RestClientV2
     {
         public enum QueryExpandOptions
         {
@@ -32,7 +32,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         }
 
         public WitRestClient(string accountName, NetworkCredential userCredential, string collectionName = DEFAULT_COLLECTION)
-            : base(string.Format(ACCOUNT_ROOT_URL, accountName, collectionName), new BasicAuthenticationFilter(userCredential), "1.0-preview.2")
+            : base(string.Format(ACCOUNT_ROOT_URL, accountName, collectionName), new BasicAuthenticationFilter(userCredential))
         {
         }
 

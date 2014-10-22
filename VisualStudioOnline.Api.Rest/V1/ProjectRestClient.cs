@@ -9,7 +9,7 @@ using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.V1
 {
-    public class ProjectRestClient : RestClient
+    public class ProjectRestClient : RestClientV1
     {
         protected override string SubSystemName
         {
@@ -17,7 +17,7 @@ namespace VisualStudioOnline.Api.Rest.V1
         }
 
         public ProjectRestClient(string accountName, NetworkCredential userCredential, string collectionName = DEFAULT_COLLECTION)
-            : base(string.Format(ACCOUNT_ROOT_URL, accountName, collectionName), new BasicAuthenticationFilter(userCredential), "1.0-preview.1")
+            : base(string.Format(ACCOUNT_ROOT_URL, accountName, collectionName), new BasicAuthenticationFilter(userCredential))
         {
         }
 

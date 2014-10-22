@@ -9,6 +9,12 @@ using System.Threading.Tasks;
 
 namespace VisualStudioOnline.Api.Rest
 {
+    public struct VsoAPI
+    {
+        public const string Version1 = "1.0-preview.1";
+        public const string Version2 = "1.0-preview.2";
+    }
+
     /// <summary>
     /// Base class for TFS subsystem REST API client
     /// </summary>
@@ -21,18 +27,21 @@ namespace VisualStudioOnline.Api.Rest
 
         private string _rootUrl;
         private IHttpRequestHeaderFilter _authProvider;
-        private string _apiVersion;
 
         protected abstract string SubSystemName
         {
             get;
         }
 
-        public RestClient(string rootUrl, IHttpRequestHeaderFilter authProvider, string apiVersion)
+        protected abstract string ApiVersion
+        {
+            get;
+        }
+
+        public RestClient(string rootUrl, IHttpRequestHeaderFilter authProvider)
         {
             _rootUrl = rootUrl;
             _authProvider = authProvider;
-            _apiVersion = apiVersion;
         }
 
         protected async Task<string> GetResponse(string path, string projectName = null)
@@ -143,7 +152,7 @@ namespace VisualStudioOnline.Api.Rest
         {
             if (!arguments.ContainsKey("api-version"))
             {
-                arguments.Add("api-version", _apiVersion);
+                arguments.Add("api-version", ApiVersion);
             }
 
             StringBuilder resultUrl = new StringBuilder(
@@ -159,6 +168,26 @@ namespace VisualStudioOnline.Api.Rest
             resultUrl.AppendFormat("?{0}", string.Join("&", arguments.Where(kvp => kvp.Value != null).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value))));
             return resultUrl.ToString();
         }
+    }
+
+    public abstract class RestClientV1 : RestClient
+    {
+        protected override string ApiVersion
+        {
+            get { return VsoAPI.Version1; }
+        }
+
+        public RestClientV1(string rootUrl, IHttpRequestHeaderFilter authProvider) : base(rootUrl, authProvider) { }
+    }
+
+    public abstract class RestClientV2 : RestClient
+    {
+        protected override string ApiVersion
+        {
+            get { return VsoAPI.Version2; }
+        }
+
+        public RestClientV2(string rootUrl, IHttpRequestHeaderFilter authProvider) : base(rootUrl, authProvider) { }
     }
 
     /// <summary>
