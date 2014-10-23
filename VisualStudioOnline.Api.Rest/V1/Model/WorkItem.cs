@@ -14,20 +14,14 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
     }
 
     [DebuggerDisplay("{Id}")]
-    public class WorkItemReference
+    public class WorkItemReference : ObjectWithId<int>
     {
-        [JsonProperty(PropertyName = "id")]
-        public int Id { get; set; }
-
-        [JsonProperty(PropertyName = "url")]
-        public string Url { get; set; }
-
         [JsonProperty(PropertyName = "webUrl")]
         public string WebUrl { get; set; }
     }
 
     [DebuggerDisplay("{Location}")]
-    public class ResourceLink
+    public class ResourceLink : BaseObject
     {
         [JsonProperty(PropertyName = "resourceId")]
         public int ResourceId { get; set; }
@@ -49,9 +43,6 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
 
         [JsonProperty(PropertyName = "length")]
         public int Length { get; set; }
-
-        [JsonProperty(PropertyName = "url")]
-        public string Url { get; set; }
 
         [JsonProperty(PropertyName = "source")]
         public WorkItemReference Source { get; set; }
@@ -199,15 +190,6 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
         }
     }
 
-    public class WorkItemCollection
-    {
-        [JsonProperty(PropertyName = "count")]
-        public int Count { get; set; }
-
-        [JsonProperty(PropertyName = "value")]
-        public List<WorkItem> WorkItems { get; set; }
-    }
-
     [DebuggerDisplay("{Field.ReferenceName}: {OriginalValue} -> {UpdatedValue}")]
     public class FieldUpdate
     {
@@ -222,16 +204,10 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
     }
 
     [DebuggerDisplay("{Id} Rev:{Rev}")]
-    public class WorkItemUpdate
+    public class WorkItemUpdate : ObjectWithId<int>
     {
-        [JsonProperty(PropertyName = "url")]
-        public string Url { get; set; }
-
         [JsonProperty(PropertyName = "revisionUrl")]
         public string RevisionUrl { get; set; }
-
-        [JsonProperty(PropertyName = "id")]
-        public int Id { get; set; }
 
         [JsonProperty(PropertyName = "rev")]
         public int Rev { get; set; }
@@ -244,14 +220,5 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
 
         [JsonProperty(PropertyName = "resourceLinkUpdates")]
         public List<ResourceLink> ResourceLinkUpdates { get; set; }
-    }
-
-    public class WorkItemUpdateCollection
-    {
-        [JsonProperty(PropertyName = "count")]
-        public int Count { get; set; }
-
-        [JsonProperty(PropertyName = "value")]
-        public List<WorkItemUpdate> Updates { get; set; }
     }
 }

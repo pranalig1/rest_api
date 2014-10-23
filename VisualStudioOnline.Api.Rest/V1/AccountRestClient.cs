@@ -28,10 +28,10 @@ namespace VisualStudioOnline.Api.Rest.V1
         /// Get account list for current user
         /// </summary>
         /// <returns></returns>
-        public async Task<AccountCollection> GetAccountList()
+        public async Task<JsonCollection<Account>> GetAccountList()
         {
             string response = await GetResponse(string.Empty);
-            return JsonConvert.DeserializeObject<AccountCollection>(response);            
+            return JsonConvert.DeserializeObject<JsonCollection<Account>>(response);            
         }
 
         /// <summary>

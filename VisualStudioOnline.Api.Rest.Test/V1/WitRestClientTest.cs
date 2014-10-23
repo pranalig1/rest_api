@@ -22,8 +22,8 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
         [TestMethod]
         public void TestCreateAndUpdateQuery()
         {
-            QueryCollection queryHierarchy = _client.GetQueries(Settings.Default.ProjectName, null, WitRestClient.QueryExpandOptions.all).Result;
-            var sharedQueriesFolder = queryHierarchy.Queries[0];
+            var queryHierarchy = _client.GetQueries(Settings.Default.ProjectName, null, WitRestClient.QueryExpandOptions.all).Result;
+            var sharedQueriesFolder = queryHierarchy.Items[0];
 
             Query queryFolder = _client.CreateQuery(new Query()
                 {
@@ -54,9 +54,9 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
             var bug = CreateBug();
             var task = CreateTask();
 
-            WorkItemCollection workItems = _client.GetWorkItems(new int[] { bug.Id }, WitRestClient.WorkItemExpandOptions.all).Result;
+            var workItems = _client.GetWorkItems(new int[] { bug.Id }, WitRestClient.WorkItemExpandOptions.all).Result;
 
-            bug = _client.GetWorkItem(workItems.WorkItems[0].Id, WitRestClient.WorkItemExpandOptions.all).Result;
+            bug = _client.GetWorkItem(workItems.Items[0].Id, WitRestClient.WorkItemExpandOptions.all).Result;
 
             bug["System.Title"] = "REST: " + DateTime.Now.ToString();
             bug.Links.Add(new Link() { Comment = DateTime.Now.ToString(), Source = bug, Target = task, LinkType = "System.LinkTypes.Dependency-Forward" });

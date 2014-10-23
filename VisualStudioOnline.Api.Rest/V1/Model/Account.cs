@@ -45,13 +45,4 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
         [JsonProperty(PropertyName = "lastUpdatedDate")]
         public string LastUpdatedDate { get; set; }
     }
-
-    public class AccountCollection
-    {
-        [JsonProperty(PropertyName = "count")]
-        public int Count { get; set; }
-
-        [JsonProperty(PropertyName = "value")]
-        public List<Account> Accounts { get; set; }
-    }
 }

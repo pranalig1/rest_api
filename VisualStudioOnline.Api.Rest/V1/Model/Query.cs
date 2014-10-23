@@ -12,16 +12,10 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
     }
 
     [DebuggerDisplay("{Name}")]
-    public class Project
+    public class Project : ObjectWithId<string>
     {
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
-
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
-
-        [JsonProperty(PropertyName = "url")]
-        public string Url { get; set; }
     }
 
     [DebuggerDisplay("{ReferenceName}")]
@@ -32,7 +26,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
     }
 
     [DebuggerDisplay("{Name}")]
-    public class Query
+    public class Query : ObjectWithId<string>
     {
         [JsonProperty(PropertyName = "parentId")]
         public string ParentId { get; set; }
@@ -53,12 +47,6 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
         [JsonProperty(PropertyName = "project")]
         public Project Project { get; set; }
 
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
-
-        [JsonProperty(PropertyName = "url")]
-        public string Url { get; set; }
-
         [JsonProperty(PropertyName = "webUrl")]
         public string WebUrl { get; set; }
 
@@ -70,15 +58,6 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
 
         [JsonProperty(PropertyName = "sortOptions")]
         public List<SortOption> SortOptions { get; set; }
-    }
-
-    public class QueryCollection
-    {
-        [JsonProperty(PropertyName = "count")]
-        public int Count { get; set; }
-
-        [JsonProperty(PropertyName = "value")]
-        public List<Query> Queries { get; set; }
     }
 
     [DebuggerDisplay("{SourceId}")]

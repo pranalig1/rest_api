@@ -54,8 +54,10 @@
     <Compile Include="RestClient.cs" />
     <Compile Include="V1\Model\Tag.cs" />
     <Compile Include="V1\Model\Team.cs" />
+    <Compile Include="V1\Model\VersionControl.cs" />
     <Compile Include="V1\ProjectRestClient.cs" />
     <Compile Include="V1\TagRestClient.cs" />
+    <Compile Include="V1\VersionControlRestClient.cs" />
     <Compile Include="V1\WitRestClient.cs" />
     <Compile Include="V2\Model\ClassificationNode.cs" />
     <Compile Include="Common.cs" />

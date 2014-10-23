@@ -30,10 +30,10 @@ namespace VisualStudioOnline.Api.Rest.V1
         /// <param name="scopeId">e.g. project id</param>
         /// <param name="includeInactive"></param>
         /// <returns></returns>
-        public async Task<TagCollection> GetTagList(string scopeId, bool includeInactive = false)
+        public async Task<JsonCollection<Tag>> GetTagList(string scopeId, bool includeInactive = false)
         {
             string response = await GetResponse(string.Format("scopes/{0}/tags", scopeId), new Dictionary<string, object>() { { "includeInactive", includeInactive } });
-            return JsonConvert.DeserializeObject<TagCollection>(response);
+            return JsonConvert.DeserializeObject<JsonCollection<Tag>>(response);
         }
 
         /// <summary>
