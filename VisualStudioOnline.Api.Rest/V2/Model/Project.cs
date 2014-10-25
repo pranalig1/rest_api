@@ -55,7 +55,7 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
     }
 
     [DebuggerDisplay("{Name}")]
-    public class TeamProject : ObjectWithId<Guid>
+    public class TeamProject : ObjectWithId<Guid, TeamProjectReference>
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
@@ -69,9 +69,6 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "capabilities")]
         public Capabilities Capabilities { get; set; }
-
-        [JsonProperty(PropertyName = "_links")]
-        public TeamProjectReference References { get; set; }
 
         [JsonProperty(PropertyName = "defaultTeam")]
         public Team DefaultTeam { get; set; }
@@ -87,7 +84,7 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
     }
 
     [DebuggerDisplay("{Name}")]
-    public class TeamProjectCollection : ObjectWithId<string>
+    public class TeamProjectCollection : ObjectWithId<string, TeamProjectCollectionReference>
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
@@ -97,8 +94,5 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "state")]
         public string State { get; set; }
-
-        [JsonProperty(PropertyName = "_links")]
-        public TeamProjectCollectionReference References { get; set; }
     }
 }

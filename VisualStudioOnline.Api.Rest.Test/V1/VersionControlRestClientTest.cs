@@ -36,5 +36,15 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
             var label = _client.GetLabel(labels[0].Id.ToString()).Result;
             var items = _client.GetLabelledItems(label.Id.ToString()).Result;
         }
+
+        [TestMethod]
+        public void TestGetShelvesets()
+        {
+            var shelvesets = _client.GetShelvesets().Result;
+            var shelveset = _client.GetShelveset(shelvesets[0].Id, true, true).Result;
+
+            var changes = _client.GetShelvesetChanges(shelveset.Id).Result;
+            var workItems = _client.GetShelvesetWorkItems(shelveset.Id).Result;
+        }
     }
 }

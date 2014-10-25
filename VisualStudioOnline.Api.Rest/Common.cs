@@ -50,6 +50,19 @@ namespace VisualStudioOnline.Api.Rest
         }
     }
 
+    public abstract class BaseObject<T> : BaseObject
+    {
+        [JsonProperty(PropertyName = "_links")]
+        public T References { get; set; }
+    }
+
+    [DebuggerDisplay("{Id}")]
+    public class ObjectWithId<TId, TLinks> : BaseObject<TLinks>
+    {
+        [JsonProperty(PropertyName = "id")]
+        public TId Id { get; set; }
+    }
+
     [DebuggerDisplay("{Id}")]
     public class ObjectWithId<T> : BaseObject
     {

@@ -93,5 +93,62 @@ namespace VisualStudioOnline.Api.Rest.V1
             string response = await GetResponse(string.Format("labels/{0}/items", labelId), new Dictionary<string, object>() { { "top", top }, { "skip", skip } });
             return JsonConvert.DeserializeObject<JsonCollection<VersionControlItem>>(response);
         }
+
+
+        /// <summary>
+        /// Get list of shelvesets
+        /// </summary>
+        /// <param name="owner"></param>
+        /// <param name="maxCommentLength"></param>
+        /// <param name="top"></param>
+        /// <param name="skip"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<Shelveset>> GetShelvesets(string owner = null, string maxCommentLength = null, int? top = null, int? skip = null)
+        {
+            string response = await GetResponse("shelvesets",
+                new Dictionary<string, object>() { { "owner", owner }, { "maxCommentLength", maxCommentLength }, { "top", top }, { "skip", skip } });
+            return JsonConvert.DeserializeObject<JsonCollection<Shelveset>>(response);
+        }
+
+        /// <summary>
+        /// Get a shelveset by id
+        /// </summary>
+        /// <param name="shelvesetId"></param>
+        /// <param name="includeDetails"></param>
+        /// <param name="includeWorkItems"></param>
+        /// <param name="maxChangeCount"></param>
+        /// <param name="maxCommentLength"></param>
+        /// <returns></returns>
+        public async Task<Shelveset> GetShelveset(string shelvesetId, bool? includeDetails = null, bool? includeWorkItems = null, int? maxChangeCount = null, string maxCommentLength = null)
+        {
+            string response = await GetResponse(string.Format("shelvesets/{0}", shelvesetId),
+                new Dictionary<string, object>() { { "includeDetails", includeDetails }, { "includeWorkItems", includeWorkItems }, { "maxChangeCount", maxChangeCount }, { "maxCommentLength", maxCommentLength } });
+            return JsonConvert.DeserializeObject<Shelveset>(response);
+        }
+
+        /// <summary>
+        /// Get shelveset changes
+        /// </summary>
+        /// <param name="shelvesetId"></param>
+        /// <param name="top"></param>
+        /// <param name="skip"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<VersionControlItemChange>> GetShelvesetChanges(string shelvesetId, int? top = null, int? skip = null)
+        {
+            string response = await GetResponse(string.Format("shelvesets/{0}/changes", shelvesetId),
+                new Dictionary<string, object>() { { "top", top }, { "skip", skip } });
+            return JsonConvert.DeserializeObject<JsonCollection<VersionControlItemChange>>(response);
+        }
+
+        /// <summary>
+        /// Get shelveset work items
+        /// </summary>
+        /// <param name="shelvesetId"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<WorkItemInfo>> GetShelvesetWorkItems(string shelvesetId)
+        {
+            string response = await GetResponse(string.Format("shelvesets/{0}/workitems", shelvesetId));
+            return JsonConvert.DeserializeObject<JsonCollection<WorkItemInfo>>(response);
+        }
     }
 }

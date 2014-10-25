@@ -118,7 +118,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
     }
 
     [DebuggerDisplay("{Id}")]
-    public class WorkItem
+    public class WorkItem : ObjectWithId<int>
     {
         public WorkItem()
         {
@@ -127,14 +127,8 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
             ResourceLinks = new List<ResourceLink>();
         }
 
-        [JsonProperty(PropertyName = "id")]
-        public int Id { get; set; }
-
         [JsonProperty(PropertyName = "rev")]
         public int Rev { get; set; }
-
-        [JsonProperty(PropertyName = "url")]
-        public string Url { get; set; }
 
         [JsonProperty(PropertyName = "webUrl")]
         public string WebUrl { get; set; }

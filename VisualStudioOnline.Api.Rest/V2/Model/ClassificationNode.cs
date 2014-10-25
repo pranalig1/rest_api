@@ -20,7 +20,7 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
 
     [DebuggerDisplay("{Name}")]
-    public class ClassificationNode : BaseObject
+    public class ClassificationNode : BaseObject<NodeReference>
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
@@ -31,9 +31,6 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
 
         [JsonProperty(PropertyName = "hasChildren")]
         public bool HasChildren { get; set; }
-
-        [JsonProperty(PropertyName = "_links")]
-        public NodeReference References { get; set; }
 
         [JsonProperty(PropertyName = "children")]
         public List<ClassificationNode> Children { get; set; }
