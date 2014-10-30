@@ -157,4 +157,47 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
         [JsonProperty(PropertyName = "changes")]
         public List<VersionControlItemChange> Changes { get; set; }
     }
+
+    public class ChangesetReference
+    {
+        [JsonProperty(PropertyName = "self")]
+        public ObjectReference Self { get; set; }
+
+        [JsonProperty(PropertyName = "changes")]
+        public ObjectReference Changes { get; set; }
+
+        [JsonProperty(PropertyName = "workItems")]
+        public ObjectReference WorkItems { get; set; }
+
+        [JsonProperty(PropertyName = "author")]
+        public ObjectReference Author { get; set; }
+
+        [JsonProperty(PropertyName = "checkedInBy")]
+        public ObjectReference CheckedInBy { get; set; }
+    }
+
+    [DebuggerDisplay("{Id}")]
+    public class Changeset : BaseObject<ChangesetReference>
+    {
+        [JsonProperty(PropertyName = "changesetId")]
+        public int Id { get; set; }
+
+        [JsonProperty(PropertyName = "author")]
+        public UserIdentity Author { get; set; }
+
+        [JsonProperty(PropertyName = "checkedInBy")]
+        public UserIdentity CheckedInBy { get; set; }
+
+        [JsonProperty(PropertyName = "createdDate")]
+        public DateTime CreatedDate { get; set; }
+
+        [JsonProperty(PropertyName = "comment")]
+        public string Comment { get; set; }
+
+        [JsonProperty(PropertyName = "commentTruncated")]
+        public bool? CommentTruncated { get; set; }
+
+        [JsonProperty(PropertyName = "workItems")]
+        public List<WorkItemInfo> WorkItems { get; set; }
+    }
 }

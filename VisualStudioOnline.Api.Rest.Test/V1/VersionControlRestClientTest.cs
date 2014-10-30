@@ -1,10 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using VisualStudioOnline.Api.Rest.Test.Properties;
 using VisualStudioOnline.Api.Rest.V1;
 
@@ -45,6 +40,17 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
 
             var changes = _client.GetShelvesetChanges(shelveset.Id).Result;
             var workItems = _client.GetShelvesetWorkItems(shelveset.Id).Result;
+        }
+
+        [TestMethod]
+        public void TestGetChangesets()
+        {
+            var changesets = _client.GetChangesets().Result;
+            var changesetBatch = _client.GetChangesets(new int[] { changesets[0].Id, changesets[1].Id }).Result;
+
+            var changeset = _client.GetChangeset(changesets[0].Id).Result;
+            var change = _client.GetChangesetChanges(changeset.Id).Result;
+            var workitems = _client.GetChangesetWorkItems(changeset.Id).Result;
         }
     }
 }
