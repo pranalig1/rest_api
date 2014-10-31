@@ -1,38 +1,86 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.V1
 {
+    public enum VersionType
+    {
+        Branch,
+        Changeset,
+        Shelveset,
+        Change,
+        Date,
+        MergeSource,
+        Latest,
+        Tip
+    }
+
+    public enum VersionOptions
+    {
+        None,
+        Previous,
+        UseRename
+    }
+
+    public struct VersionSearchFilter
+    {
+        [JsonProperty(PropertyName = "versionType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public VersionType? Type;
+
+        [JsonProperty(PropertyName = "versionOptions", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public VersionOptions? Options;
+
+        [JsonProperty(PropertyName = "version")]
+        public string Value;
+
+        [JsonProperty(PropertyName = "path")]
+        public string Path;
+
+        [JsonProperty(PropertyName = "recursionLevel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public RecursionLevel? Recursion;
+    }
+
+    public enum RecursionLevel
+    {
+        OneLevel,
+        Full
+    }
+
+    public enum OrderBy
+    {
+        asc,
+        desc
+    }
+
+    public struct ChangesetSearchFilter
+    {
+        public string ItemPath;
+        public string Version;
+        public VersionType? VersionType;
+        public VersionOptions? VersionOption;
+        public string Author;
+
+        public int? FromId;
+        public int? ToId;
+
+        public DateTime? FromDate;
+        public DateTime? ToDate;
+    }
+
     /// <summary>
     /// TFS Version Control REST API client
     /// </summary>
     public class VersionControlRestClient : RestClientV1
     {
-        public enum OrderBy
-        {
-            asc,
-            desc
-        }
-
-        public struct SearchCriteria
-        {
-            public string ItemPath;
-            public string Version;
-            public string VersionType;
-            public string VersionOption;
-            public string Author;
-
-            public int? FromId;
-            public int? ToId;
-
-            public DateTime? FromDate;
-            public DateTime? ToDate;
-        }
-
         protected override string SubSystemName
         {
             get
@@ -176,28 +224,28 @@ namespace VisualStudioOnline.Api.Rest.V1
         /// <summary>
         /// Get list of changesets
         /// </summary>
-        /// <param name="criteria"></param>
+        /// <param name="filter"></param>
         /// <param name="top"></param>
         /// <param name="skip"></param>
         /// <param name="order"></param>
         /// <param name="maxCommentLength"></param>
         /// <returns></returns>
-        public async Task<JsonCollection<Changeset>> GetChangesets(SearchCriteria? criteria = null, int? top = null, int? skip = null, OrderBy? order = null, int? maxCommentLength = null)
+        public async Task<JsonCollection<Changeset>> GetChangesets(ChangesetSearchFilter? filter = null, int? top = null, int? skip = null, OrderBy? order = null, int? maxCommentLength = null)
         {
             var arguments = new Dictionary<string, object>() { { "maxCommentLength", maxCommentLength }, { "$top", top }, { "$skip", skip } };
-            if(criteria.HasValue) 
+            if(filter.HasValue) 
             {
-                arguments.Add("searchCriteria.itemPath", criteria.Value.ItemPath);
-                arguments.Add("searchCriteria.version", criteria.Value.Version);
-                arguments.Add("searchCriteria.versionType", criteria.Value.VersionType);
-                arguments.Add("searchCriteria.versionOption", criteria.Value.VersionOption);
-                arguments.Add("searchCriteria.author", criteria.Value.Author);
+                arguments.Add("searchCriteria.itemPath", filter.Value.ItemPath);
+                arguments.Add("searchCriteria.version", filter.Value.Version);
+                arguments.Add("searchCriteria.versionType", filter.Value.VersionType.ToString());
+                arguments.Add("searchCriteria.versionOption", filter.Value.VersionOption.ToString());
+                arguments.Add("searchCriteria.author", filter.Value.Author);
 
-                arguments.Add("searchCriteria.fromId", criteria.Value.FromId);
-                arguments.Add("searchCriteria.toId", criteria.Value.ToId);
+                arguments.Add("searchCriteria.fromId", filter.Value.FromId);
+                arguments.Add("searchCriteria.toId", filter.Value.ToId);
 
-                arguments.Add("searchCriteria.fromDate", criteria.Value.FromDate);
-                arguments.Add("searchCriteria.toDate", criteria.Value.ToDate);
+                arguments.Add("searchCriteria.fromDate", filter.Value.FromDate);
+                arguments.Add("searchCriteria.toDate", filter.Value.ToDate);
             }
             if(order.HasValue) { arguments.Add("$orderby", order.Value == OrderBy.asc ? "id asc" : "id desc"); }
 
@@ -262,6 +310,70 @@ namespace VisualStudioOnline.Api.Rest.V1
         {
             string response = await GetResponse(string.Format("changesets/{0}/workitems", changesetId));
             return JsonConvert.DeserializeObject<JsonCollection<WorkItemInfo>>(response);
+        }
+       
+        /// <summary>
+        /// Get file content
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public async Task<string> GetVersionControlItemContent(VersionSearchFilter filter)
+        {
+            string response = await GetResponse(string.Format("items/{0}", filter.Path), AddVersionCriteria(filter, new Dictionary<string, object>()), null, HTML_MEDIA_TYPE);
+            return response;
+        }
+
+        /// <summary>
+        /// Get version control item metadata 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public async Task<VersionControlItemVersion> GetVersionControlItem(VersionSearchFilter filter)
+        {
+            string response = await GetResponse(string.Format("items/{0}", filter.Path), AddVersionCriteria(filter, new Dictionary<string, object>()));
+            return JsonConvert.DeserializeObject<VersionControlItemVersion>(response);
+        }
+
+        /// <summary>
+        /// Get version control item metadata 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<VersionControlItemVersion>> GetVersionControlItemVersions(VersionSearchFilter filter)
+        {
+            var arguments = new Dictionary<string, object>() { { "scopepath", filter.Path } };
+
+            string response = await GetResponse("items", AddVersionCriteria(filter, arguments));
+            return JsonConvert.DeserializeObject<JsonCollection<VersionControlItemVersion>>(response);
+        }
+
+        /// <summary>
+        /// Get metadata for several version control items 
+        /// </summary>
+        /// <param name="filters"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<VersionControlItemVersion>> GetVersionControlItemVersions(IList<VersionSearchFilter> filters)
+        {
+            string response = await PostResponse("itemBatch", new { itemDescriptors = filters });
+            return JsonConvert.DeserializeObject<JsonCollection<VersionControlItemVersion>>(response);
+        }
+
+        private Dictionary<string, object> AddVersionCriteria(VersionSearchFilter filter, Dictionary<string, object> arguments)
+        {
+            if (filter.Type.HasValue) 
+            { 
+                arguments.Add("versionType", filter.Type.ToString());
+
+                if (filter.Type.Value != VersionType.Latest && filter.Type.Value != VersionType.Tip)
+                {
+                    arguments.Add("version", filter.Value);
+                }
+            }
+            
+            if (filter.Options.HasValue) { arguments.Add("versionOptions", filter.Options.ToString()); }
+            if (filter.Recursion.HasValue) { arguments.Add("recursionLevel", filter.Recursion.ToString()); }
+
+            return arguments;
         }
     }
 }

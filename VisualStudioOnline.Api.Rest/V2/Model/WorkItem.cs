@@ -177,7 +177,7 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         public ObservableDictionary<string, object> Fields;
 
         [JsonProperty(PropertyName = "_links")]
-        public WorkItemReference References;
+        public WorkItemLink References;
 
         public WorkItem()
         {
@@ -268,28 +268,25 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         }
     }
 
-    public class WorkItemReference
+    public class WorkItemLink : ObjectLink
     {
-        [JsonProperty(PropertyName = "self")]
-        public ObjectReference Self { get; set; }
-
         [JsonProperty(PropertyName = "workItemUpdates")]
-        public ObjectReference Updates { get; set; }
+        public ObjectLink Updates { get; set; }
 
         [JsonProperty(PropertyName = "workItemRevisions")]
-        public ObjectReference Revisions { get; set; }
+        public ObjectLink Revisions { get; set; }
 
         [JsonProperty(PropertyName = "workItemHistory")]
-        public ObjectReference History { get; set; }
+        public ObjectLink History { get; set; }
 
         [JsonProperty(PropertyName = "html")]
-        public ObjectReference Html { get; set; }
+        public ObjectLink Html { get; set; }
 
         [JsonProperty(PropertyName = "workItemType")]
-        public ObjectReference Type { get; set; }
+        public ObjectLink Type { get; set; }
 
         [JsonProperty(PropertyName = "fields")]
-        public ObjectReference Fields { get; set; }
+        public ObjectLink Fields { get; set; }
     }
 
     public class RelationChanges

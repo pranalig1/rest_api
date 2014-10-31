@@ -7,29 +7,29 @@ using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.V1
 {
+    public enum QueryExpandOptions
+    {
+        none,
+        all,
+        wiql,
+        columns,
+        sortOptions
+    }
+
+    public enum WorkItemExpandOptions
+    {
+        all,
+        links,
+        resourceLinks,
+        none
+    }
+
     /// <summary>
     /// WIT REST API client v.1.0-preview.1
     /// </summary>
     [Obsolete("deprecated, use VisualStudioOnline.Api.Rest.V2.WitRestClient")]
     public class WitRestClient : RestClientV1
     {
-        public enum QueryExpandOptions
-        { 
-            none, 
-            all, 
-            wiql, 
-            columns, 
-            sortOptions 
-        }
-
-        public enum WorkItemExpandOptions
-        {
-            all,
-            links,
-            resourceLinks,
-            none
-        }
-
         protected override string SubSystemName
         {
             get { return "wit"; }

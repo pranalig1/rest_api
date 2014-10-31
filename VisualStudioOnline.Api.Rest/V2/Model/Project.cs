@@ -42,20 +42,17 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         public ProcessTemplate ProcessTemplate { get; set; }
     }
 
-    public class TeamProjectReference
+    public class TeamProjectLink : ObjectLink
     {
-        [JsonProperty(PropertyName = "self")]
-        public ObjectReference Self { get; set; }
-
         [JsonProperty(PropertyName = "collection")]
-        public ObjectReference Collection { get; set; }
+        public ObjectLink Collection { get; set; }
 
         [JsonProperty(PropertyName = "web")]
-        public ObjectReference Web { get; set; }
+        public ObjectLink Web { get; set; }
     }
 
     [DebuggerDisplay("{Name}")]
-    public class TeamProject : ObjectWithId<Guid, TeamProjectReference>
+    public class TeamProject : ObjectWithId<Guid, TeamProjectLink>
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
@@ -74,17 +71,14 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         public Team DefaultTeam { get; set; }
     }
 
-    public class TeamProjectCollectionReference
+    public class TeamProjectCollectionLink : ObjectLink
     {
-        [JsonProperty(PropertyName = "self")]
-        public ObjectReference Self { get; set; }
-
         [JsonProperty(PropertyName = "web")]
-        public ObjectReference Web { get; set; }
+        public ObjectLink Web { get; set; }
     }
 
     [DebuggerDisplay("{Name}")]
-    public class TeamProjectCollection : ObjectWithId<string, TeamProjectCollectionReference>
+    public class TeamProjectCollection : ObjectWithId<string, TeamProjectCollectionLink>
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }

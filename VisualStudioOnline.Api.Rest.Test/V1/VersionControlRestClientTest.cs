@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using System.Net;
 using VisualStudioOnline.Api.Rest.Test.Properties;
 using VisualStudioOnline.Api.Rest.V1;
@@ -51,6 +52,32 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
             var changeset = _client.GetChangeset(changesets[0].Id).Result;
             var change = _client.GetChangesetChanges(changeset.Id).Result;
             var workitems = _client.GetChangesetWorkItems(changeset.Id).Result;
+        }
+
+        [TestMethod]
+        public void TestGetVersionControlItems()
+        {
+            var changesets = _client.GetChangesets().Result;
+
+            if (changesets.Count > 1)
+            {
+                var change = _client.GetChangesetChanges(changesets[1].Id).Result;
+
+                var vcItemContent = _client.GetVersionControlItemContent(new VersionSearchFilter() { Path = change[0].Item.Path }).Result;
+                var vcItem = _client.GetVersionControlItem(new VersionSearchFilter() { Path = change[0].Item.Path }).Result;
+
+                var vcVersions = _client.GetVersionControlItemVersions(new VersionSearchFilter() { Path = change[0].Item.Path }).Result;
+
+                if (change.Count > 1)
+                {
+                    var multipleVcVersions = _client.GetVersionControlItemVersions(
+                        new List<VersionSearchFilter>()
+                {
+                    new VersionSearchFilter() { Path = change[0].Item.Path, Type = VersionType.Tip },
+                    new VersionSearchFilter() { Path = change[1].Item.Path }
+                }).Result;
+                }
+            }
         }
     }
 }

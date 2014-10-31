@@ -7,25 +7,25 @@ using VisualStudioOnline.Api.Rest.V2.Model;
 
 namespace VisualStudioOnline.Api.Rest.V2
 {
+    public enum QueryExpandOptions
+    {
+        none,
+        all,
+        wiql,
+    }
+
+    public enum RevisionExpandOptions
+    {
+        all,
+        relations,
+        none
+    }
+
     /// <summary>
     /// WIT REST API client v.1.0-preview.2
     /// </summary>
     public class WitRestClient : RestClientV2
     {
-        public enum QueryExpandOptions
-        {
-            none,
-            all,
-            wiql,
-        }
-
-        public enum RevisionExpandOptions
-        {
-            all,
-            relations,
-            none
-        }
-
         protected override string SubSystemName
         {
             get { return "wit"; }

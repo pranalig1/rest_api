@@ -69,7 +69,7 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
         [TestMethod]
         public void TestGetWorkItemRevisions()
         {
-            var revisions = _client.GetWorkItemRevisions(Settings.Default.WorkItemId, null, null, WitRestClient.RevisionExpandOptions.all).Result;
+            var revisions = _client.GetWorkItemRevisions(Settings.Default.WorkItemId, null, null, RevisionExpandOptions.all).Result;
             var revision = _client.GetWorkItemRevision(Settings.Default.WorkItemId, Settings.Default.WorkItemRevision).Result;
 
             var areaPath = revision.Fields["System.AreaPath"];
@@ -97,14 +97,14 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
         public void TestCreateAndUpdateWorkItem()
         {
             var defaultValues = _client.GetWorkItemTypeDefaultValues(Settings.Default.ProjectName, "Bug").Result;
-            var workItems = _client.GetWorkItems(new int[] { Settings.Default.WorkItemId }, WitRestClient.RevisionExpandOptions.all).Result;
+            var workItems = _client.GetWorkItems(new int[] { Settings.Default.WorkItemId }, RevisionExpandOptions.all).Result;
 
             var bug = new WorkItem();
             bug.Fields["System.Title"] = "Test bug 2";
             bug.Fields["System.History"] = DateTime.Now.ToString();
             bug = _client.CreateWorkItem(Settings.Default.ProjectName, "Bug", bug).Result;
 
-            bug = _client.GetWorkItem(bug.Id, WitRestClient.RevisionExpandOptions.all).Result;
+            bug = _client.GetWorkItem(bug.Id, RevisionExpandOptions.all).Result;
             bug.Fields["System.Title"] = bug.Fields["System.Title"] + " (updated)";
             bug.Fields["System.Tags"] = "SimpleTag";
             bug.Relations.Add(new WorkItemRelation()
@@ -127,7 +127,7 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
         public void TestCreateAndUpdateQueries()
         {
             var rootQueries = _client.GetQueries(Settings.Default.ProjectName).Result;
-            var sharedQueries = _client.GetQuery(Settings.Default.ProjectName, "Shared Queries", 2, WitRestClient.QueryExpandOptions.all).Result;
+            var sharedQueries = _client.GetQuery(Settings.Default.ProjectName, "Shared Queries", 2, QueryExpandOptions.all).Result;
 
             var newQuery = _client.CreateQuery(Settings.Default.ProjectName, 
                 "Shared Queries/Troubleshooting", 
@@ -139,7 +139,7 @@ namespace VisualStudioOnline.Api.Rest.Test.V2
             newQuery = _client.UpdateQuery(Settings.Default.ProjectName, newQuery).Result;
             
             string response = _client.DeleteQuery(Settings.Default.ProjectName, newQuery).Result;
-            newQuery = _client.GetQuery(Settings.Default.ProjectName, newQuery.Id, null, WitRestClient.QueryExpandOptions.all, true).Result;
+            newQuery = _client.GetQuery(Settings.Default.ProjectName, newQuery.Id, null, QueryExpandOptions.all, true).Result;
             newQuery = _client.UndeleteQuery(Settings.Default.ProjectName, newQuery).Result;
             response = _client.DeleteQuery(Settings.Default.ProjectName, newQuery).Result;
 

@@ -53,7 +53,7 @@ namespace VisualStudioOnline.Api.Rest
     public abstract class BaseObject<T> : BaseObject
     {
         [JsonProperty(PropertyName = "_links")]
-        public T References { get; set; }
+        public T ObjectLinks { get; set; }
     }
 
     [DebuggerDisplay("{Id}")]
@@ -71,10 +71,17 @@ namespace VisualStudioOnline.Api.Rest
     }
 
     [DebuggerDisplay("{Href}")]
-    public class ObjectReference
+    public class ObjectLink
     {
         [JsonProperty(PropertyName = "href")]
         public string Href { get; set; }
+    }
+
+    [DebuggerDisplay("{Self.Href}")]
+    public class SelfLink
+    {
+        [JsonProperty(PropertyName = "self")]
+        public ObjectLink Self { get; set; }
     }
 
     public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INotifyCollectionChanged

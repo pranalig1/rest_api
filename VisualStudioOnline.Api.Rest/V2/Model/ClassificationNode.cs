@@ -11,16 +11,8 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         iteration,
     }
 
-    [DebuggerDisplay("{Self.Href}")]
-    public class NodeReference
-    {
-        [JsonProperty(PropertyName = "self")]
-        public ObjectReference Self { get; set; }
-    }
-
-
     [DebuggerDisplay("{Name}")]
-    public class ClassificationNode : BaseObject<NodeReference>
+    public class ClassificationNode : BaseObject<SelfLink>
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }

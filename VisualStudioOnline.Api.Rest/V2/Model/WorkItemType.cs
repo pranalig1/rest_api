@@ -77,16 +77,16 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         public List<WorkItemType> workItemTypes { get; set; }
     }
 
-    public class TypeReference
+    public class TypeLink
     {
         [JsonProperty(PropertyName = "workItemType")]
-        public ObjectReference WorkItemTypeReference { get; set; }
+        public ObjectLink WorkItemTypeReference { get; set; }
 
         [JsonProperty(PropertyName = "fields")]
-        public ObjectReference FieldsReference { get; set; }
+        public ObjectLink FieldsReference { get; set; }
     }
 
-    public class WorkItemTypeDefaults : BaseObject<TypeReference>
+    public class WorkItemTypeDefaults : BaseObject<TypeLink>
     {
         [JsonProperty(PropertyName = "fields")]
         public dynamic Fields { get; set; }

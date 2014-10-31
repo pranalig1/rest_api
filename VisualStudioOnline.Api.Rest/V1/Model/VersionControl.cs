@@ -33,20 +33,17 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
         public bool IsDeleted { get; set; }
     }
 
-    public class LabelReference
+    public class LabelLink : ObjectLink
     {
-        [JsonProperty(PropertyName = "self")]
-        public ObjectReference Self { get; set; }
-
         [JsonProperty(PropertyName = "items")]
-        public ObjectReference Items { get; set; }
+        public ObjectLink Items { get; set; }
 
         [JsonProperty(PropertyName = "owner")]
-        public ObjectReference Owner { get; set; }
+        public ObjectLink Owner { get; set; }
     }
 
     [DebuggerDisplay("{Name}")]
-    public class Label : ObjectWithId<int, LabelReference>
+    public class Label : ObjectWithId<int, LabelLink>
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
@@ -64,6 +61,22 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
         public UserIdentity Owner { get; set; }
     }
 
+    [DebuggerDisplay("{FileName}")]
+    public class ContentMetadata
+    {
+        [JsonProperty(PropertyName = "encoding")]
+        public int Encoding { get; set; }
+
+        [JsonProperty(PropertyName = "contentType")]
+        public string ContentType { get; set; }
+
+        [JsonProperty(PropertyName = "fileName")]
+        public string FileName { get; set; }
+
+        [JsonProperty(PropertyName = "extension")]
+        public string Extension { get; set; }
+    }
+
     [DebuggerDisplay("{Path}")]
     public class VersionControlItem : BaseObject
     {
@@ -75,21 +88,34 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
 
         [JsonProperty(PropertyName = "isFolder")]
         public bool IsFolder { get; set; }
+
+        [JsonProperty(PropertyName = "isBranch")]
+        public bool IsBranch { get; set; }
+
+        [JsonProperty(PropertyName = "contentMetadata")]
+        public ContentMetadata contentMetadata { get; set; }
+
+        [JsonProperty(PropertyName = "_links")]
+        public SelfLink _links { get; set; }
     }
 
-    public class ShelvesetReference
+    [DebuggerDisplay("{Path}")]
+    public class VersionControlItemVersion : VersionControlItem
     {
-        [JsonProperty(PropertyName = "self")]
-        public ObjectReference Self { get; set; }
+        [JsonProperty(PropertyName = "changeDate")]
+        public DateTime ChangeDate { get; set; }
+    }
 
+    public class ShelvesetLink : ObjectLink
+    {
         [JsonProperty(PropertyName = "changes")]
-        public ObjectReference Changes { get; set; }
+        public ObjectLink Changes { get; set; }
 
         [JsonProperty(PropertyName = "workItems")]
-        public ObjectReference WorkItems { get; set; }
+        public ObjectLink WorkItems { get; set; }
 
         [JsonProperty(PropertyName = "owner")]
-        public ObjectReference Owner { get; set; }
+        public ObjectLink Owner { get; set; }
     }
 
     public class PolicyOverride
@@ -128,7 +154,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
     }
 
     [DebuggerDisplay("{Name}")]
-    public class Shelveset : ObjectWithId<string, ShelvesetReference>
+    public class Shelveset : ObjectWithId<string, ShelvesetLink>
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
@@ -158,26 +184,23 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
         public List<VersionControlItemChange> Changes { get; set; }
     }
 
-    public class ChangesetReference
+    public class ChangesetLink : ObjectLink
     {
-        [JsonProperty(PropertyName = "self")]
-        public ObjectReference Self { get; set; }
-
         [JsonProperty(PropertyName = "changes")]
-        public ObjectReference Changes { get; set; }
+        public ObjectLink Changes { get; set; }
 
         [JsonProperty(PropertyName = "workItems")]
-        public ObjectReference WorkItems { get; set; }
+        public ObjectLink WorkItems { get; set; }
 
         [JsonProperty(PropertyName = "author")]
-        public ObjectReference Author { get; set; }
+        public ObjectLink Author { get; set; }
 
         [JsonProperty(PropertyName = "checkedInBy")]
-        public ObjectReference CheckedInBy { get; set; }
+        public ObjectLink CheckedInBy { get; set; }
     }
 
     [DebuggerDisplay("{Id}")]
-    public class Changeset : BaseObject<ChangesetReference>
+    public class Changeset : BaseObject<ChangesetLink>
     {
         [JsonProperty(PropertyName = "changesetId")]
         public int Id { get; set; }

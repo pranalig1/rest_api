@@ -11,8 +11,9 @@ namespace VisualStudioOnline.Api.Rest
 {
     public struct VsoAPI
     {
-        public const string Version1 = "1.0-preview.1";
-        public const string Version2 = "1.0-preview.2";
+        public const string Preview1 = "1.0-preview.1";
+        public const string Preview2 = "1.0-preview.2";
+        public const string Version1 = "1.0";
     }
 
     /// <summary>
@@ -24,6 +25,7 @@ namespace VisualStudioOnline.Api.Rest
         protected const string DEFAULT_COLLECTION = "DefaultCollection";
         protected const string JSON_MEDIA_TYPE = "application/json";
         protected const string JSON_PATCH_MEDIA_TYPE = "application/json-patch+json";
+        protected const string HTML_MEDIA_TYPE = "text/html";
 
         private string _rootUrl;
         private IHttpRequestHeaderFilter _authProvider;
@@ -49,9 +51,9 @@ namespace VisualStudioOnline.Api.Rest
             return await GetResponse(path, new Dictionary<string, object>(), projectName);
         }
 
-        protected async Task<string> GetResponse(string path, IDictionary<string, object> arguments, string projectName = null)
+        protected async Task<string> GetResponse(string path, IDictionary<string, object> arguments, string projectName = null, string mediaType = JSON_MEDIA_TYPE)
         {
-            using (HttpClient client = GetHttpClient())
+            using (HttpClient client = GetHttpClient(mediaType))
             {
                 using (HttpResponseMessage response = client.GetAsync(ConstructUrl(projectName, path, arguments)).Result)
                 {
@@ -76,7 +78,7 @@ namespace VisualStudioOnline.Api.Rest
         {            
             var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, mediaType);
 
-            using (HttpClient client = GetHttpClient())
+            using (HttpClient client = GetHttpClient(mediaType))
             {
                 using (HttpResponseMessage response = client.PostAsync(ConstructUrl(projectName, path, arguments), httpContent).Result)
                 {
@@ -101,7 +103,7 @@ namespace VisualStudioOnline.Api.Rest
         {
             var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, mediaType);
 
-            using (HttpClient client = GetHttpClient())
+            using (HttpClient client = GetHttpClient(mediaType))
             {
                 using (HttpResponseMessage response = client.PatchAsync(ConstructUrl(projectName, path, arguments), httpContent).Result)
                 {
@@ -174,7 +176,7 @@ namespace VisualStudioOnline.Api.Rest
     {
         protected override string ApiVersion
         {
-            get { return VsoAPI.Version1; }
+            get { return VsoAPI.Preview1; }
         }
 
         public RestClientV1(string rootUrl, IHttpRequestHeaderFilter authProvider) : base(rootUrl, authProvider) { }
@@ -184,7 +186,7 @@ namespace VisualStudioOnline.Api.Rest
     {
         protected override string ApiVersion
         {
-            get { return VsoAPI.Version2; }
+            get { return VsoAPI.Preview2; }
         }
 
         public RestClientV2(string rootUrl, IHttpRequestHeaderFilter authProvider) : base(rootUrl, authProvider) { }

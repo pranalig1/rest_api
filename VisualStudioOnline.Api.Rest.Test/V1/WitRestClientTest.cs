@@ -22,7 +22,7 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
         [TestMethod]
         public void TestCreateAndUpdateQuery()
         {
-            var queryHierarchy = _client.GetQueries(Settings.Default.ProjectName, null, WitRestClient.QueryExpandOptions.all).Result;
+            var queryHierarchy = _client.GetQueries(Settings.Default.ProjectName, null, QueryExpandOptions.all).Result;
             var sharedQueriesFolder = queryHierarchy.Items[0];
 
             Query queryFolder = _client.CreateQuery(new Query()
@@ -54,9 +54,9 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
             var bug = CreateBug();
             var task = CreateTask();
 
-            var workItems = _client.GetWorkItems(new int[] { bug.Id }, WitRestClient.WorkItemExpandOptions.all).Result;
+            var workItems = _client.GetWorkItems(new int[] { bug.Id }, WorkItemExpandOptions.all).Result;
 
-            bug = _client.GetWorkItem(workItems.Items[0].Id, WitRestClient.WorkItemExpandOptions.all).Result;
+            bug = _client.GetWorkItem(workItems.Items[0].Id, WorkItemExpandOptions.all).Result;
 
             bug["System.Title"] = "REST: " + DateTime.Now.ToString();
             bug.Links.Add(new Link() { Comment = DateTime.Now.ToString(), Source = bug, Target = task, LinkType = "System.LinkTypes.Dependency-Forward" });
@@ -85,7 +85,7 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
             bug.ResourceLinks.Add(resourceLink);
             bug = _client.UpdateWorkItem(bug).Result;
 
-            bug = _client.GetWorkItem(bug.Id, WitRestClient.WorkItemExpandOptions.all).Result;
+            bug = _client.GetWorkItem(bug.Id, WorkItemExpandOptions.all).Result;
 
             string content = _client.DownloadAttachment(bug.ResourceLinks[0].Location).Result;
         }

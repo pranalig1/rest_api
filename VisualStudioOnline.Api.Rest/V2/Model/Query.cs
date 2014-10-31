@@ -13,13 +13,10 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
         oneHop
     }
 
-    public class QueryReference
+    public class QueryLink : ObjectLink
     {
-        [JsonProperty(PropertyName = "self")]
-        public ObjectReference Self { get; set; }
-
         [JsonProperty(PropertyName = "html")]
-        public ObjectReference Html { get; set; }
+        public ObjectLink Html { get; set; }
     }
 
     [DebuggerDisplay("{Field.ReferenceName}")]
@@ -33,7 +30,7 @@ namespace VisualStudioOnline.Api.Rest.V2.Model
     }
 
     [DebuggerDisplay("{Name}")]
-    public class Query : ObjectWithId<string, QueryReference>
+    public class Query : ObjectWithId<string, QueryLink>
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
