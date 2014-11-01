@@ -1,7 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Net;
 using VisualStudioOnline.Api.Rest.Test.Properties;
-using VisualStudioOnline.Api.Rest.V1;
+using VisualStudioOnline.Api.Rest.V1.Client;
 
 namespace VisualStudioOnline.Api.Rest.Test.V1
 {
@@ -15,6 +16,17 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
         {
             _client = new ProjectRestClient(Settings.Default.AccountName,
                 new NetworkCredential(Settings.Default.UserName, Settings.Default.Password));
+        }
+
+        [TestMethod]
+        public void TestGetProjects()
+        {
+            var projects = _client.GetTeamProjects().Result;
+
+            var project = _client.GetTeamProject(projects[0].Id.ToString(), true).Result;
+            project.Description = DateTime.Now.Ticks.ToString();
+
+            project = _client.UpdateTeamProject(project).Result;
         }
 
         [TestMethod]

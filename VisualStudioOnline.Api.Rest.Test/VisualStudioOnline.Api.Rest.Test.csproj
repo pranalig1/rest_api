@@ -61,11 +61,10 @@
     <Compile Include="V1\ProjectRestClientTest.cs" />
     <Compile Include="V1\TagRestClientTest.cs" />
     <Compile Include="V1\VersionControlRestClientTest.cs" />
-    <Compile Include="V1\WitRestClientTest.cs" />
+    <Compile Include="V1\WitRestClientTestOld.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="V2\ProjectCollectionRestClientTest.cs" />
-    <Compile Include="V2\ProjectRestClientTest.cs" />
-    <Compile Include="V2\WitRestClientTest.cs" />
+    <Compile Include="V1\ProjectCollectionRestClientTest.cs" />
+    <Compile Include="V1\WitRestClientTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VisualStudioOnline.Api.Rest\VisualStudioOnline.Api.Rest.csproj">
@@ -80,6 +79,7 @@
       <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using VisualStudioOnline.Api.Rest.V1.Model;
 
-namespace VisualStudioOnline.Api.Rest.V1
+namespace VisualStudioOnline.Api.Rest.V1.Client
 {
-    public class ProjectRestClient : RestClientV1
+    public class ProjectRestClient : RestClientVersion1
     {
         protected override string SubSystemName
         {
@@ -19,6 +19,44 @@ namespace VisualStudioOnline.Api.Rest.V1
         public ProjectRestClient(string accountName, NetworkCredential userCredential, string collectionName = DEFAULT_COLLECTION)
             : base(string.Format(ACCOUNT_ROOT_URL, accountName, collectionName), new BasicAuthenticationFilter(userCredential))
         {
+        }
+
+        /// <summary>
+        /// Get team project list
+        /// </summary>
+        /// <param name="stateFilter"></param>
+        /// <param name="top"></param>
+        /// <param name="skip"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<TeamProject>> GetTeamProjects(ProjectState? stateFilter = null, int? top = null, int? skip = null)
+        {
+            string response = await GetResponse(string.Empty,
+                new Dictionary<string, object>() { { "$stateFilter", stateFilter }, { "$top", top }, { "$skip", skip } });
+            return JsonConvert.DeserializeObject<JsonCollection<TeamProject>>(response);
+        }
+
+        /// <summary>
+        /// Get team project by name or id
+        /// </summary>
+        /// <param name="projectNameOrId"></param>
+        /// <param name="includecapabilities"></param>
+        /// <returns></returns>
+        public async Task<TeamProject> GetTeamProject(string projectNameOrId, bool? includecapabilities = null)
+        {
+            string response = await GetResponse(projectNameOrId, new Dictionary<string, object>() { { "includecapabilities", includecapabilities } });
+            return JsonConvert.DeserializeObject<TeamProject>(response);
+        }
+
+        /// <summary>
+        /// Update team project description
+        /// </summary>
+        /// <param name="project"></param>
+        /// <returns></returns>
+        public async Task<TeamProject> UpdateTeamProject(TeamProject project)
+        {
+            string response = await PatchResponse(project.Id.ToString(), new { description = project.Description }, null, JSON_MEDIA_TYPE);
+            JsonConvert.PopulateObject(response, project);
+            return project;
         }
 
         /// <summary>

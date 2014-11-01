@@ -3,7 +3,7 @@ using Newtonsoft.Json.Converters;
 using System;
 using System.Diagnostics;
 
-namespace VisualStudioOnline.Api.Rest.V2.Model
+namespace VisualStudioOnline.Api.Rest.V1.Model
 {
     public enum ProjectState
     {

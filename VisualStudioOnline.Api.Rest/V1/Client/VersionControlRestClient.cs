@@ -7,7 +7,7 @@ using System.Net;
 using System.Threading.Tasks;
 using VisualStudioOnline.Api.Rest.V1.Model;
 
-namespace VisualStudioOnline.Api.Rest.V1
+namespace VisualStudioOnline.Api.Rest.V1.Client
 {
     public enum VersionType
     {
@@ -79,7 +79,7 @@ namespace VisualStudioOnline.Api.Rest.V1
     /// <summary>
     /// TFS Version Control REST API client
     /// </summary>
-    public class VersionControlRestClient : RestClientV1
+    public class VersionControlRestClient : RestClientVersion1
     {
         protected override string SubSystemName
         {

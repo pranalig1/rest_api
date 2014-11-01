@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using VisualStudioOnline.Api.Rest.Test.Properties;
-using VisualStudioOnline.Api.Rest.V1;
+using VisualStudioOnline.Api.Rest.V1.Client;
 
 namespace VisualStudioOnline.Api.Rest.Test.V1
 {
@@ -22,7 +22,7 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
         public void TestGetBranches()
         {
             var rootBranches = _client.GetRootBranches().Result;
-            var branch = _client.GetBranch(rootBranches[0].Path).Result;
+            var branch = _client.GetBranch(rootBranches[1].Path).Result;
         }
 
         [TestMethod]

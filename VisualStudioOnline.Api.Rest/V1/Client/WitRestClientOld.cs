@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using VisualStudioOnline.Api.Rest.V1.Model;
+using VisualStudioOnline.Api.Rest.VPreview1.Model;
 
-namespace VisualStudioOnline.Api.Rest.V1
+namespace VisualStudioOnline.Api.Rest.VPreview1.Client
 {
     public enum QueryExpandOptions
     {
@@ -28,7 +28,7 @@ namespace VisualStudioOnline.Api.Rest.V1
     /// WIT REST API client v.1.0-preview.1
     /// </summary>
     [Obsolete("deprecated, use VisualStudioOnline.Api.Rest.V2.WitRestClient")]
-    public class WitRestClient : RestClientV1
+    public class WitRestClient : RestClientPreview1
     {
         protected override string SubSystemName
         {

@@ -172,24 +172,34 @@ namespace VisualStudioOnline.Api.Rest
         }
     }
 
-    public abstract class RestClientV1 : RestClient
+    public abstract class RestClientPreview1 : RestClient
     {
         protected override string ApiVersion
         {
             get { return VsoAPI.Preview1; }
         }
 
-        public RestClientV1(string rootUrl, IHttpRequestHeaderFilter authProvider) : base(rootUrl, authProvider) { }
+        public RestClientPreview1(string rootUrl, IHttpRequestHeaderFilter authProvider) : base(rootUrl, authProvider) { }
     }
 
-    public abstract class RestClientV2 : RestClient
+    public abstract class RestClientPreview2 : RestClient
     {
         protected override string ApiVersion
         {
             get { return VsoAPI.Preview2; }
         }
 
-        public RestClientV2(string rootUrl, IHttpRequestHeaderFilter authProvider) : base(rootUrl, authProvider) { }
+        public RestClientPreview2(string rootUrl, IHttpRequestHeaderFilter authProvider) : base(rootUrl, authProvider) { }
+    }
+
+    public abstract class RestClientVersion1 : RestClient
+    {
+        protected override string ApiVersion
+        {
+            get { return VsoAPI.Version1; }
+        }
+
+        public RestClientVersion1(string rootUrl, IHttpRequestHeaderFilter authProvider) : base(rootUrl, authProvider) { }
     }
 
     /// <summary>

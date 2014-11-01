@@ -1,218 +1,379 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 
 namespace VisualStudioOnline.Api.Rest.V1.Model
 {
-    public enum LinkUpdateType
+    public enum TopologyType
+    {
+        dependency,
+        network,
+        tree
+    }
+
+    public enum OperationType
     {
         add,
-        delete,
-        update
+        remove,
+        replace,        
+        test
     }
-
-    [DebuggerDisplay("{Id}")]
-    public class WorkItemReference : ObjectWithId<int>
+   
+    public class RelationTypeAttributes
     {
-        [JsonProperty(PropertyName = "webUrl")]
-        public string WebUrl { get; set; }
-    }
+        [JsonProperty(PropertyName = "usage")]
+        public string Usage { get; set; }
 
-    [DebuggerDisplay("{Location}")]
-    public class ResourceLink : BaseObject
-    {
-        [JsonProperty(PropertyName = "resourceId")]
-        public int ResourceId { get; set; }
+        [JsonProperty(PropertyName = "editable")]
+        public bool Editable { get; set; }
 
-        [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; }
+        [JsonProperty(PropertyName = "enabled")]
+        public bool Enabled { get; set; }
 
-        [JsonProperty(PropertyName = "location")]
-        public string Location { get; set; }
+        [JsonProperty(PropertyName = "acyclic")]
+        public bool Acyclic { get; set; }
 
-        [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        [JsonProperty(PropertyName = "directional")]
+        public bool Directional { get; set; }
 
-        [JsonProperty(PropertyName = "creationDate")]
-        public string CreationDate { get; set; }
-
-        [JsonProperty(PropertyName = "lastModifiedDate")]
-        public string LastModifiedDate { get; set; }
-
-        [JsonProperty(PropertyName = "length")]
-        public int Length { get; set; }
-
-        [JsonProperty(PropertyName = "source")]
-        public WorkItemReference Source { get; set; }
-
-        [JsonProperty(PropertyName = "comment")]
-        public string Comment { get; set; }
+        [JsonProperty(PropertyName = "singleTarget")]
+        public bool SingleTarget { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        [JsonProperty(PropertyName = "updateType")]
-        public LinkUpdateType UpdateType { get; set; }
-
-        public ResourceLink()
-        {
-            Type = "attachment";
-        }
-    }
-
-    [DebuggerDisplay("{Source.Id} -> {Target.Id}")]
-    public class Link
-    {
-        [JsonProperty(PropertyName = "linkType")]
-        public string LinkType { get; set; }
-
-        [JsonProperty(PropertyName = "comment")]
-        public string Comment { get; set; }
-
-        [JsonProperty(PropertyName = "locked")]
-        public bool IsLocked { get; set; }
-
-        [JsonProperty(PropertyName = "target")]
-        public WorkItem Target { get; set; }
-
-        [JsonProperty(PropertyName = "targetWorkItemId")]
-        public int TargetId { get; set; }
-
-        [JsonProperty(PropertyName = "source")]
-        public WorkItem Source { get; set; }
-
-        [JsonProperty(PropertyName = "sourceWorkItemId")]
-        public int SourceId { get; set; }
-        
-        [JsonConverter(typeof(StringEnumConverter))]
-        [JsonProperty(PropertyName = "updateType")]
-        public LinkUpdateType UpdateType { get; set; }
-
-        public Link()
-        {
-            UpdateType = LinkUpdateType.add;
-        }
+        [JsonProperty(PropertyName = "topology")]
+        public TopologyType Topology { get; set; }
     }
 
     [DebuggerDisplay("{ReferenceName}")]
-    public class FieldMetadata
+    public class WorkItemRelationType : BaseObject
     {
-        [JsonProperty(PropertyName = "id")]
-        public int Id { get; set; }
-
-        [JsonProperty(PropertyName = "refName")]
+        [JsonProperty(PropertyName = "referenceName")]
         public string ReferenceName { get; set; }
 
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "attributes")]
+        public RelationTypeAttributes Attributes { get; set; }
     }
 
-    [DebuggerDisplay("{Metadata.ReferenceName}={Value}")]
-    public class Field
+    [DebuggerDisplay("{Name}")]
+    public class User : ObjectWithId<string>
     {
-        [JsonProperty(PropertyName = "field")]
-        public FieldMetadata Metadata { get; set; }
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+    }
+
+    [DebuggerDisplay("{Value}")]
+    public class HistoryComment : BaseObject
+    {
+        [JsonProperty(PropertyName = "rev")]
+        public int Rev { get; set; }
 
         [JsonProperty(PropertyName = "value")]
         public string Value { get; set; }
+
+        [JsonProperty(PropertyName = "revisedBy")]
+        public User RevisedBy { get; set; }
+
+        [JsonProperty(PropertyName = "revisedDate")]
+        public DateTime RevisedDate { get; set; }
     }
 
-    [DebuggerDisplay("{Id}")]
-    public class WorkItem : ObjectWithId<int>
+    [DebuggerDisplay("{Id:Name}")]
+    public class RelationAttributes
     {
+        [JsonProperty(PropertyName = "authorizedDate")]
+        public DateTime AuthorizedDate { get; set; }
+
+        [JsonProperty(PropertyName = "id")]
+        public int Id { get; set; }
+
+        [JsonProperty(PropertyName = "resourceCreatedDate")]
+        public DateTime ResourceCreatedDate { get; set; }
+
+        [JsonProperty(PropertyName = "resourceModifiedDate")]
+        public DateTime ResourceModifiedDate { get; set; }
+
+        [JsonProperty(PropertyName = "revisedDate")]
+        public DateTime RevisedDate { get; set; }
+
+        [JsonProperty(PropertyName = "resourceSize")]
+        public int ResourceSize { get; set; }
+
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "isLocked")]
+        public bool? IsLocked { get; set; }
+
+        [JsonProperty(PropertyName = "comment")]
+        public string Comment { get; set; }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode() ^ AuthorizedDate.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var attributes = obj as RelationAttributes;
+            if (attributes == null) return false;
+
+            return Id == attributes.Id && AuthorizedDate == attributes.AuthorizedDate;
+        }
+    }
+
+    [DebuggerDisplay("{Rel}")]
+    public class WorkItemRelation : BaseObject
+    {
+        [JsonProperty(PropertyName = "rel")]
+        public string Rel { get; set; }
+
+        [JsonProperty(PropertyName = "attributes")]
+        public RelationAttributes Attributes { get; set; }
+
+        [JsonProperty(PropertyName = "source")]
+        public WorkItem Source { get; set; }
+
+        [JsonProperty(PropertyName = "target")]
+        public WorkItem Target { get; set; }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode() ^ (Rel != null? Rel.GetHashCode() : 1) ^ (Attributes != null? Attributes.GetHashCode() : 1);
+        }
+
+        public override bool Equals(object obj)
+        {
+            var relation = obj as WorkItemRelation;
+            if (relation == null) return false;
+            
+            return relation.Rel == Rel && relation.Attributes == Attributes && base.Equals(obj);
+        }
+    }
+
+    [DebuggerDisplay("{Id:Rev}")]
+    public abstract class WorkItemCore : ObjectWithId<int>
+    {
+        [JsonProperty(PropertyName = "rev")]
+        public int Rev { get; set; }
+    }
+    
+    public class WorkItem : WorkItemCore
+    {
+        internal List<FieldUpdate> FieldUpdates = new List<FieldUpdate>();
+        internal List<RelationUpdate> RelationUpdates = new List<RelationUpdate>();
+
+        [JsonProperty(PropertyName = "relations")]
+        public ObservableCollection<WorkItemRelation> Relations { get; set; }
+
+        [JsonProperty(PropertyName = "fields")]
+        public ObservableDictionary<string, object> Fields;
+
+        [JsonProperty(PropertyName = "_links")]
+        public WorkItemLink References;
+
         public WorkItem()
         {
-            Fields = new List<Field>();
-            Links = new List<Link>();
-            ResourceLinks = new List<ResourceLink>();
+            Relations = new ObservableCollection<WorkItemRelation>();
+            Fields = new ObservableDictionary<string, object>();
+
+            //TODO
+            //Relations.CollectionChanged += OnRelations_CollectionChanged;
+            //Fields.CollectionChanged += OnFields_CollectionChanged;
         }
 
-        [JsonProperty(PropertyName = "rev")]
-        public int Rev { get; set; }
-
-        [JsonProperty(PropertyName = "webUrl")]
-        public string WebUrl { get; set; }
-
-        [JsonProperty(PropertyName = "updatesUrl")]
-        public string UpdatesUrl { get; set; }
-
-        [JsonProperty(PropertyName = "fields")]
-        public List<Field> Fields { get; set; }
-
-        [JsonProperty(PropertyName = "links")]
-        public List<Link> Links { get; set; }
-
-        [JsonProperty(PropertyName = "resourceLinks")]
-        public List<ResourceLink> ResourceLinks { get; set; }
-
-        [JsonIgnore]
-        public string this[string refName]
+        private void OnFields_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            get
+            if (e.Action == NotifyCollectionChangedAction.Add ||
+                e.Action == NotifyCollectionChangedAction.Remove ||
+                e.Action == NotifyCollectionChangedAction.Replace)
             {
-                return GetFieldValue(refName);
+                //TODO: NotifyCollectionChangedAction.Replace
+
+                foreach (KeyValuePair<string, object> newfield in e.NewItems)
+                {
+                    var existingUpdate = FieldUpdates.FirstOrDefault(fu => fu.Name == newfield.Key);
+                    if (existingUpdate != null)
+                    {
+                        FieldUpdates.Remove(existingUpdate);
+                    }
+
+                    FieldUpdates.Add(new FieldUpdate(newfield.Key, newfield.Value, (OperationType)e.Action /*TODO*/));
+                }
+
+                foreach (KeyValuePair<string, object> removedField in e.OldItems)
+                {
+                    var existingUpdate = FieldUpdates.FirstOrDefault(fu => fu.Name == removedField.Key);
+                    if (existingUpdate != null)
+                    {
+                        FieldUpdates.Remove(existingUpdate);
+                    }
+
+                    FieldUpdates.Add(new FieldUpdate(removedField.Key, (OperationType)e.Action /*TODO*/));
+                }
             }
-            set
+        }
+
+        private void OnRelations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add || 
+                e.Action == NotifyCollectionChangedAction.Remove || 
+                e.Action == NotifyCollectionChangedAction.Replace)
             {
-                SetFieldValue(refName, value);
+                foreach (WorkItemRelation newRelation in e.NewItems)
+                {
+                    var existingUpdate = RelationUpdates.FirstOrDefault(ru => ru.Value == newRelation);
+                    if (existingUpdate != null)
+                    {
+                        if (existingUpdate.Operation == OperationType.remove)
+                        {
+                            RelationUpdates.Remove(existingUpdate);
+                        }
+                    }
+                    else
+                    {
+                        RelationUpdates.Add(new RelationUpdate(newRelation, OperationType.add));
+                    }
+                }
+
+                foreach (WorkItemRelation oldRelation in e.OldItems)
+                {
+                    var existingUpdate = RelationUpdates.FirstOrDefault(ru => ru.Value == oldRelation);
+                    if (existingUpdate != null)
+                    {
+                        if (existingUpdate.Operation == OperationType.add)
+                        {
+                            RelationUpdates.Remove(existingUpdate);
+                        }
+                    }
+                    else
+                    {
+                        RelationUpdates.Add(new RelationUpdate(oldRelation, OperationType.remove));
+                    }
+                }
             }
-        }
-
-        public Field GetField(string refName)
-        {
-            return Fields.FirstOrDefault(f => f.Metadata.ReferenceName == refName);
-        }
-
-        public string GetFieldValue(string refName)
-        {
-            return GetField(refName) != null ? GetField(refName).Value : null;
-        }
-
-        public Field SetFieldValue(string refName, string value)
-        {
-            Field field = GetField(refName);
-
-            if (field == null)
+            else if(e.Action == NotifyCollectionChangedAction.Reset)
             {
-                field = new Field() { Metadata = new FieldMetadata() { ReferenceName = refName } };
-                Fields.Add(field);
+                // Remove all links
+                RelationUpdates.Clear();
+                RelationUpdates.Add(new RelationUpdate() { Operation = OperationType.remove });                
             }
-
-            field.Value = value;
-
-            return field;
         }
     }
 
-    [DebuggerDisplay("{Field.ReferenceName}: {OriginalValue} -> {UpdatedValue}")]
+    public class WorkItemLink : ObjectLink
+    {
+        [JsonProperty(PropertyName = "workItemUpdates")]
+        public ObjectLink Updates { get; set; }
+
+        [JsonProperty(PropertyName = "workItemRevisions")]
+        public ObjectLink Revisions { get; set; }
+
+        [JsonProperty(PropertyName = "workItemHistory")]
+        public ObjectLink History { get; set; }
+
+        [JsonProperty(PropertyName = "html")]
+        public ObjectLink Html { get; set; }
+
+        [JsonProperty(PropertyName = "workItemType")]
+        public ObjectLink Type { get; set; }
+
+        [JsonProperty(PropertyName = "fields")]
+        public ObjectLink Fields { get; set; }
+    }
+
+    public class RelationChanges
+    {
+        [JsonProperty(PropertyName = "added")]
+        public List<WorkItemRelation> AddedRelations { get; set; }
+
+        [JsonProperty(PropertyName = "removed")]
+        public List<WorkItemRelation> RemovedRelations { get; set; }
+    }
+
+    public class WorkItemUpdate : WorkItemCore
+    {
+        [JsonProperty(PropertyName = "revisedBy")]
+        public User RevisedBy { get; set; }
+
+        [JsonProperty(PropertyName = "revisedDate")]
+        public DateTime RevisedDate { get; set; }
+
+        [JsonProperty(PropertyName = "relations")]
+        public RelationChanges Changes { get; set; }
+
+        [JsonProperty(PropertyName = "fields")]
+        public Dictionary<string, FieldChange> FieldChanges;
+    }
+
+    [DebuggerDisplay("{OldValue}->{NewValue}")]
+    public class FieldChange
+    {
+        [JsonProperty(PropertyName = "oldValue")]
+        public object OldValue { get; set; }
+
+        [JsonProperty(PropertyName = "newValue")]
+        public object NewValue { get; set; }
+    }
+
+    [DebuggerDisplay("{Path}")]
     public class FieldUpdate
     {
-        [JsonProperty(PropertyName = "field")]
-        public FieldMetadata Field { get; set; }
+        [JsonProperty(PropertyName = "op")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public OperationType Operation { get; set; }
 
-        [JsonProperty(PropertyName = "originalValue")]
-        public object OriginalValue { get; set; }
+        [JsonProperty(PropertyName = "path")]
+        public string Path { get; set; }
 
-        [JsonProperty(PropertyName = "updatedValue")]
-        public object UpdatedValue { get; set; }
+        [JsonProperty(PropertyName = "value")]
+        public object Value { get; set; }
+
+        [JsonIgnore]
+        public string Name { get; set; }
+
+        public FieldUpdate()
+        {}
+
+        public FieldUpdate(string referenceName, object value, OperationType operation = OperationType.add)
+        {
+            Operation = operation;
+            Name = referenceName;
+            Path = string.Format("/fields/{0}", referenceName);
+            Value = value;
+        }
     }
 
-    [DebuggerDisplay("{Id} Rev:{Rev}")]
-    public class WorkItemUpdate : ObjectWithId<int>
+    [DebuggerDisplay("{Path}")]
+    public class RelationUpdate
     {
-        [JsonProperty(PropertyName = "revisionUrl")]
-        public string RevisionUrl { get; set; }
+        [JsonProperty(PropertyName = "op")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public OperationType Operation { get; set; }
 
-        [JsonProperty(PropertyName = "rev")]
-        public int Rev { get; set; }
+        [JsonProperty(PropertyName = "path")]
+        public string Path { get; set; }
 
-        [JsonProperty(PropertyName = "fields")]
-        public List<FieldUpdate> FieldUpdates { get; set; }
+        [JsonProperty(PropertyName = "value")]
+        public WorkItemRelation Value { get; set; }
 
-        [JsonProperty(PropertyName = "linkUpdates")]
-        public List<Link> LinkUpdates { get; set; }
+        public RelationUpdate()
+        {
+            Path = "/relations/-";
+        }
 
-        [JsonProperty(PropertyName = "resourceLinkUpdates")]
-        public List<ResourceLink> ResourceLinkUpdates { get; set; }
+        public RelationUpdate(WorkItemRelation value, OperationType operation)
+        {
+            Operation = operation;
+            Path = string.Format("/relations/{0}", value.Attributes.Id);
+            Value = value;
+        }
     }
 }

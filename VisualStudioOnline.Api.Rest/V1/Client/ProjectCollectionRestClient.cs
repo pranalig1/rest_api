@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using VisualStudioOnline.Api.Rest.V2.Model;
+using VisualStudioOnline.Api.Rest.V1.Model;
 
-namespace VisualStudioOnline.Api.Rest.V2
+namespace VisualStudioOnline.Api.Rest.V1.Client
 {
-    public class ProjectCollectionRestClient : RestClientV2
+    public class ProjectCollectionRestClient : RestClientVersion1
     {
         protected override string SubSystemName
         {

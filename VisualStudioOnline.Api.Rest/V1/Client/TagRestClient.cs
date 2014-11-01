@@ -4,12 +4,12 @@ using System.Net;
 using System.Threading.Tasks;
 using VisualStudioOnline.Api.Rest.V1.Model;
 
-namespace VisualStudioOnline.Api.Rest.V1
+namespace VisualStudioOnline.Api.Rest.V1.Client
 {
     /// <summary>
     /// Tagging REST API client
     /// </summary>
-    public class TagRestClient : RestClientV1
+    public class TagRestClient : RestClientVersion1
     {
         protected override string SubSystemName
         {

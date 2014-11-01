@@ -3,12 +3,12 @@ using System.Net;
 using System.Threading.Tasks;
 using VisualStudioOnline.Api.Rest.V1.Model;
 
-namespace VisualStudioOnline.Api.Rest.V1
+namespace VisualStudioOnline.Api.Rest.V1.Client
 {
     /// <summary>
     /// Account REST API client
     /// </summary>
-    public class AccountRestClient : RestClientV1
+    public class AccountRestClient : RestClientVersion1
     {
         private const string VSSPS_ROOT_URL = "https://app.vssps.visualstudio.com";
         

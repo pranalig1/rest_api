@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -7,82 +8,88 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
 {
     public enum QueryType
     {
-        query,
-        folder
+        flat,
+        tree,
+        oneHop
+    }
+
+    public class QueryLink : ObjectLink
+    {
+        [JsonProperty(PropertyName = "html")]
+        public ObjectLink Html { get; set; }
+    }
+
+    [DebuggerDisplay("{Field.ReferenceName}")]
+    public class SortColumn
+    {
+        [JsonProperty(PropertyName = "field")]
+        public Field Field { get; set; }
+
+        [JsonProperty(PropertyName = "descending")]
+        public bool Descending { get; set; }
     }
 
     [DebuggerDisplay("{Name}")]
-    public class Project : ObjectWithId<string>
+    public class Query : ObjectWithId<string, QueryLink>
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
-    }
 
-    [DebuggerDisplay("{ReferenceName}")]
-    public class SortOption
-    {
-        [JsonProperty(PropertyName = "refereceName")]
-        public string ReferenceName { get; set; }
-    }
+        [JsonProperty(PropertyName = "path")]
+        public string Path { get; set; }
 
-    [DebuggerDisplay("{Name}")]
-    public class Query : ObjectWithId<string>
-    {
-        [JsonProperty(PropertyName = "parentId")]
-        public string ParentId { get; set; }
-
-        [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
-
+        [JsonProperty(PropertyName = "queryType")]
         [JsonConverter(typeof(StringEnumConverter))]
-        [JsonProperty(PropertyName = "type")]
-        public QueryType Type { get; set; }
-
-        [JsonProperty(PropertyName = "count")]
-        public int Count { get; set; }
-
-        [JsonProperty(PropertyName = "value")]
-        public List<Query> Children { get; set; }
-
-        [JsonProperty(PropertyName = "project")]
-        public Project Project { get; set; }
-
-        [JsonProperty(PropertyName = "webUrl")]
-        public string WebUrl { get; set; }
-
-        [JsonProperty(PropertyName = "wiql")]
-        public string QueryText { get; set; }
+        public QueryType QueryType { get; set; }
 
         [JsonProperty(PropertyName = "columns")]
-        public List<string> Columns { get; set; }
+        public List<Field> Columns { get; set; }
 
-        [JsonProperty(PropertyName = "sortOptions")]
-        public List<SortOption> SortOptions { get; set; }
+        [JsonProperty(PropertyName = "sortColumns")]
+        public List<SortColumn> SortColumns { get; set; }
+
+        [JsonProperty(PropertyName = "wiql")]
+        public string Wiql { get; set; }
+
+        [JsonProperty(PropertyName = "isFolder")]
+        public bool IsFolder { get; set; }
+
+        [JsonProperty(PropertyName = "hasChildren")]
+        public bool HasChildren { get; set; }
+
+        [JsonProperty(PropertyName = "children")]
+        public List<Query> Children { get; set; }
+
+        [JsonProperty(PropertyName = "isPublic")]
+        public bool IsPublic { get; set; }
     }
 
-    [DebuggerDisplay("{SourceId}")]
-    public class Result
+    [DebuggerDisplay("{QueryType}")]
+    public abstract class QueryResult
     {
-        [JsonProperty(PropertyName = "sourceId")]
-        public int SourceId { get; set; }
+        [JsonProperty(PropertyName = "queryType")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public QueryType QueryType { get; set; }
 
-        [JsonProperty(PropertyName = "targetId")]
-        public int TargetId { get; set; }
-
-        [JsonProperty(PropertyName = "linkType")]
-        public string LinkType { get; set; }
-    }
-
-    [DebuggerDisplay("AsOf: {AsOf}")]
-    public class QueryResult
-    {
         [JsonProperty(PropertyName = "asOf")]
-        public string AsOf { get; set; }
+        public DateTime AsOf { get; set; }
 
-        [JsonProperty(PropertyName = "query")]
-        public Query Query { get; set; }
+        [JsonProperty(PropertyName = "columns")]
+        public List<Field> Columns { get; set; }
 
-        [JsonProperty(PropertyName = "results")]
-        public List<Result> Results { get; set; }
+        [JsonProperty(PropertyName = "sortColumns")]
+        public List<SortColumn> SortColumns { get; set; }
+    }
+
+    public class FlatQueryResult : QueryResult
+    {
+        [JsonProperty(PropertyName = "workItems")]
+        public List<WorkItem> WorkItems { get; set; }
+    }
+
+    public class LinkQueryResult : QueryResult
+    {
+        [JsonProperty(PropertyName = "workItemRelations")]
+        public List<WorkItemRelation> Relations { get; set; }
     }
 }

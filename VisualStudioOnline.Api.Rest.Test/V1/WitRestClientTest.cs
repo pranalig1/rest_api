@@ -2,7 +2,7 @@
 using System;
 using System.Net;
 using VisualStudioOnline.Api.Rest.Test.Properties;
-using VisualStudioOnline.Api.Rest.V1;
+using VisualStudioOnline.Api.Rest.V1.Client;
 using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.Test.V1
@@ -20,101 +20,156 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
         }
 
         [TestMethod]
-        public void TestCreateAndUpdateQuery()
+        public void TestGetRelationTypes()
         {
-            var queryHierarchy = _client.GetQueries(Settings.Default.ProjectName, null, QueryExpandOptions.all).Result;
-            var sharedQueriesFolder = queryHierarchy.Items[0];
-
-            Query queryFolder = _client.CreateQuery(new Query()
-                {
-                    Name = "REST_" + DateTime.Now.Ticks.ToString(),
-                    ParentId = sharedQueriesFolder.Id,
-                    Type = QueryType.folder
-                }).Result;
-
-            Query query = _client.CreateQuery(new Query()
-                {
-                    Name = "REST_" + DateTime.Now.Ticks.ToString(),
-                    ParentId = queryFolder.Id,
-                    QueryText = "select System.Id from workitems"
-                }).Result;
-
-            query.Name = "REST_" + DateTime.Now.Ticks.ToString();
-            query = _client.UpdateQuery(query).Result;
-
-            var queryResults = _client.GetQueryResult(query).Result;
-            queryResults = _client.GetQueryResult("select System.Id from workitems").Result;
-
-            string result = _client.DeleteQuery(queryFolder).Result;
+            var relations = _client.GetWorkItemRelationTypes().Result;
+            var relation = _client.GetWorkItemRelationType(relations.Items[0].ReferenceName).Result;
         }
 
         [TestMethod]
-        public void TestCreateAndUpdateWorkItem()
+        public void TestGetFields()
         {
-            var bug = CreateBug();
-            var task = CreateTask();
+            var fields = _client.GetFields().Result;
+            var field = _client.GetField(fields.Items[0].ReferenceName).Result;
+        }
 
-            var workItems = _client.GetWorkItems(new int[] { bug.Id }, WorkItemExpandOptions.all).Result;
+        [TestMethod]
+        public void TestGetWorkItemTypeCategories()
+        {
+            var workItemTypeCategories = _client.GetWorkItemTypeCategories(Settings.Default.ProjectName).Result;
+            var workItemTypeCategory = _client.GetWorkItemTypeCategory(Settings.Default.ProjectName, workItemTypeCategories.Items[0].ReferenceName).Result;
+        }
 
-            bug = _client.GetWorkItem(workItems.Items[0].Id, WorkItemExpandOptions.all).Result;
+        [TestMethod]
+        public void TestGetWorkItemTypes()
+        {
+            var workItemTypes = _client.GetWorkItemTypes(Settings.Default.ProjectName).Result;
+            var workItemType = _client.GetWorkItemType(Settings.Default.ProjectName, workItemTypes.Items[0].Name).Result;
+        }
 
-            bug["System.Title"] = "REST: " + DateTime.Now.ToString();
-            bug.Links.Add(new Link() { Comment = DateTime.Now.ToString(), Source = bug, Target = task, LinkType = "System.LinkTypes.Dependency-Forward" });
-            bug = _client.UpdateWorkItem(bug).Result;
+        [TestMethod]
+        public void TestGetClassificationNodes()
+        {
+            var nodes = _client.GetClassificationNodes(Settings.Default.ProjectName).Result;
 
-            bug.Links[0].Comment = DateTime.Now.ToString();
-            bug.Links[0].UpdateType = LinkUpdateType.update;
-            bug = _client.UpdateWorkItem(bug).Result;
+            var rootArea = _client.GetAreaNode(Settings.Default.ProjectName, 5).Result;
+            var rootIteration = _client.GetIterationNode(Settings.Default.ProjectName, 5).Result;
 
-            bug.Links[0].UpdateType = LinkUpdateType.delete;
-            bug = _client.UpdateWorkItem(bug).Result;
+            var iteration1 = _client.GetIterationNode(Settings.Default.ProjectName, "Iteration 1").Result;
+            var area1 = _client.GetAreaNode(Settings.Default.ProjectName, "Area 1").Result;
+        }
 
-            var bugInitialRevision = _client.GetWorkItemRevision(bug.Id, 1).Result;
-            var allBugUpdates = _client.GetWorkItemUpdates(bug.Id).Result;
-            var bugInitialUpdate = _client.GetWorkItemUpdate(bug.Id, 1).Result;
+        [TestMethod]
+        public void TestGetWorkItemHistory()
+        {
+            var history = _client.GetWorkItemHistory(Settings.Default.WorkItemId).Result;
+            var revHistory = _client.GetWorkItemRevisionHistory(Settings.Default.WorkItemId, Settings.Default.WorkItemRevision).Result;
+        }
+
+        [TestMethod]
+        public void TestGetWorkItemRevisions()
+        {
+            var revisions = _client.GetWorkItemRevisions(Settings.Default.WorkItemId, null, null, RevisionExpandOptions.all).Result;
+            var revision = _client.GetWorkItemRevision(Settings.Default.WorkItemId, Settings.Default.WorkItemRevision).Result;
+
+            var areaPath = revision.Fields["System.AreaPath"];
+        }
+
+        [TestMethod]
+        public void TestGetWorkItemUpdates()
+        {
+            var updates = _client.GetWorkItemUpdates(Settings.Default.WorkItemId).Result;
+            var update = _client.GetWorkItemUpdate(Settings.Default.WorkItemId, Settings.Default.WorkItemRevision).Result;
         }
 
         [TestMethod]
         public void TestUploadDownloadAttachments()
         {
-            var bug = CreateBug();
-            var resourceLink = _client.UploadAttachment(Settings.Default.ProjectName, bug["System.AreaPath"], "Test.txt", "Hello world").Result;
-            
-            resourceLink.Name = "TestFile";
-            resourceLink.Comment = DateTime.Now.ToString();
-            bug.ResourceLinks.Add(resourceLink);
+            var fileRef = _client.UploadAttachment("Test.txt", "Hello world").Result;
+            string content = _client.DownloadAttachment(fileRef.Id).Result;
+
+            //TODO: add attachment to WI
+
+            //TODO: remove attachment from WI
+        }
+
+        [TestMethod]
+        public void TestCreateAndUpdateWorkItem()
+        {
+            var defaultValues = _client.GetWorkItemTypeDefaultValues(Settings.Default.ProjectName, "Bug").Result;
+            var workItems = _client.GetWorkItems(new int[] { Settings.Default.WorkItemId }, RevisionExpandOptions.all).Result;
+
+            var bug = new WorkItem();
+            bug.Fields["System.Title"] = "Test bug 2";
+            bug.Fields["System.History"] = DateTime.Now.ToString();
+            bug = _client.CreateWorkItem(Settings.Default.ProjectName, "Bug", bug).Result;
+
+            bug = _client.GetWorkItem(bug.Id, RevisionExpandOptions.all).Result;
+            bug.Fields["System.Title"] = bug.Fields["System.Title"] + " (updated)";
+            bug.Fields["System.Tags"] = "SimpleTag";
+            bug.Relations.Add(new WorkItemRelation()
+                {
+                    Url = workItems[0].Url,
+                    Rel = "System.LinkTypes.Dependency-Forward",
+                    Attributes = new RelationAttributes() { Comment = "Hello world" }
+                });
+
             bug = _client.UpdateWorkItem(bug).Result;
 
-            bug = _client.GetWorkItem(bug.Id, WorkItemExpandOptions.all).Result;
+            //TODO: update link
 
-            string content = _client.DownloadAttachment(bug.ResourceLinks[0].Location).Result;
+            //TODO: remove link
+
+            //TODO: add hyperlink
         }
 
-        private WorkItem CreateBug()
+        [TestMethod]
+        public void TestCreateAndUpdateQueries()
         {
-            var bug = new WorkItem();
-            bug["System.WorkItemType"] = "Bug";
-            bug["System.Title"] = "REST: " + DateTime.Now.ToString();
-            bug["System.State"] = "Active";
-            bug["System.Reason"] = "New";
-            bug["System.AreaPath"] = Settings.Default.ProjectName;
-            bug["System.IterationPath"] = string.Format("{0}\\Iteration 1", Settings.Default.ProjectName);
-            bug["Microsoft.VSTS.Common.ActivatedBy"] = Settings.Default.DefaultUser;
+            var rootQueries = _client.GetQueries(Settings.Default.ProjectName).Result;
+            var sharedQueries = _client.GetQuery(Settings.Default.ProjectName, "Shared Queries", 2, QueryExpandOptions.all).Result;
 
-            return  _client.CreateWorkItem(bug).Result;
+            var newQuery = _client.CreateQuery(Settings.Default.ProjectName, 
+                "Shared Queries/Troubleshooting", 
+                string.Format("REST {0}", DateTime.Now.Ticks),
+                "select System.Id from Issue").Result;
+
+            newQuery.Name = newQuery.Name + "_Renamed";
+            newQuery.Wiql = "select System.Id, System.AssignedTo from Issue";
+            newQuery = _client.UpdateQuery(Settings.Default.ProjectName, newQuery).Result;
+            
+            string response = _client.DeleteQuery(Settings.Default.ProjectName, newQuery).Result;
+            newQuery = _client.GetQuery(Settings.Default.ProjectName, newQuery.Id, null, QueryExpandOptions.all, true).Result;
+            newQuery = _client.UndeleteQuery(Settings.Default.ProjectName, newQuery).Result;
+            response = _client.DeleteQuery(Settings.Default.ProjectName, newQuery).Result;
+
+            var newFolder = _client.CreateQueryFolder(Settings.Default.ProjectName, "Shared Queries", string.Format("REST {0}", DateTime.Now.Ticks)).Result;
+
+            newFolder = _client.MoveQuery(Settings.Default.ProjectName, "Shared Queries/Troubleshooting", newFolder).Result;
+
+            response = _client.DeleteQuery(Settings.Default.ProjectName, newFolder).Result;
         }
 
-        private WorkItem CreateTask()
+        [TestMethod]
+        public void TestRunQueries()
         {
-            var task = new WorkItem();
-            task["System.WorkItemType"] = "Task";
-            task["System.Title"] = "REST: " + DateTime.Now.ToString();
-            task["System.State"] = "New";
-            task["System.Reason"] = "New";
-            task["System.AreaPath"] = Settings.Default.ProjectName;
-            task["System.IterationPath"] = string.Format("{0}\\Iteration 1", Settings.Default.ProjectName);
+            const string FLAT_QUERY = "select System.Id, System.AssignedTo from Issue";
+            var flatResult = _client.RunFlatQuery(Settings.Default.ProjectName, FLAT_QUERY).Result;
 
-            return _client.CreateWorkItem(task).Result;
+            // Run one hop query
+            var linkResult = _client.RunLinkQuery(Settings.Default.ProjectName, "select System.Id from WorkItemLinks where ([Source].[System.WorkItemType] <> '' and [Source].[System.State] <> '') and ([System.Links.LinkType] <> '') and ([Target].[System.WorkItemType]<> '') order by System.Id mode(MayContain)").Result;
+
+            // Run tree query
+            var treeResult = _client.RunLinkQuery(Settings.Default.ProjectName, "select System.Id from WorkItemLinks where ([Source].[System.WorkItemType] <> '' and [Source].[System.State] <> '') and ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward') and ([Target].[System.WorkItemType] <> '') order by System.Id mode(Recursive)").Result;
+
+            var newQuery = _client.CreateQuery(Settings.Default.ProjectName,
+                "Shared Queries/Troubleshooting",
+                string.Format("REST {0}", DateTime.Now.Ticks),
+                FLAT_QUERY).Result;
+
+            var result = _client.RunFlatQuery(Settings.Default.ProjectName, newQuery).Result;
+
+            _client.DeleteQuery(Settings.Default.ProjectName, newQuery).Wait();
         }
     }
 }

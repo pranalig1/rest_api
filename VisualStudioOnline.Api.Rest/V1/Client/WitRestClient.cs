@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using VisualStudioOnline.Api.Rest.V2.Model;
+using VisualStudioOnline.Api.Rest.V1.Model;
 
-namespace VisualStudioOnline.Api.Rest.V2
+namespace VisualStudioOnline.Api.Rest.V1.Client
 {
     public enum QueryExpandOptions
     {
@@ -22,9 +22,9 @@ namespace VisualStudioOnline.Api.Rest.V2
     }
 
     /// <summary>
-    /// WIT REST API client v.1.0-preview.2
+    /// WIT REST API client v.1.0
     /// </summary>
-    public class WitRestClient : RestClientV2
+    public class WitRestClient : RestClientVersion1
     {
         protected override string SubSystemName
         {
@@ -463,7 +463,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<Query> UpdateQuery(string projectName, Query query)
         {
-            string response = await PatchResponse(string.Format("queries/{0}", query.Path), query, projectName, JSON_MEDIA_TYPE);
+            string response = await PatchResponse(string.Format("queries/{0}", query.Path), new { wiql = query.Wiql, name = query.Name }, projectName, JSON_MEDIA_TYPE);
             JsonConvert.PopulateObject(response, query);
             return query;
         }
@@ -477,7 +477,7 @@ namespace VisualStudioOnline.Api.Rest.V2
         /// <returns></returns>
         public async Task<Query> MoveQuery(string projectName, string newPath, Query query)
         {
-            string response = await PostResponse(string.Format("queries/{0}", newPath), new Dictionary<string, object>(), query, projectName);
+            string response = await PostResponse(string.Format("queries/{0}", newPath), new Dictionary<string, object>(), new { Id = query.Id }, projectName);
             JsonConvert.PopulateObject(response, query);
             return query;
         }
@@ -574,7 +574,7 @@ namespace VisualStudioOnline.Api.Rest.V2
             string path = "classificationnodes";
             if (!string.IsNullOrEmpty(nodePath)) { path = string.Format("{0}/{1}", path, nodePath); }
 
-            string response = await GetResponse(path, new Dictionary<string, object>() { { "$depth", depth.Value } }, projectName);
+            string response = await GetResponse(path, new Dictionary<string, object>() { { "$depth", depth } }, projectName);
             return response;
         }
         #endregion
