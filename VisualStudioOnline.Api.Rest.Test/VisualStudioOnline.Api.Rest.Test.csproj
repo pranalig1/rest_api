@@ -61,7 +61,6 @@
     <Compile Include="V1\ProjectRestClientTest.cs" />
     <Compile Include="V1\TagRestClientTest.cs" />
     <Compile Include="V1\VersionControlRestClientTest.cs" />
-    <Compile Include="V1\WitRestClientTestOld.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="V1\ProjectCollectionRestClientTest.cs" />
     <Compile Include="V1\WitRestClientTest.cs" />
