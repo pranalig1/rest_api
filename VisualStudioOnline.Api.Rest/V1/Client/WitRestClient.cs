@@ -102,7 +102,12 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         public async Task<WorkItem> GetWorkItem(int workItemId, RevisionExpandOptions options = RevisionExpandOptions.none)
         {
             string response = await GetResponse(string.Format("workitems/{0}", workItemId), new Dictionary<string, object>() { { "$expand", options } });
-            return JsonConvert.DeserializeObject<WorkItem>(response);
+            var workItem = JsonConvert.DeserializeObject<WorkItem>(response);
+
+            workItem.FieldUpdates.Clear();
+            workItem.RelationUpdates.Clear();
+
+            return workItem;
         }
 
         /// <summary>
@@ -120,7 +125,15 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
             if (fields != null) { arguments.Add("fields", string.Join(",", fields)); }
 
             string response = await GetResponse("workitems", arguments);
-            return JsonConvert.DeserializeObject<JsonCollection<WorkItem>>(response);
+            var workItems = JsonConvert.DeserializeObject<JsonCollection<WorkItem>>(response);
+
+            for (int i = 0; i < workItems.Count; i++)
+            {
+                workItems[i].FieldUpdates.Clear();
+                workItems[i].RelationUpdates.Clear();
+            }
+
+            return workItems;
         }
 
         /// <summary>

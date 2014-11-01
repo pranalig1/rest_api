@@ -185,8 +185,8 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
             Fields = new ObservableDictionary<string, object>();
 
             //TODO
-            //Relations.CollectionChanged += OnRelations_CollectionChanged;
-            //Fields.CollectionChanged += OnFields_CollectionChanged;
+            Relations.CollectionChanged += OnRelations_CollectionChanged;
+            Fields.CollectionChanged += OnFields_CollectionChanged;
         }
 
         private void OnFields_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -197,26 +197,32 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
             {
                 //TODO: NotifyCollectionChangedAction.Replace
 
-                foreach (KeyValuePair<string, object> newfield in e.NewItems)
+                if (e.NewItems != null)
                 {
-                    var existingUpdate = FieldUpdates.FirstOrDefault(fu => fu.Name == newfield.Key);
-                    if (existingUpdate != null)
+                    foreach (KeyValuePair<string, object> newfield in e.NewItems)
                     {
-                        FieldUpdates.Remove(existingUpdate);
-                    }
+                        var existingUpdate = FieldUpdates.FirstOrDefault(fu => fu.Name == newfield.Key);
+                        if (existingUpdate != null)
+                        {
+                            FieldUpdates.Remove(existingUpdate);
+                        }
 
-                    FieldUpdates.Add(new FieldUpdate(newfield.Key, newfield.Value, (OperationType)e.Action /*TODO*/));
+                        FieldUpdates.Add(new FieldUpdate(newfield.Key, newfield.Value, (OperationType)e.Action /*TODO*/));
+                    }
                 }
 
-                foreach (KeyValuePair<string, object> removedField in e.OldItems)
+                if (e.Action != NotifyCollectionChangedAction.Replace && e.OldItems != null)
                 {
-                    var existingUpdate = FieldUpdates.FirstOrDefault(fu => fu.Name == removedField.Key);
-                    if (existingUpdate != null)
+                    foreach (KeyValuePair<string, object> removedField in e.OldItems)
                     {
-                        FieldUpdates.Remove(existingUpdate);
-                    }
+                        var existingUpdate = FieldUpdates.FirstOrDefault(fu => fu.Name == removedField.Key);
+                        if (existingUpdate != null)
+                        {
+                            FieldUpdates.Remove(existingUpdate);
+                        }
 
-                    FieldUpdates.Add(new FieldUpdate(removedField.Key, (OperationType)e.Action /*TODO*/));
+                        FieldUpdates.Add(new FieldUpdate(removedField.Key, (OperationType)e.Action /*TODO*/));
+                    }
                 }
             }
         }
@@ -227,35 +233,41 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
                 e.Action == NotifyCollectionChangedAction.Remove || 
                 e.Action == NotifyCollectionChangedAction.Replace)
             {
-                foreach (WorkItemRelation newRelation in e.NewItems)
+                if (e.NewItems != null)
                 {
-                    var existingUpdate = RelationUpdates.FirstOrDefault(ru => ru.Value == newRelation);
-                    if (existingUpdate != null)
+                    foreach (WorkItemRelation newRelation in e.NewItems)
                     {
-                        if (existingUpdate.Operation == OperationType.remove)
+                        var existingUpdate = RelationUpdates.FirstOrDefault(ru => ru.Value == newRelation);
+                        if (existingUpdate != null)
                         {
-                            RelationUpdates.Remove(existingUpdate);
+                            if (existingUpdate.Operation == OperationType.remove)
+                            {
+                                RelationUpdates.Remove(existingUpdate);
+                            }
                         }
-                    }
-                    else
-                    {
-                        RelationUpdates.Add(new RelationUpdate(newRelation, OperationType.add));
+                        else
+                        {
+                            RelationUpdates.Add(new RelationUpdate(newRelation, OperationType.add));
+                        }
                     }
                 }
 
-                foreach (WorkItemRelation oldRelation in e.OldItems)
+                if (e.OldItems != null)
                 {
-                    var existingUpdate = RelationUpdates.FirstOrDefault(ru => ru.Value == oldRelation);
-                    if (existingUpdate != null)
+                    foreach (WorkItemRelation oldRelation in e.OldItems)
                     {
-                        if (existingUpdate.Operation == OperationType.add)
+                        var existingUpdate = RelationUpdates.FirstOrDefault(ru => ru.Value == oldRelation);
+                        if (existingUpdate != null)
                         {
-                            RelationUpdates.Remove(existingUpdate);
+                            if (existingUpdate.Operation == OperationType.add)
+                            {
+                                RelationUpdates.Remove(existingUpdate);
+                            }
                         }
-                    }
-                    else
-                    {
-                        RelationUpdates.Add(new RelationUpdate(oldRelation, OperationType.remove));
+                        else
+                        {
+                            RelationUpdates.Add(new RelationUpdate(oldRelation, OperationType.remove));
+                        }
                     }
                 }
             }
@@ -342,11 +354,15 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
         public FieldUpdate()
         {}
 
-        public FieldUpdate(string referenceName, object value, OperationType operation = OperationType.add)
+        public FieldUpdate(string referenceName, OperationType operation)
         {
             Operation = operation;
             Name = referenceName;
             Path = string.Format("/fields/{0}", referenceName);
+        }
+
+        public FieldUpdate(string referenceName, object value, OperationType operation = OperationType.add) : this(referenceName, operation)
+        {            
             Value = value;
         }
     }

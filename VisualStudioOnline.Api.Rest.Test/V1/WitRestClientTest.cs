@@ -107,12 +107,12 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
             bug = _client.GetWorkItem(bug.Id, RevisionExpandOptions.all).Result;
             bug.Fields["System.Title"] = bug.Fields["System.Title"] + " (updated)";
             bug.Fields["System.Tags"] = "SimpleTag";
-            bug.Relations.Add(new WorkItemRelation()
-                {
-                    Url = workItems[0].Url,
-                    Rel = "System.LinkTypes.Dependency-Forward",
-                    Attributes = new RelationAttributes() { Comment = "Hello world" }
-                });
+            //bug.Relations.Add(new WorkItemRelation()
+            //    {
+            //        Url = workItems[0].Url,
+            //        Rel = "System.LinkTypes.Dependency-Forward",
+            //        Attributes = new RelationAttributes() { Comment = "Hello world" }
+            //    });
 
             bug = _client.UpdateWorkItem(bug).Result;
 
