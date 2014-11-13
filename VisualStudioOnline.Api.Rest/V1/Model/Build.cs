@@ -65,4 +65,29 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
         [JsonProperty(PropertyName = "queueStatus")]
         public string QueueStatus { get; set; }
     }
+
+    [DebuggerDisplay("{Name}")]
+    public class BuildQueue : ObjectWithId<int>
+    {
+        [JsonProperty(PropertyName = "uri")]
+        public string Uri { get; set; }
+
+        [JsonProperty(PropertyName = "status")]
+        public string Status { get; set; }
+
+        [JsonProperty(PropertyName = "enabled")]
+        public bool Enabled { get; set; }
+
+        [JsonProperty(PropertyName = "createdDate")]
+        public DateTime CreatedDate { get; set; }
+
+        [JsonProperty(PropertyName = "updatedDate")]
+        public DateTime UpdatedDate { get; set; }
+
+        [JsonProperty(PropertyName = "queueType")]
+        public string QueueType { get; set; }
+
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+    }
 }

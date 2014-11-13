@@ -77,5 +77,25 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
             string response = await DeleteResponse(string.Format("qualities/{0}", quality), projectName);
             return response;
         }
+
+        /// <summary>
+        /// Get a list of queues
+        /// </summary>
+        /// <returns></returns>
+        public async Task<JsonCollection<BuildQueue>> GetBuildQueues()
+        {
+            string response = await GetResponse("queues");
+            return JsonConvert.DeserializeObject<JsonCollection<BuildQueue>>(response);
+        }
+
+        /// <summary>
+        /// Get a queue
+        /// </summary>
+        /// <returns></returns>
+        public async Task<BuildQueue> GetBuildQueue(int queueId)
+        {
+            string response = await GetResponse(string.Format("queues/{0}", queueId));
+            return JsonConvert.DeserializeObject<BuildQueue>(response);
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
         public void TestGetBuildDefinitions()
         {
             var definitions = _client.GetBuildDefinitions(Settings.Default.ProjectName).Result;
-            var definition = _client.GetBuildDefinition(Settings.Default.ProjectName, definitions.Items[0].Id);
+            var definition = _client.GetBuildDefinition(Settings.Default.ProjectName, definitions.Items[0].Id).Result;
         }
 
         [TestMethod]
@@ -36,6 +36,13 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
 
             result = _client.DeleteBuildQuality(Settings.Default.ProjectName, newQuality).Result;
             qualities = _client.GetBuildQualities(Settings.Default.ProjectName).Result;
+        }
+
+        [TestMethod]
+        public void TestGetBuildQueues()
+        {
+            var queues = _client.GetBuildQueues().Result;
+            var queue = _client.GetBuildQueue(queues.Items[0].Id).Result;
         }
     }
 }
