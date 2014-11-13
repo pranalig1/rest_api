@@ -119,6 +119,31 @@ namespace VisualStudioOnline.Api.Rest
             }
         }
 
+        protected async Task<string> PutResponse(string path, object content, string projectName = null, string mediaType = JSON_MEDIA_TYPE)
+        {
+            return await PutResponse(path, new Dictionary<string, object>(), content, projectName, mediaType);
+        }
+
+        protected async Task<string> PutResponse(string path, IDictionary<string, object> arguments, object content, string projectName = null, string mediaType = JSON_MEDIA_TYPE)
+        {
+            var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, mediaType);
+
+            using (HttpClient client = GetHttpClient(mediaType))
+            {
+                using (HttpResponseMessage response = client.PutAsync(ConstructUrl(projectName, path, arguments), httpContent).Result)
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw JsonConvert.DeserializeObject<VsoException>(responseBody);
+                    }
+
+                    return responseBody;
+                }
+            }
+        }
+
         protected async Task<string> DeleteResponse(string path, string projectName = null)
         {
             using (HttpClient client = GetHttpClient())
