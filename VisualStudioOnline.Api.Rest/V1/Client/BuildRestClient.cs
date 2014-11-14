@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using VisualStudioOnline.Api.Rest.V1.Model;
@@ -96,6 +97,66 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         {
             string response = await GetResponse(string.Format("queues/{0}", queueId));
             return JsonConvert.DeserializeObject<BuildQueue>(response);
+        }
+
+
+        public async Task<JsonCollection<BuildRequest>> GetBuildRequests(string projectName, string requestedFor = null,
+            int? definitionId = null, int? queueId = null, int? maxCompletedAge = null, 
+            BuildStatus? status = null, int? top = null, int? skip = null)
+        {
+            string response = await GetResponse("requests", 
+                new Dictionary<string, object>() { 
+                    { "requestedFor", requestedFor},
+                    { "definitionId", definitionId},
+                    { "queueId", queueId},
+                    { "maxCompletedAge", maxCompletedAge},
+                    { "status", status != null ? status.Value.ToString() : null },
+                    { "$top", top }, 
+                    { "$skip", skip } }, 
+                projectName);
+            return JsonConvert.DeserializeObject<JsonCollection<BuildRequest>>(response);
+        }
+
+        /// <summary>
+        /// Request a build
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="buildDefinitionId"></param>
+        /// <param name="reason"></param>
+        /// <param name="priority"></param>
+        /// <param name="queueId"></param>
+        /// <returns></returns>
+        public async Task<BuildRequest> RequestBuild(string projectName, int buildDefinitionId, BuildReason reason, BuildPriority priority, int? queueId = null)
+        {
+            string response = await PostResponse("requests",
+                new { definition = new { id = buildDefinitionId }, reason = reason.ToString(), priority = priority.ToString(), queue = new { id = queueId } },
+                projectName);
+            return JsonConvert.DeserializeObject<BuildRequest>(response);
+        }
+
+        /// <summary>
+        /// Update the status of a request
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="requestId"></param>
+        /// <param name="newStatus"></param>
+        /// <returns></returns>
+        public async Task<string> UpdateBuildRequest(string projectName, int requestId, BuildStatus newStatus)
+        {
+            string response = await PatchResponse(string.Format("requests/{0}", requestId), new { status = newStatus.ToString() }, projectName, JSON_MEDIA_TYPE);
+            return response;
+        }
+
+        /// <summary>
+        /// Cancel a build request
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="requestId"></param>
+        /// <returns></returns>
+        public async Task<string> CancelBuildRequest(string projectName, int requestId)
+        {
+            string response = await DeleteResponse(string.Format("requests/{0}", requestId), projectName);
+            return response;
         }
     }
 }

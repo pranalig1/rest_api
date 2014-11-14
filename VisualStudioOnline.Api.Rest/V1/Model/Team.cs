@@ -28,5 +28,8 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
 
         [JsonProperty(PropertyName = "imageUrl")]
         public string ImageUrl { get; set; }
+
+        [JsonProperty(PropertyName = "isContainer")]
+        public bool? IsContainer { get; set; }
     }
 }

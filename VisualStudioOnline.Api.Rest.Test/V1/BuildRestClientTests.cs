@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using VisualStudioOnline.Api.Rest.Test.Properties;
 using VisualStudioOnline.Api.Rest.V1.Client;
+using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.Test.V1
 {
@@ -43,6 +44,17 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
         {
             var queues = _client.GetBuildQueues().Result;
             var queue = _client.GetBuildQueue(queues.Items[0].Id).Result;
+        }
+
+        [TestMethod]
+        public void TestBuildRequests()
+        {
+            var requests = _client.GetBuildRequests(Settings.Default.ProjectName).Result;
+            var definitions = _client.GetBuildDefinitions(Settings.Default.ProjectName).Result;
+            var result = _client.UpdateBuildRequest(Settings.Default.ProjectName, requests.Items[0].Id, BuildStatus.Cancelled).Result;
+
+            var request = _client.RequestBuild(Settings.Default.ProjectName, definitions.Items[0].Id, BuildReason.Manual, BuildPriority.Low).Result;
+            result = _client.CancelBuildRequest(Settings.Default.ProjectName, request.Id).Result;
         }
     }
 }
