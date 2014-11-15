@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -192,7 +193,18 @@ namespace VisualStudioOnline.Api.Rest
                 resultUrl.AppendFormat("/{0}", path);
             }
 
-            resultUrl.AppendFormat("?{0}", string.Join("&", arguments.Where(kvp => kvp.Value != null).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value))));
+            resultUrl.AppendFormat("?{0}", string.Join("&", arguments.Where(kvp => kvp.Value != null).Select(kvp => 
+                {
+                    if (kvp.Value is IEnumerable<string>)
+                    {
+                        return string.Join("&", ((IEnumerable<string>)kvp.Value).Select(v => string.Format("{0}={1}", kvp.Key, v)));
+                    }
+                    else
+                    {
+                        return string.Format("{0}={1}", kvp.Key, kvp.Value);
+                    }
+                }
+                )));
             return resultUrl.ToString();
         }
     }

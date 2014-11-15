@@ -1,11 +1,36 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.V1.Client
 {
+    public enum BuildDetails
+    {
+        ActivityProperties,
+        ActivityTracking,
+        AgentScopeActivityTracking,
+        AssociatedChangeset,
+        AssociatedCommit,
+        AssociatedWorkItem,
+        BuildError,
+        BuildMessage,
+        BuildProject,
+        BuildStep,
+        BuildWarning,
+        CheckInOutcome,
+        CompilationSummary,
+        ConfigurationSummary,
+        CustomSummaryInformation,
+        DeploymentInformation,
+        ExternalLink,
+        GetStatus,
+        OpenedWorkItem
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -156,6 +181,85 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         public async Task<string> CancelBuildRequest(string projectName, int requestId)
         {
             string response = await DeleteResponse(string.Format("requests/{0}", requestId), projectName);
+            return response;
+        }
+
+        /// <summary>
+        /// Get a list of builds
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="requestedFor"></param>
+        /// <param name="definitionId"></param>
+        /// <param name="minFinishTime"></param>
+        /// <param name="quality"></param>
+        /// <param name="status"></param>
+        /// <param name="top"></param>
+        /// <param name="skip"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<Build>> GetBuilds(string projectName, string requestedFor = null,
+           int? definitionId = null, DateTime? minFinishTime = null, string quality = null, BuildStatus? status = null, int? top = null, int? skip = null)
+        {
+            string response = await GetResponse("builds",
+                new Dictionary<string, object>() { 
+                    { "requestedFor", requestedFor },
+                    { "definitionId", definitionId },
+                    { "minFinishTime", minFinishTime },
+                    { "quality", quality },
+                    { "status", status != null ? status.Value.ToString() : null },
+                    { "$top", top }, 
+                    { "$skip", skip } },
+                projectName);
+            return JsonConvert.DeserializeObject<JsonCollection<Build>>(response);
+        }
+
+        /// <summary>
+        /// Get build details
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="buildId"></param>
+        /// <param name="details"></param>
+        /// <returns></returns>
+        public async Task<Build> GetBuild(string projectName, int buildId, params BuildDetails[] details)
+        {            
+            var arguments = new Dictionary<string, object>();
+
+            if (details != null)
+            {
+                arguments.Add("types", details.Select(d => d.ToString()));
+            }
+
+            string response = await GetResponse(string.Format("builds/{0}", buildId), arguments, projectName);
+            return JsonConvert.DeserializeObject<Build>(response);
+        }
+
+        /// <summary>
+        /// Modify a build
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="buildId"></param>
+        /// <param name="status"></param>
+        /// <param name="quality"></param>
+        /// <param name="retainIndefinitely"></param>
+        /// <returns></returns>
+        public async Task<Build> UpdateBuild(string projectName, int buildId, BuildStatus? status = null, string quality = null, bool? retainIndefinitely = null)
+        {
+            string response = await PatchResponse(string.Format("builds/{0}", buildId), 
+                new { status = status, quality = quality, retainIndefinitely = retainIndefinitely }, 
+                projectName, 
+                JSON_MEDIA_TYPE);
+
+            return JsonConvert.DeserializeObject<Build>(response);
+        }
+
+        /// <summary>
+        /// Delete a build
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="buildId"></param>
+        /// <returns></returns>
+        public async Task<string> DeleteBuild(string projectName, int buildId)
+        {
+            string response = await DeleteResponse(string.Format("builds/{0}", buildId), projectName);
             return response;
         }
     }

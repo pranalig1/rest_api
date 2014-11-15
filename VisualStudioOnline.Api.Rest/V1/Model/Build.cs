@@ -52,13 +52,6 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
     }
 
     [DebuggerDisplay("{Name}")]
-    public class Build : ObjectWithId<int>
-    {
-        [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
-    }
-
-    [DebuggerDisplay("{Name}")]
     public class BuildDefinition : ObjectWithId<int>
     {
         [JsonProperty(PropertyName = "batchSize")]
@@ -179,5 +172,83 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
 
         [JsonProperty(PropertyName = "requestDropLocation")]
         public string RequestDropLocation { get; set; }
+    }
+
+    [DebuggerDisplay("{DownloadUrl}")]
+    public class Log : BaseObject
+    {
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("downloadUrl")]
+        public string DownloadUrl { get; set; }
+    }
+
+    [DebuggerDisplay("{Location}")]
+    public class Drop : BaseObject
+    {
+        [JsonProperty("location")]
+        public string Location { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("downloadUrl")]
+        public string DownloadUrl { get; set; }
+    }
+
+    [DebuggerDisplay("{Uri}")]
+    public class Build : ObjectWithId<int>
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [JsonProperty("uri")]
+        public string Uri { get; set; }
+
+        [JsonProperty("buildNumber")]
+        public string BuildNumber { get; set; }
+
+        [JsonProperty("startTime")]
+        public DateTime StartTime { get; set; }
+
+        [JsonProperty("finishTime")]
+        public DateTime FinishTime { get; set; }
+
+        [JsonProperty("reason")]
+        public string Reason { get; set; }
+
+        [JsonProperty("status")]
+        public string Status { get; set; }
+
+        [JsonProperty("drop")]
+        public Drop Drop { get; set; }
+
+        [JsonProperty("log")]
+        public Log Log { get; set; }
+
+        [JsonProperty("sourceGetVersion")]
+        public string SourceGetVersion { get; set; }
+
+        [JsonProperty("lastChangedBy")]
+        public UserIdentity LastChangedBy { get; set; }
+
+        [JsonProperty("retainIndefinitely")]
+        public bool RetainIndefinitely { get; set; }
+
+        [JsonProperty("definition")]
+        public BuildDefinition Definition { get; set; }
+
+        [JsonProperty("queue")]
+        public Queue Queue { get; set; }
+
+        [JsonProperty("requests")]
+        public IList<BuildRequest> Requests { get; set; }
+
+        [JsonProperty("hasDiagnostics")]
+        public bool? HasDiagnostics { get; set; }
+
+        [JsonProperty("dropLocation")]
+        public string DropLocation { get; set; }
     }
 }

@@ -56,5 +56,20 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
             var request = _client.RequestBuild(Settings.Default.ProjectName, definitions.Items[0].Id, BuildReason.Manual, BuildPriority.Low).Result;
             result = _client.CancelBuildRequest(Settings.Default.ProjectName, request.Id).Result;
         }
+
+        [TestMethod]
+        public void TestBuilds()
+        {
+            var builds = _client.GetBuilds(Settings.Default.ProjectName).Result;
+
+            if (builds.Items.Count > 0)
+            {
+                var build = _client.GetBuild(Settings.Default.ProjectName, builds.Items[0].Id, BuildDetails.BuildMessage, BuildDetails.GetStatus).Result;
+
+                build = _client.UpdateBuild(Settings.Default.ProjectName, build.Id, BuildStatus.Cancelled).Result;
+                var result = _client.DeleteBuild(Settings.Default.ProjectName, build.Id).Result;
+                builds = _client.GetBuilds(Settings.Default.ProjectName).Result;
+            }
+        }
     }
 }
