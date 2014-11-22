@@ -8,6 +8,42 @@ using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.V1.Client
 {
+    public interface IVsoBuild
+    {
+        Task<JsonCollection<BuildDefinition>> GetBuildDefinitions(string projectName);
+
+        Task<BuildDefinition> GetBuildDefinition(string projectName, int definitionId);
+
+        Task<JsonCollection<string>> GetBuildQualities(string projectName);
+
+        Task<string> AddBuildQuality(string projectName, string quality);
+
+        Task<string> DeleteBuildQuality(string projectName, string quality);
+
+        Task<JsonCollection<BuildQueue>> GetBuildQueues();
+
+        Task<BuildQueue> GetBuildQueue(int queueId);
+
+        Task<JsonCollection<BuildRequest>> GetBuildRequests(string projectName, string requestedFor = null,
+            int? definitionId = null, int? queueId = null, int? maxCompletedAge = null,
+            BuildStatus? status = null, int? top = null, int? skip = null);
+
+        Task<BuildRequest> RequestBuild(string projectName, int buildDefinitionId, BuildReason reason, BuildPriority priority, int? queueId = null);
+
+        Task<string> UpdateBuildRequest(string projectName, int requestId, BuildStatus newStatus);
+
+        Task<string> CancelBuildRequest(string projectName, int requestId);
+
+        Task<JsonCollection<Build>> GetBuilds(string projectName, string requestedFor = null,
+           int? definitionId = null, DateTime? minFinishTime = null, string quality = null, BuildStatus? status = null, int? top = null, int? skip = null);
+
+        Task<Build> GetBuild(string projectName, int buildId, params BuildDetails[] details);
+
+        Task<Build> UpdateBuild(string projectName, int buildId, BuildStatus? status = null, string quality = null, bool? retainIndefinitely = null);
+
+        Task<string> DeleteBuild(string projectName, int buildId);
+    }
+
     public enum BuildDetails
     {
         ActivityProperties,
@@ -34,15 +70,15 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
     /// <summary>
     /// 
     /// </summary>
-    public class BuildRestClient : RestClientVersion1
+    public class BuildRestClient : RestClientVersion1, IVsoBuild
     {
         protected override string SubSystemName
         {
             get { return "build"; }
         }
 
-        public BuildRestClient(string accountName, NetworkCredential userCredential, string collectionName = DEFAULT_COLLECTION)
-            : base(string.Format(ACCOUNT_ROOT_URL, accountName, collectionName), new BasicAuthenticationFilter(userCredential))
+        public BuildRestClient(string url, NetworkCredential userCredential)
+            : base(url, new BasicAuthenticationFilter(userCredential))
         {
         }
 

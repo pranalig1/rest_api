@@ -9,15 +9,30 @@ using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.V1.Client
 {
-    public class ProjectRestClient : RestClientVersion1
+    public interface IVsoProject
+    {
+        Task<JsonCollection<TeamProject>> GetTeamProjects(ProjectState? stateFilter = null, int? top = null, int? skip = null);
+
+        Task<TeamProject> GetTeamProject(string projectNameOrId, bool? includecapabilities = null);
+
+        Task<TeamProject> UpdateTeamProject(TeamProject project);
+
+        Task<JsonCollection<ProjectTeam>> GetProjectTeams(string projectNameOrId, int? top = null, int? skip = null);
+
+        Task<ProjectTeam> GetProjectTeam(string projectNameOrId, string teamNameOrId);
+
+        Task<JsonCollection<UserIdentity>> GetTeamMembers(string projectNameOrId, string teamNameOrId, int? top = null, int? skip = null);
+    }
+
+    public class ProjectRestClient : RestClientVersion1, IVsoProject
     {
         protected override string SubSystemName
         {
             get { return "projects"; }
         }
 
-        public ProjectRestClient(string accountName, NetworkCredential userCredential, string collectionName = DEFAULT_COLLECTION)
-            : base(string.Format(ACCOUNT_ROOT_URL, accountName, collectionName), new BasicAuthenticationFilter(userCredential))
+        public ProjectRestClient(string url, NetworkCredential userCredential)
+            : base(url, new BasicAuthenticationFilter(userCredential))
         {
         }
 

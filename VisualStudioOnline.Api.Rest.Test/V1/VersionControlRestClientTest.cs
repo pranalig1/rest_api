@@ -1,21 +1,17 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using System.Net;
-using VisualStudioOnline.Api.Rest.Test.Properties;
 using VisualStudioOnline.Api.Rest.V1.Client;
 
 namespace VisualStudioOnline.Api.Rest.Test.V1
 {
     [TestClass]
-    public class VersionControlRestClientTest
+    public class VersionControlRestClientTest : VsoTestBase
     {
-        private VersionControlRestClient _client;
+        private IVsoVersionControl _client;
 
-        [TestInitialize]
-        public void Initialize()
+        protected override void OnInitialize(VsoClient vsoClient)
         {
-            _client = new VersionControlRestClient(Settings.Default.AccountName,
-                new NetworkCredential(Settings.Default.UserName, Settings.Default.Password));
+            _client = vsoClient.GetService<IVsoVersionControl>();
         }
 
         [TestMethod]

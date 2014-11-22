@@ -1,20 +1,17 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Net;
 using VisualStudioOnline.Api.Rest.Test.Properties;
 using VisualStudioOnline.Api.Rest.V1.Client;
 
 namespace VisualStudioOnline.Api.Rest.Test.V1
 {
     [TestClass]
-    public class TagRestClientTest
+    public class TagRestClientTest : VsoTestBase
     {
-        private TagRestClient _client;
+        private IVsoTag _client;
 
-        [TestInitialize]
-        public void Initialize()
+        protected override void OnInitialize(VsoClient vsoClient)
         {
-            _client = new TagRestClient(Settings.Default.AccountName,
-                new NetworkCredential(Settings.Default.UserName, Settings.Default.Password));
+            _client = vsoClient.GetService<IVsoTag>();
         }
 
         [TestMethod]

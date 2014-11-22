@@ -7,6 +7,89 @@ using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.V1.Client
 {
+    public interface IVsoWit
+    {
+        Task<WorkItemTypeDefaults> GetWorkItemTypeDefaultValues(string projectName, string workItemTypeName);
+
+        Task<WorkItem> CreateWorkItem(string projectName, string workItemTypeName, WorkItem workItem);
+
+        Task<WorkItem> UpdateWorkItem(WorkItem workItem);
+
+        Task<WorkItem> GetWorkItem(int workItemId, RevisionExpandOptions options = RevisionExpandOptions.none);
+
+        Task<JsonCollection<WorkItem>> GetWorkItems(int[] workItemIds, RevisionExpandOptions options = RevisionExpandOptions.none, DateTime? asOfDate = null, string[] fields = null);
+
+        Task<JsonCollection<HistoryComment>> GetWorkItemHistory(int workitemId, int? top = null, int? skip = null);
+
+        Task<HistoryComment> GetWorkItemRevisionHistory(int workitemId, int revision);
+
+        Task<JsonCollection<WorkItemRelationType>> GetWorkItemRelationTypes();
+
+        Task<WorkItemRelationType> GetWorkItemRelationType(string relationName);
+
+        Task<JsonCollection<Field>> GetFields();
+
+        Task<Field> GetField(string fieldName);
+
+        Task<JsonCollection<WorkItemTypeCategory>> GetWorkItemTypeCategories(string projectName);
+
+        Task<WorkItemTypeCategory> GetWorkItemTypeCategory(string projectName, string categoryName);
+
+        Task<JsonCollection<WorkItemType>> GetWorkItemTypes(string projectName);
+
+        Task<WorkItemType> GetWorkItemType(string projectName, string typeName);
+
+        Task<JsonCollection<ClassificationNode>> GetClassificationNodes(string projectName, int? depth = null);
+
+        Task<ClassificationNode> GetAreaNode(string projectName, int? depth = null);
+
+        Task<ClassificationNode> GetAreaNode(string projectName, string nodePath, int? depth = null);
+
+        Task<ClassificationNode> GetIterationNode(string projectName, int? depth = null);
+
+        Task<ClassificationNode> GetIterationNode(string projectName, string nodePath, int? depth = null);
+
+        Task<JsonCollection<WorkItem>> GetWorkItemRevisions(int workItemId, int? top = null, int? skip = null, RevisionExpandOptions options = RevisionExpandOptions.none);
+
+        Task<WorkItem> GetWorkItemRevision(int workItemId, int revision, RevisionExpandOptions options = RevisionExpandOptions.none);
+
+        Task<JsonCollection<WorkItemUpdate>> GetWorkItemUpdates(int workItemId, int? top = null, int? skip = null);
+
+        Task<WorkItemUpdate> GetWorkItemUpdate(int workItemId, int revisionId);
+
+        Task<string> DownloadAttachment(string attachmentId);
+
+        Task<ObjectWithId<string>> UploadAttachment(string projectName, string area, string fileName, byte[] content);
+
+        Task<ObjectWithId<string>> UploadAttachment(string fileName, string content);
+
+        Task<JsonCollection<Query>> GetQueries(string projectName, string folderPath = null, int? depth = null, QueryExpandOptions options = QueryExpandOptions.none, bool? includeDeleted = null);
+
+        Task<Query> GetQuery(string projectName, string folderPathOrId, int? depth = null, QueryExpandOptions options = QueryExpandOptions.none, bool? includeDeleted = null);
+
+        Task<Query> CreateQuery(string projectName, string parentPath, string queryName, string queryText);
+
+        Task<Query> CreateQueryFolder(string projectName, string parentPath, string folderName);
+
+        Task<Query> UpdateQuery(string projectName, Query query);
+
+        Task<Query> MoveQuery(string projectName, string newPath, Query query);
+
+        Task<string> DeleteQuery(string projectName, Query query);
+
+        Task<string> DeleteQuery(string projectName, string queryPath);
+
+        Task<Query> UndeleteQuery(string projectName, Query query, bool? undeleteDescendants = null);
+
+        Task<FlatQueryResult> RunFlatQuery(string projectName, string queryText);
+
+        Task<LinkQueryResult> RunLinkQuery(string projectName, string queryText);
+
+        Task<FlatQueryResult> RunFlatQuery(string projectName, Query query);
+
+        Task<LinkQueryResult> RunLinkQuery(string projectName, Query query);
+    }
+
     public enum QueryExpandOptions
     {
         none,
@@ -24,15 +107,15 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
     /// <summary>
     /// WIT REST API client v.1.0
     /// </summary>
-    public class WitRestClient : RestClientVersion1
+    public class WitRestClient : RestClientVersion1, IVsoWit
     {
         protected override string SubSystemName
         {
             get { return "wit"; }
         }
 
-        public WitRestClient(string accountName, NetworkCredential userCredential, string collectionName = DEFAULT_COLLECTION)
-            : base(string.Format(ACCOUNT_ROOT_URL, accountName, collectionName), new BasicAuthenticationFilter(userCredential))
+        public WitRestClient(string url, NetworkCredential userCredential)
+            : base(url, new BasicAuthenticationFilter(userCredential))
         {
         }
 

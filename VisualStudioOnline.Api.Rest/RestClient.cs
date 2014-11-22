@@ -20,10 +20,8 @@ namespace VisualStudioOnline.Api.Rest
     /// <summary>
     /// Base class for TFS subsystem REST API client
     /// </summary>
-    public abstract class RestClient
+    public abstract class VsoRestClient
     {
-        protected const string ACCOUNT_ROOT_URL = "https://{0}.visualstudio.com/{1}";
-        protected const string DEFAULT_COLLECTION = "DefaultCollection";
         protected const string JSON_MEDIA_TYPE = "application/json";
         protected const string JSON_PATCH_MEDIA_TYPE = "application/json-patch+json";
         protected const string HTML_MEDIA_TYPE = "text/html";
@@ -41,12 +39,13 @@ namespace VisualStudioOnline.Api.Rest
             get;
         }
 
-        public RestClient(string rootUrl, IHttpRequestHeaderFilter authProvider)
+        public VsoRestClient(string rootUrl, IHttpRequestHeaderFilter authProvider)
         {
             _rootUrl = rootUrl;
             _authProvider = authProvider;
         }
 
+        #region GET operation
         protected async Task<string> GetResponse(string path, string projectName = null)
         {
             return await GetResponse(path, new Dictionary<string, object>(), projectName);
@@ -69,14 +68,16 @@ namespace VisualStudioOnline.Api.Rest
                 }
             }
         }
+        #endregion
 
+        #region POST operation
         protected async Task<string> PostResponse(string path, object content, string projectName = null)
         {
             return await PostResponse(path, new Dictionary<string, object>(), content, projectName);
         }
 
         protected async Task<string> PostResponse(string path, IDictionary<string, object> arguments, object content, string projectName = null, string mediaType = JSON_MEDIA_TYPE)
-        {            
+        {
             var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, mediaType);
 
             using (HttpClient client = GetHttpClient(mediaType))
@@ -93,8 +94,10 @@ namespace VisualStudioOnline.Api.Rest
                     return responseBody;
                 }
             }
-        }
+        } 
+        #endregion
 
+        #region PATCH operation
         protected async Task<string> PatchResponse(string path, object content, string projectName = null, string mediaType = JSON_PATCH_MEDIA_TYPE)
         {
             return await PatchResponse(path, new Dictionary<string, object>(), content, projectName, mediaType);
@@ -118,8 +121,10 @@ namespace VisualStudioOnline.Api.Rest
                     return responseBody;
                 }
             }
-        }
+        } 
+        #endregion
 
+        #region PUT operation
         protected async Task<string> PutResponse(string path, object content, string projectName = null, string mediaType = JSON_MEDIA_TYPE)
         {
             return await PutResponse(path, new Dictionary<string, object>(), content, projectName, mediaType);
@@ -143,8 +148,10 @@ namespace VisualStudioOnline.Api.Rest
                     return responseBody;
                 }
             }
-        }
+        } 
+        #endregion
 
+        #region DELETE operation
         protected async Task<string> DeleteResponse(string path, string projectName = null)
         {
             using (HttpClient client = GetHttpClient())
@@ -161,7 +168,8 @@ namespace VisualStudioOnline.Api.Rest
                     return responseBody;
                 }
             }
-        }
+        } 
+        #endregion
 
         private HttpClient GetHttpClient(string mediaType = JSON_MEDIA_TYPE)
         {
@@ -209,7 +217,7 @@ namespace VisualStudioOnline.Api.Rest
         }
     }
 
-    public abstract class RestClientPreview1 : RestClient
+    public abstract class RestClientPreview1 : VsoRestClient
     {
         protected override string ApiVersion
         {
@@ -219,7 +227,7 @@ namespace VisualStudioOnline.Api.Rest
         public RestClientPreview1(string rootUrl, IHttpRequestHeaderFilter authProvider) : base(rootUrl, authProvider) { }
     }
 
-    public abstract class RestClientPreview2 : RestClient
+    public abstract class RestClientPreview2 : VsoRestClient
     {
         protected override string ApiVersion
         {
@@ -229,7 +237,7 @@ namespace VisualStudioOnline.Api.Rest
         public RestClientPreview2(string rootUrl, IHttpRequestHeaderFilter authProvider) : base(rootUrl, authProvider) { }
     }
 
-    public abstract class RestClientVersion1 : RestClient
+    public abstract class RestClientVersion1 : VsoRestClient
     {
         protected override string ApiVersion
         {
@@ -260,6 +268,12 @@ namespace VisualStudioOnline.Api.Rest
     [JsonObject(MemberSerialization.OptIn)]
     public class VsoException : Exception
     {
+        public VsoException()
+        { }
+
+        public VsoException(string errorMessage) : base(errorMessage)
+        { }
+
         [JsonProperty(PropertyName = "$id")]
         public int Id { get; set; }
 

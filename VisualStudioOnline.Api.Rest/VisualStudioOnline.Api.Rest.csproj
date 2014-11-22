@@ -50,6 +50,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="V1\Client\AccountRestClient.cs" />
     <Compile Include="V1\Client\BuildRestClient.cs" />
+    <Compile Include="V1\Client\GitRestClient.cs" />
+    <Compile Include="V1\Client\VsoClient.cs" />
     <Compile Include="V1\Model\Account.cs" />
     <Compile Include="RestClient.cs" />
     <Compile Include="V1\Model\Build.cs" />

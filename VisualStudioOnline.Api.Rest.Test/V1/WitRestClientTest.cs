@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Net;
 using VisualStudioOnline.Api.Rest.Test.Properties;
 using VisualStudioOnline.Api.Rest.V1.Client;
 using VisualStudioOnline.Api.Rest.V1.Model;
@@ -8,15 +7,13 @@ using VisualStudioOnline.Api.Rest.V1.Model;
 namespace VisualStudioOnline.Api.Rest.Test.V1
 {
     [TestClass]
-    public class WitRestClientTest
+    public class WitRestClientTest : VsoTestBase
     {
-        private WitRestClient _client;
+        private IVsoWit _client;
 
-        [TestInitialize]
-        public void Initialize()
+        protected override void OnInitialize(VsoClient vsoClient)
         {
-            _client = new WitRestClient(Settings.Default.AccountName,
-                new NetworkCredential(Settings.Default.UserName, Settings.Default.Password));
+            _client = vsoClient.GetService<IVsoWit>();
         }
 
         [TestMethod]

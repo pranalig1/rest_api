@@ -5,10 +5,17 @@ using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.V1.Client
 {
+    public interface IVsoAccount
+    {
+        Task<JsonCollection<Account>> GetAccountList();
+
+        Task<Account> GetAccount(string name);
+    }
+
     /// <summary>
     /// Account REST API client
     /// </summary>
-    public class AccountRestClient : RestClientVersion1
+    public class AccountRestClient : RestClientVersion1, IVsoAccount
     {
         private const string VSSPS_ROOT_URL = "https://app.vssps.visualstudio.com";
         

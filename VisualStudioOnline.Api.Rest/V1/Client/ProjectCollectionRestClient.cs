@@ -6,15 +6,22 @@ using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.V1.Client
 {
-    public class ProjectCollectionRestClient : RestClientVersion1
+    public interface IVsoProjectCollection
+    {
+        Task<JsonCollection<TeamProjectCollection>> GetProjectCollections(int? top = null, int? skip = null);
+
+        Task<TeamProjectCollection> GetProjectCollection(string projectCollectionName);
+    }
+
+    public class ProjectCollectionRestClient : RestClientVersion1, IVsoProjectCollection
     {
         protected override string SubSystemName
         {
             get { return "projectcollections"; }
         }
 
-        public ProjectCollectionRestClient(string accountName, NetworkCredential userCredential, string collectionName = DEFAULT_COLLECTION)
-            : base(string.Format(ACCOUNT_ROOT_URL, accountName, collectionName), new BasicAuthenticationFilter(userCredential))
+        public ProjectCollectionRestClient(string url, NetworkCredential userCredential)
+            : base(url, new BasicAuthenticationFilter(userCredential))
         {
         }
 

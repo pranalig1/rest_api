@@ -64,6 +64,7 @@
     <Compile Include="V1\VersionControlRestClientTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="V1\ProjectCollectionRestClientTest.cs" />
+    <Compile Include="V1\VsoTestBase.cs" />
     <Compile Include="V1\WitRestClientTest.cs" />
   </ItemGroup>
   <ItemGroup>

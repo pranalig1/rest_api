@@ -7,7 +7,7 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
     [TestClass]
     public class AccountRestClientTest
     {
-        private AccountRestClient _client;
+        private IVsoAccount _client;
 
         [TestInitialize]
         public void Initialize()

@@ -6,10 +6,23 @@ using VisualStudioOnline.Api.Rest.V1.Model;
 
 namespace VisualStudioOnline.Api.Rest.V1.Client
 {
+    public interface IVsoTag
+    {
+        Task<JsonCollection<Tag>> GetTagList(string scopeId, bool includeInactive = false);
+
+        Task<Tag> GetTag(string scopeId, string nameOrId);
+
+        Task<Tag> CreateTag(string scopeId, string name);
+
+        Task<Tag> UpdateTag(string scopeId, Tag tag);
+
+        Task<string> DeleteTag(string scopeId, Tag tag);
+    }
+
     /// <summary>
     /// Tagging REST API client
     /// </summary>
-    public class TagRestClient : RestClientVersion1
+    public class TagRestClient : RestClientVersion1, IVsoTag
     {
         protected override string SubSystemName
         {
@@ -19,8 +32,8 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
             }
         }
 
-        public TagRestClient(string accountName, NetworkCredential userCredential, string collectionName = DEFAULT_COLLECTION)
-            : base(string.Format(ACCOUNT_ROOT_URL, accountName, collectionName), new BasicAuthenticationFilter(userCredential))
+        public TagRestClient(string url, NetworkCredential userCredential)
+            : base(url, new BasicAuthenticationFilter(userCredential))
         {
         }
 
