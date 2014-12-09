@@ -17,6 +17,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
 
         private static Dictionary<Type, Type> _serviceMapping = new Dictionary<Type, Type>()
         {
+            { typeof(IVsoGit), typeof(GitRestClient) },
             { typeof(IVsoBuild), typeof(BuildRestClient) },
             { typeof(IVsoProjectCollection), typeof(ProjectCollectionRestClient) },
             { typeof(IVsoProject), typeof(ProjectRestClient) },
@@ -26,13 +27,8 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         };
 
         public VsoClient(string accountName, NetworkCredential userCredential, string collectionName = DEFAULT_COLLECTION)
-            : this(string.Format(ACCOUNT_ROOT_URL, accountName, collectionName), userCredential)
         {
-        }
-
-        public VsoClient(string url, NetworkCredential userCredential)
-        {
-            _rootUrl = url;
+            _rootUrl = string.Format(ACCOUNT_ROOT_URL, accountName, collectionName);
             _userCredential = userCredential;
         }
 

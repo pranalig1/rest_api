@@ -55,6 +55,7 @@
     <Compile Include="V1\Model\Account.cs" />
     <Compile Include="RestClient.cs" />
     <Compile Include="V1\Model\Build.cs" />
+    <Compile Include="V1\Model\Git.cs" />
     <Compile Include="V1\Model\Tag.cs" />
     <Compile Include="V1\Model\Team.cs" />
     <Compile Include="V1\Model\VersionControl.cs" />

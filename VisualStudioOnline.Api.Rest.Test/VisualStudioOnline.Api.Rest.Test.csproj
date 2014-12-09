@@ -59,6 +59,7 @@
     </Compile>
     <Compile Include="V1\AccountRestClientTest.cs" />
     <Compile Include="V1\BuildRestClientTests.cs" />
+    <Compile Include="V1\GitRestClientTests.cs" />
     <Compile Include="V1\ProjectRestClientTest.cs" />
     <Compile Include="V1\TagRestClientTest.cs" />
     <Compile Include="V1\VersionControlRestClientTest.cs" />
