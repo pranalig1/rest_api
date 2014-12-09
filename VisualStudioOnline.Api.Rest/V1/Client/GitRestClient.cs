@@ -16,6 +16,8 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         Task<Repository> RenameRepository(string id, string newName);
 
         Task<string> DeleteRepository(string id);
+
+        Task<JsonCollection<GitReference>> GetRefs(string repoId, string filter = null);
     }
 
     public class GitRestClient : RestClientVersion1, IVsoGit
@@ -43,11 +45,11 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         /// <summary>
         /// Get a repository
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="repoId"></param>
         /// <returns></returns>
-        public async Task<Repository> GetRepository(string id)
+        public async Task<Repository> GetRepository(string repoId)
         {
-            string response = await GetResponse(string.Format("repositories/{0}", id));
+            string response = await GetResponse(string.Format("repositories/{0}", repoId));
             return JsonConvert.DeserializeObject<Repository>(response);
         }
 
@@ -66,24 +68,37 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         /// <summary>
         /// Rename a repository
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="repoId"></param>
         /// <param name="newName"></param>
         /// <returns></returns>
-        public async Task<Repository> RenameRepository(string id, string newName)
+        public async Task<Repository> RenameRepository(string repoId, string newName)
         {
-            string response = await PatchResponse(string.Format("repositories/{0}", id), new { name = newName }, null, JSON_MEDIA_TYPE);
+            string response = await PatchResponse(string.Format("repositories/{0}", repoId), new { name = newName }, null, JSON_MEDIA_TYPE);
             return JsonConvert.DeserializeObject<Repository>(response);
         }
 
         /// <summary>
         /// Delete a repository
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="repoId"></param>
         /// <returns></returns>
-        public async Task<string> DeleteRepository(string id)
+        public async Task<string> DeleteRepository(string repoId)
         {
-            string response = await DeleteResponse(string.Format("repositories/{0}", id));
+            string response = await DeleteResponse(string.Format("repositories/{0}", repoId));
             return response;
+        }
+
+        /// <summary>
+        /// Get a list of references
+        /// </summary>
+        /// <param name="repoId"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<GitReference>> GetRefs(string repoId, string filter = null)
+        {
+            string response = await GetResponse(string.IsNullOrEmpty(filter) ? 
+                string.Format("repositories/{0}/refs", repoId) : string.Format("repositories/{0}/refs/{1}", repoId, filter));
+            return JsonConvert.DeserializeObject<JsonCollection<GitReference>>(response);
         }
     }
 }

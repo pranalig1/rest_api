@@ -20,6 +20,8 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
             var repos = _client.GetRepositories().Result;
             var repo = _client.GetRepository(repos.Items[0].Id).Result;
 
+            var refs = _client.GetRefs(repo.Id).Result;
+
             var newRepo = _client.CreateRepository("MyRepo", Settings.Default.ProjectId).Result;
             newRepo = _client.RenameRepository(newRepo.Id, "MyRepoRenamed").Result;
             string result = _client.DeleteRepository(newRepo.Id).Result;

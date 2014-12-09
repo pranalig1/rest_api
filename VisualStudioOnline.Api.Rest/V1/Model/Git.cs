@@ -18,4 +18,14 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
         [JsonProperty("remoteUrl")]
         public string RemoteUrl { get; set; }
     }
+
+    [DebuggerDisplay("{Name}")]
+    public class GitReference : BaseObject
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("objectId")]
+        public string ObjectId { get; set; }
+    }
 }
