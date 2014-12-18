@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using VisualStudioOnline.Api.Rest.V1.Model;
@@ -18,6 +19,17 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         Task<string> DeleteRepository(string id);
 
         Task<JsonCollection<GitReference>> GetRefs(string repoId, string filter = null);
+
+        Task<JsonCollection<GitBranchInfo>> GetBranchStatistics(string repoId);
+
+        Task<GitBranchInfo> GetBranchStatistics(string repoId, string branchName, BaseVersionType? type = null, string baseVersion = null);
+    }
+
+    public enum BaseVersionType 
+    { 
+        Branch, 
+        Tag, 
+        Commit 
     }
 
     public class GitRestClient : RestClientVersion1, IVsoGit
@@ -99,6 +111,34 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
             string response = await GetResponse(string.IsNullOrEmpty(filter) ? 
                 string.Format("repositories/{0}/refs", repoId) : string.Format("repositories/{0}/refs/{1}", repoId, filter));
             return JsonConvert.DeserializeObject<JsonCollection<GitReference>>(response);
+        }
+
+        /// <summary>
+        /// Get branch statistics
+        /// </summary>
+        /// <param name="repoId"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<GitBranchInfo>> GetBranchStatistics(string repoId)
+        {
+            string response = await GetResponse(string.Format("repositories/{0}/stats/branches", repoId));
+            return JsonConvert.DeserializeObject<JsonCollection<GitBranchInfo>>(response);
+        }
+
+        /// <summary>
+        /// A version of a branch
+        /// </summary>
+        /// <param name="repoId"></param>
+        /// <param name="branchName"></param>
+        /// <param name="type"></param>
+        /// <param name="baseVersion"></param>
+        /// <returns></returns>
+        public async Task<GitBranchInfo> GetBranchStatistics(string repoId, string branchName, BaseVersionType? type = null, string baseVersion = null)
+        {
+            string response = await GetResponse(string.Format("repositories/{0}/stats/branches/{1}", repoId, branchName),
+                 new Dictionary<string, object>() { 
+                    { "baseVersionType", type != null ? type.Value.ToString() :  null},
+                    { "baseVersion", baseVersion}});
+            return JsonConvert.DeserializeObject<GitBranchInfo>(response);
         }
     }
 }

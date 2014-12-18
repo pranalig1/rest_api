@@ -20,6 +20,9 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
             var repos = _client.GetRepositories().Result;
             var repo = _client.GetRepository(repos.Items[0].Id).Result;
 
+            var stats = _client.GetBranchStatistics(repo.Id).Result;
+            var stat = _client.GetBranchStatistics(repo.Id, "master").Result;
+
             var refs = _client.GetRefs(repo.Id).Result;
 
             var newRepo = _client.CreateRepository("MyRepo", Settings.Default.ProjectId).Result;

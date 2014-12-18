@@ -5,6 +5,7 @@ using System.Diagnostics;
 
 namespace VisualStudioOnline.Api.Rest
 {
+    [DebuggerDisplay("{Count}")]
     public class JsonCollection<T> where T : class
     {
         [JsonProperty(PropertyName = "count")]
