@@ -140,5 +140,32 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
                     { "baseVersion", baseVersion}});
             return JsonConvert.DeserializeObject<GitBranchInfo>(response);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="repoId"></param>
+        /// <param name="objectId"></param>
+        /// <param name="recursive"></param>
+        /// <returns></returns>
+        public async Task<string> GetTreeMetadata(string repoId, string objectId, bool? recursive = null)
+        {
+            string response = await GetResponse(string.Format("repositories/{0}/trees/{1}", repoId, objectId));
+            return response;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="repoId"></param>
+        /// <param name="objectId"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public async Task<string> DownloadTree(string repoId, string objectId, string fileName = null)
+        {
+            string response = await GetResponse(string.Format("repositories/{0}/trees/{1}", repoId, objectId), 
+                new Dictionary<string, object>() { { "fileName", fileName}, { "$format", "zip"} });
+            return response;
+        }
     }
 }

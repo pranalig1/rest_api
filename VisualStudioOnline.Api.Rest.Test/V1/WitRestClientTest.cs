@@ -93,29 +93,39 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
         [TestMethod]
         public void TestCreateAndUpdateWorkItem()
         {
-            var defaultValues = _client.GetWorkItemTypeDefaultValues(Settings.Default.ProjectName, "Bug").Result;
-            var workItems = _client.GetWorkItems(new int[] { Settings.Default.WorkItemId }, RevisionExpandOptions.all).Result;
+            //var defaultValues = _client.GetWorkItemTypeDefaultValues(Settings.Default.ProjectName, "Bug").Result;
+            //var workItems = _client.GetWorkItems(new int[] { Settings.Default.WorkItemId }, RevisionExpandOptions.all).Result;
 
-            var bug = new WorkItem();
-            bug.Fields["System.Title"] = "Test bug 2";
-            bug.Fields["System.History"] = DateTime.Now.ToString();
-            bug = _client.CreateWorkItem(Settings.Default.ProjectName, "Bug", bug).Result;
+            //var bug = new WorkItem();
+            //bug.Fields["System.Title"] = "Test bug 2";
+            //bug.Fields["System.History"] = DateTime.Now.ToString();
+            //bug = _client.CreateWorkItem(Settings.Default.ProjectName, "Bug", bug).Result;
 
-            bug = _client.GetWorkItem(bug.Id, RevisionExpandOptions.all).Result;
+            //var other = workItems[0];
+            //bug = _client.GetWorkItem(bug.Id, RevisionExpandOptions.all).Result;
+
+            var other = _client.GetWorkItem(9, RevisionExpandOptions.all).Result;
+            var bug = _client.GetWorkItem(10, RevisionExpandOptions.all).Result;
             bug.Fields["System.Title"] = bug.Fields["System.Title"] + " (updated)";
             bug.Fields["System.Tags"] = "SimpleTag";
-            //bug.Relations.Add(new WorkItemRelation()
-            //    {
-            //        Url = workItems[0].Url,
-            //        Rel = "System.LinkTypes.Dependency-Forward",
-            //        Attributes = new RelationAttributes() { Comment = "Hello world" }
-            //    });
+            
+            bug.Relations.Add(new WorkItemRelation()
+                {
+                    Url = other.Url,
+                    Rel = "System.LinkTypes.Dependency-Forward",
+                    Attributes = new RelationAttributes() { Comment = "Hello world" }
+                });
 
             bug = _client.UpdateWorkItem(bug).Result;
 
             //TODO: update link
 
+            //bug.Relations[0].Attributes.IsLocked = true;
+            //bug = _client.UpdateWorkItem(bug).Result;
+
             //TODO: remove link
+            bug.Relations.RemoveAt(0);
+            bug = _client.UpdateWorkItem(bug).Result;
 
             //TODO: add hyperlink
         }

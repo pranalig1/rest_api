@@ -336,7 +336,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
     }
 
     [DebuggerDisplay("{Path}")]
-    public class FieldUpdate
+    internal abstract class Update
     {
         [JsonProperty(PropertyName = "op")]
         [JsonConverter(typeof(StringEnumConverter))]
@@ -345,14 +345,14 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
         [JsonProperty(PropertyName = "path")]
         public string Path { get; set; }
 
-        [JsonProperty(PropertyName = "value")]
+        [JsonProperty(PropertyName = "value", NullValueHandling = NullValueHandling.Ignore)]
         public object Value { get; set; }
-
+    }
+    
+    internal class FieldUpdate : Update
+    {
         [JsonIgnore]
         public string Name { get; set; }
-
-        public FieldUpdate()
-        {}
 
         public FieldUpdate(string referenceName, OperationType operation)
         {
@@ -367,29 +367,26 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
         }
     }
 
-    [DebuggerDisplay("{Path}")]
-    public class RelationUpdate
+    internal class RelationUpdate : Update
     {
-        [JsonProperty(PropertyName = "op")]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public OperationType Operation { get; set; }
-
-        [JsonProperty(PropertyName = "path")]
-        public string Path { get; set; }
-
-        [JsonProperty(PropertyName = "value")]
-        public WorkItemRelation Value { get; set; }
-
         public RelationUpdate()
         {
             Path = "/relations/-";
         }
 
-        public RelationUpdate(WorkItemRelation value, OperationType operation)
+        public RelationUpdate(WorkItemRelation relation, OperationType operation)
         {
             Operation = operation;
-            Path = string.Format("/relations/{0}", value.Attributes.Id);
-            Value = value;
+            Path = operation == OperationType.add ? "/relations/-" : string.Format("/relations/{0}", relation.Attributes.Id);
+
+            if (operation != OperationType.remove)
+            {
+                var attributeDictionary = new Dictionary<string, object>();
+                if (relation.Attributes.Comment != null) attributeDictionary.Add("comment", relation.Attributes.Comment);
+                if (relation.Attributes.IsLocked != null) attributeDictionary.Add("isLocked", relation.Attributes.IsLocked.Value);
+
+                Value = new { rel = relation.Rel, url = relation.Url, attributes = attributeDictionary };
+            }
         }
     }
 }

@@ -149,8 +149,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
             string response = await PatchResponse(string.Format("workitems/${0}", workItemTypeName), updateList, projectName);
             JsonConvert.PopulateObject(response, workItem);
 
-            workItem.FieldUpdates.Clear();
-            workItem.RelationUpdates.Clear();
+            PrepareWorkItem(workItem);
 
             return workItem;
         }
@@ -162,16 +161,18 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         /// <returns></returns>
         public async Task<WorkItem> UpdateWorkItem(WorkItem workItem)
         {
-            List<object> updateList = new List<object>();
+            List<Update> updateList = new List<Update>();
 
             updateList.AddRange(workItem.FieldUpdates);
             updateList.AddRange(workItem.RelationUpdates);
 
             string response = await PatchResponse(string.Format("workitems/{0}", workItem.Id), updateList);
+
+            workItem.Relations.Clear();            
+
             JsonConvert.PopulateObject(response, workItem);
 
-            workItem.FieldUpdates.Clear();
-            workItem.RelationUpdates.Clear();
+            PrepareWorkItem(workItem);
 
             return workItem;
         }
@@ -187,8 +188,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
             string response = await GetResponse(string.Format("workitems/{0}", workItemId), new Dictionary<string, object>() { { "$expand", options } });
             var workItem = JsonConvert.DeserializeObject<WorkItem>(response);
 
-            workItem.FieldUpdates.Clear();
-            workItem.RelationUpdates.Clear();
+            PrepareWorkItem(workItem);
 
             return workItem;
         }
@@ -212,8 +212,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
 
             for (int i = 0; i < workItems.Count; i++)
             {
-                workItems[i].FieldUpdates.Clear();
-                workItems[i].RelationUpdates.Clear();
+                PrepareWorkItem(workItems[i]);
             }
 
             return workItems;
@@ -412,7 +411,14 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         {
             string response = await GetResponse(string.Format("workitems/{0}/revisions", workItemId),
                 new Dictionary<string, object>() { { "$top", top }, { "$skip", skip }, { "$expand", options } });
-            return JsonConvert.DeserializeObject<JsonCollection<WorkItem>>(response);
+            var revisions = JsonConvert.DeserializeObject<JsonCollection<WorkItem>>(response);
+
+            foreach (var revision in revisions.Items)
+            {
+                PrepareWorkItem(revision);
+            }
+
+            return revisions;
         }
 
         /// <summary>
@@ -425,7 +431,11 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         public async Task<WorkItem> GetWorkItemRevision(int workItemId, int revision, RevisionExpandOptions options = RevisionExpandOptions.none)
         {
             string response = await GetResponse(string.Format("workitems/{0}/revisions/{1}", workItemId, revision), new Dictionary<string, object>() { { "$expand", options } });
-            return JsonConvert.DeserializeObject<WorkItem>(response);
+            var workItem = JsonConvert.DeserializeObject<WorkItem>(response);
+
+            PrepareWorkItem(workItem);
+
+            return workItem;
         }
 
         /// <summary>
@@ -672,6 +682,17 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
 
             string response = await GetResponse(path, new Dictionary<string, object>() { { "$depth", depth } }, projectName);
             return response;
+        }
+
+        private void PrepareWorkItem(WorkItem workItem)
+        {
+            foreach (var relation in workItem.Relations)
+            {
+                relation.Source = workItem;
+            }
+
+            workItem.FieldUpdates.Clear();
+            workItem.RelationUpdates.Clear();
         }
         #endregion
     }

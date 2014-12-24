@@ -27,6 +27,7 @@ namespace VisualStudioOnline.Api.Rest
         }
     }
 
+    [DebuggerDisplay("{Url}")]
     public abstract class BaseObject
     {
         [JsonProperty(PropertyName = "url")]
