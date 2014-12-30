@@ -85,7 +85,17 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
             var fileRef = _client.UploadAttachment("Test.txt", "Hello world").Result;
             string content = _client.DownloadAttachment(fileRef.Id).Result;
 
-            //TODO: add attachment to WI
+            var bug = _client.GetWorkItem(Settings.Default.WorkItemId, RevisionExpandOptions.relations).Result;
+
+            // Add attachment to WI
+            bug.Relations.Add(new WorkItemRelation()
+            {
+                Url = fileRef.Url,
+                Rel = "AttachedFile",
+                Attributes = new RelationAttributes() { Comment = "Hello world" }
+            });
+
+            bug = _client.UpdateWorkItem(bug).Result;
 
             //TODO: remove attachment from WI
         }
@@ -126,8 +136,16 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
             //TODO: remove link
             bug.Relations.RemoveAt(0);
             bug = _client.UpdateWorkItem(bug).Result;
+            
+            // Add hyperlink
+            bug.Relations.Add(new WorkItemRelation()
+            {
+                Url = "http://www.bing.com",
+                Rel = "Hyperlink",
+                Attributes = new RelationAttributes() { Comment = "Hello world" }
+            });
 
-            //TODO: add hyperlink
+            bug = _client.UpdateWorkItem(bug).Result;
         }
 
         [TestMethod]
