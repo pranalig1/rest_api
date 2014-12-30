@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace VisualStudioOnline.Api.Rest.V1.Client
 {
@@ -23,7 +25,8 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
             { typeof(IVsoProject), typeof(ProjectRestClient) },
             { typeof(IVsoTag), typeof(TagRestClient) },
             { typeof(IVsoVersionControl), typeof(VersionControlRestClient) },
-            { typeof(IVsoWit), typeof(WitRestClient) }
+            { typeof(IVsoWit), typeof(WitRestClient) },
+            { typeof(IVsoSimple), typeof(SimpleRestClient) }
         };
 
         public VsoClient(string accountName, NetworkCredential userCredential, string collectionName = DEFAULT_COLLECTION)
@@ -40,6 +43,43 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
             }
 
             return (T)Activator.CreateInstance(_serviceMapping[typeof(T)], _rootUrl, _userCredential);
+        }
+
+        public Task<T> Get<T>(string url)
+        {
+            return GetService<IVsoSimple>().Get<T>(url);
+        }
+    }
+
+    public interface IVsoSimple
+    {
+        Task<T> Get<T>(string url);
+    }
+
+    public class SimpleRestClient : RestClientVersion1, IVsoSimple
+    {
+        public SimpleRestClient(string rootUrl, IHttpRequestHeaderFilter authProvider) : base(rootUrl, authProvider) { }
+
+        protected override string SubSystemName
+        {
+            get { return string.Empty; }
+        }
+
+        protected override string ConstructUrl(string projectName, string path, IDictionary<string, object> arguments)
+        {
+            return path;
+        }
+
+        /// <summary>
+        /// Get object of type T from the URL
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public async Task<T> Get<T>(string url)
+        {
+            string response = await GetResponse(url);
+            return JsonConvert.DeserializeObject<T>(response);
         }
     }
 }

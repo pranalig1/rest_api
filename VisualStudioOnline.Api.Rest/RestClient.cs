@@ -184,7 +184,7 @@ namespace VisualStudioOnline.Api.Rest
             return ConstructUrl(projectName, path, new Dictionary<string, object>());
         }
 
-        private string ConstructUrl(string projectName, string path, IDictionary<string, object> arguments)
+        protected virtual string ConstructUrl(string projectName, string path, IDictionary<string, object> arguments)
         {
             if (!arguments.ContainsKey("api-version"))
             {
