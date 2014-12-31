@@ -58,7 +58,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
 
     public class SimpleRestClient : RestClientVersion1, IVsoSimple
     {
-        public SimpleRestClient(string rootUrl, IHttpRequestHeaderFilter authProvider) : base(rootUrl, authProvider) { }
+        public SimpleRestClient(string rootUrl, NetworkCredential userCredential) : base(rootUrl, new BasicAuthenticationFilter(userCredential)) { }
 
         protected override string SubSystemName
         {

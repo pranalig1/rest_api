@@ -132,6 +132,9 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
     [DebuggerDisplay("{Rel}")]
     public class WorkItemRelation : BaseObject
     {
+        [JsonIgnore]
+        internal int Index { get; set; }
+
         [JsonProperty(PropertyName = "rel")]
         public string Rel { get; set; }
 
@@ -184,7 +187,6 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
             Relations = new ObservableCollection<WorkItemRelation>();
             Fields = new ObservableDictionary<string, object>();
 
-            //TODO
             Relations.CollectionChanged += OnRelations_CollectionChanged;
             Fields.CollectionChanged += OnFields_CollectionChanged;
         }
@@ -377,7 +379,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
         public RelationUpdate(WorkItemRelation relation, OperationType operation)
         {
             Operation = operation;
-            Path = operation == OperationType.add ? "/relations/-" : string.Format("/relations/{0}", relation.Attributes.Id);
+            Path = operation == OperationType.add ? "/relations/-" : string.Format("/relations/{0}", relation.Index);
 
             if (operation != OperationType.remove)
             {

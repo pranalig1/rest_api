@@ -7,10 +7,13 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
 {
     public class VsoTestBase
     {
+        protected VsoClient _vsoClient;
+
         [TestInitialize]
         public void Initialize()
         {
-            OnInitialize(new VsoClient(Settings.Default.AccountName, new NetworkCredential(Settings.Default.UserName, Settings.Default.Password)));
+            _vsoClient = new VsoClient(Settings.Default.AccountName, new NetworkCredential(Settings.Default.UserName, Settings.Default.Password));
+            OnInitialize(_vsoClient);
         }
 
         protected virtual void OnInitialize(VsoClient vsoClient)

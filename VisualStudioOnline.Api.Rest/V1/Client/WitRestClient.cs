@@ -686,10 +686,11 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
 
         private void PrepareWorkItem(WorkItem workItem)
         {
-            foreach (var relation in workItem.Relations)
+            for (int i = 0; i < workItem.Relations.Count; i++)
             {
-                relation.Source = workItem;
-            }
+                workItem.Relations[i].Index = i;
+                workItem.Relations[i].Source = workItem;
+            }           
 
             workItem.FieldUpdates.Clear();
             workItem.RelationUpdates.Clear();

@@ -97,25 +97,26 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
 
             bug = _client.UpdateWorkItem(bug).Result;
 
-            //TODO: remove attachment from WI
+            // Remove attachment from WI
+            bug.Relations.RemoveAt(2);
+            bug = _client.UpdateWorkItem(bug).Result;            
         }
 
         [TestMethod]
         public void TestCreateAndUpdateWorkItem()
         {
-            //var defaultValues = _client.GetWorkItemTypeDefaultValues(Settings.Default.ProjectName, "Bug").Result;
-            //var workItems = _client.GetWorkItems(new int[] { Settings.Default.WorkItemId }, RevisionExpandOptions.all).Result;
+            var defaultValues = _client.GetWorkItemTypeDefaultValues(Settings.Default.ProjectName, "Bug").Result;
+            var workItems = _client.GetWorkItems(new int[] { Settings.Default.WorkItemId }, RevisionExpandOptions.all).Result;
 
-            //var bug = new WorkItem();
-            //bug.Fields["System.Title"] = "Test bug 2";
-            //bug.Fields["System.History"] = DateTime.Now.ToString();
-            //bug = _client.CreateWorkItem(Settings.Default.ProjectName, "Bug", bug).Result;
+            // Create new work item
+            var bug = new WorkItem();
+            bug.Fields["System.Title"] = "Test bug 1";
+            bug.Fields["System.History"] = DateTime.Now.ToString();
+            bug = _client.CreateWorkItem(Settings.Default.ProjectName, "Bug", bug).Result;
 
-            //var other = workItems[0];
-            //bug = _client.GetWorkItem(bug.Id, RevisionExpandOptions.all).Result;
+            var other = workItems[0];
 
-            var other = _client.GetWorkItem(9, RevisionExpandOptions.all).Result;
-            var bug = _client.GetWorkItem(10, RevisionExpandOptions.all).Result;
+            // Update fields, add a link
             bug.Fields["System.Title"] = bug.Fields["System.Title"] + " (updated)";
             bug.Fields["System.Tags"] = "SimpleTag";
             
@@ -129,11 +130,10 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
             bug = _client.UpdateWorkItem(bug).Result;
 
             //TODO: update link
-
             //bug.Relations[0].Attributes.IsLocked = true;
             //bug = _client.UpdateWorkItem(bug).Result;
 
-            //TODO: remove link
+            // Remove link
             bug.Relations.RemoveAt(0);
             bug = _client.UpdateWorkItem(bug).Result;
             
@@ -146,6 +146,13 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
             });
 
             bug = _client.UpdateWorkItem(bug).Result;
+
+            // Remove it
+            bug.Relations.RemoveAt(0);
+            bug = _client.UpdateWorkItem(bug).Result;
+
+            // Get all revisions
+            var revisions = _vsoClient.Get<JsonCollection<WorkItem>>(bug.References.Revisions.Href).Result;            
         }
 
         [TestMethod]
