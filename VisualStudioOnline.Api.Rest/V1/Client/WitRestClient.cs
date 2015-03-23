@@ -9,8 +9,15 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
 {
     public interface IVsoWit
     {
+        #region WorkItem Type
         Task<WorkItemTypeDefaults> GetWorkItemTypeDefaultValues(string projectName, string workItemTypeName);
+        
+        Task<JsonCollection<WorkItemType>> GetWorkItemTypes(string projectName);
 
+        Task<WorkItemType> GetWorkItemType(string projectName, string typeName);
+        #endregion
+
+        #region WorkItem
         Task<WorkItem> CreateWorkItem(string projectName, string workItemTypeName, WorkItem workItem);
 
         Task<WorkItem> UpdateWorkItem(WorkItem workItem);
@@ -30,15 +37,15 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         Task<JsonCollection<Field>> GetFields();
 
         Task<Field> GetField(string fieldName);
+        #endregion
 
+        #region WorkItem Type Category
         Task<JsonCollection<WorkItemTypeCategory>> GetWorkItemTypeCategories(string projectName);
 
         Task<WorkItemTypeCategory> GetWorkItemTypeCategory(string projectName, string categoryName);
+        #endregion
 
-        Task<JsonCollection<WorkItemType>> GetWorkItemTypes(string projectName);
-
-        Task<WorkItemType> GetWorkItemType(string projectName, string typeName);
-
+        #region Classification Nodes
         Task<JsonCollection<ClassificationNode>> GetClassificationNodes(string projectName, int? depth = null);
 
         Task<ClassificationNode> GetAreaNode(string projectName, int? depth = null);
@@ -49,6 +56,20 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
 
         Task<ClassificationNode> GetIterationNode(string projectName, string nodePath, int? depth = null);
 
+        Task<ClassificationNode> CreateAreaNode(string projectName, string nodeName, string rootPath = null);
+
+        Task<ClassificationNode> CreateIterationNode(string projectName, string nodeName, string rootPath = null, DateTime? startDate = null, DateTime? endDate = null);
+
+        Task<ClassificationNode> MoveNode(string projectName, string newPath, ClassificationNode node);
+
+        Task<ClassificationNode> UpdateNode(string projectName, string path, ClassificationNode node);
+
+        Task<string> DeleteAreaNode(string projectName, string areaPath, ClassificationNode reclassificationNode);
+
+        Task<string> DeleteIterationNode(string projectName, string iterationPath, ClassificationNode reclassificationNode);
+        #endregion
+
+        #region WorkItem Revisions
         Task<JsonCollection<WorkItem>> GetWorkItemRevisions(int workItemId, int? top = null, int? skip = null, RevisionExpandOptions options = RevisionExpandOptions.none);
 
         Task<WorkItem> GetWorkItemRevision(int workItemId, int revision, RevisionExpandOptions options = RevisionExpandOptions.none);
@@ -56,13 +77,17 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         Task<JsonCollection<WorkItemUpdate>> GetWorkItemUpdates(int workItemId, int? top = null, int? skip = null);
 
         Task<WorkItemUpdate> GetWorkItemUpdate(int workItemId, int revisionId);
+        #endregion
 
+        #region Attachments
         Task<string> DownloadAttachment(string attachmentId);
 
         Task<ObjectWithId<string>> UploadAttachment(string projectName, string area, string fileName, byte[] content);
 
         Task<ObjectWithId<string>> UploadAttachment(string fileName, string content);
+        #endregion
 
+        #region Queries
         Task<JsonCollection<Query>> GetQueries(string projectName, string folderPath = null, int? depth = null, QueryExpandOptions options = QueryExpandOptions.none, bool? includeDeleted = null);
 
         Task<Query> GetQuery(string projectName, string folderPathOrId, int? depth = null, QueryExpandOptions options = QueryExpandOptions.none, bool? includeDeleted = null);
@@ -88,6 +113,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         Task<FlatQueryResult> RunFlatQuery(string projectName, Query query);
 
         Task<LinkQueryResult> RunLinkQuery(string projectName, Query query);
+        #endregion
     }
 
     public enum QueryExpandOptions
@@ -397,6 +423,88 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
 
             string response = await GetCssNode(projectName, path, depth);
             return JsonConvert.DeserializeObject<ClassificationNode>(response);
+        }
+
+        /// <summary>
+        /// Create a classification node
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="rootPath"></param>
+        /// <param name="nodeName"></param>
+        /// <returns></returns>
+        public async Task<ClassificationNode> CreateAreaNode(string projectName, string nodeName, string rootPath = null)
+        {
+            string response = await PostResponse(string.Format("classificationnodes/areas/{0}", rootPath), new { name = nodeName }, projectName);
+            return JsonConvert.DeserializeObject<ClassificationNode>(response);
+        }
+
+        /// <summary>
+        /// Create a classification node
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="rootPath"></param>
+        /// <param name="nodeName"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        public async Task<ClassificationNode> CreateIterationNode(string projectName, string nodeName, string rootPath = null, DateTime? startDate = null, DateTime? endDate = null)
+        {
+            string response = await PostResponse(string.Format("classificationnodes/iterations/{0}", rootPath), new { name = nodeName, attributes = new { startDate = startDate, endDate = endDate } }, projectName);
+            return JsonConvert.DeserializeObject<ClassificationNode>(response);
+        }
+
+        /// <summary>
+        /// Move a classification node
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="newPath"></param>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public async Task<ClassificationNode> MoveNode(string projectName, string newPath, ClassificationNode node)
+        {
+            string response = await PostResponse(string.Format("classificationnodes/{0}/{1}", node.StructureType == NodeType.area ? "areas" : "iterations", newPath), 
+                new Dictionary<string, object>(), new { Id = node.Id }, projectName);
+            JsonConvert.PopulateObject(response, node);
+            return node;
+        }
+
+        /// <summary>
+        /// Update a classification node
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="path"></param>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public async Task<ClassificationNode> UpdateNode(string projectName, string path, ClassificationNode node)
+        {
+            string response = await PatchResponse(string.Format("classificationnodes/{0}/{1}", node.StructureType == NodeType.area ? "areas" : "iterations", path),
+                new { name = node.Name, attributes = node.Attributes }, projectName, JSON_MEDIA_TYPE);
+            JsonConvert.PopulateObject(response, node);
+            return node;
+        }
+
+        /// <summary>
+        /// Delete classification node
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="areaPath"></param>
+        /// <param name="reclassificationNode"></param>
+        /// <returns></returns>
+        public async Task<string> DeleteAreaNode(string projectName, string areaPath, ClassificationNode reclassificationNode)
+        {
+            return await DeleteResponse(string.Format("classificationnodes/areas/{0}", areaPath), new Dictionary<string, object>() { { "$reclassifyId", reclassificationNode.Id } }, projectName);
+        }
+
+        /// <summary>
+        /// Delete classification node
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="iterationPath"></param>
+        /// <param name="reclassificationNode"></param>
+        /// <returns></returns>
+        public async Task<string> DeleteIterationNode(string projectName, string iterationPath, ClassificationNode reclassificationNode)
+        {
+            return await DeleteResponse(string.Format("classificationnodes/iterations/{0}", iterationPath), new Dictionary<string, object>() { { "$reclassifyId", reclassificationNode.Id } }, projectName);
         }
 
         /// <summary>

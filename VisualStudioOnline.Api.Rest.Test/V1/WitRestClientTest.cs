@@ -45,15 +45,30 @@ namespace VisualStudioOnline.Api.Rest.Test.V1
         }
 
         [TestMethod]
-        public void TestGetClassificationNodes()
+        public void TestCRUDForClassificationNodes()
         {
             var nodes = _client.GetClassificationNodes(Settings.Default.ProjectName).Result;
 
             var rootArea = _client.GetAreaNode(Settings.Default.ProjectName, 5).Result;
             var rootIteration = _client.GetIterationNode(Settings.Default.ProjectName, 5).Result;
 
+            var newArea = _client.CreateAreaNode(Settings.Default.ProjectName, "Test Area").Result;
+            var newIteration = _client.CreateIterationNode(Settings.Default.ProjectName, "Test Iteration").Result;
+            
+            newArea.Name = "Renamed";
+            newArea = _client.UpdateNode(Settings.Default.ProjectName, "Test Area", newArea).Result;
+
+            newIteration.Attributes = new NodeAttributes() { StartDate = DateTime.Now.AddDays(-1), FinishDate = DateTime.Now };
+            newIteration = _client.UpdateNode(Settings.Default.ProjectName, "Test Iteration", newIteration).Result;
+
             var iteration1 = _client.GetIterationNode(Settings.Default.ProjectName, "Iteration 1").Result;
             var area1 = _client.GetAreaNode(Settings.Default.ProjectName, "Area 1").Result;
+
+            newArea = _client.MoveNode(Settings.Default.ProjectName, "Area 1", newArea).Result;
+            newIteration = _client.MoveNode(Settings.Default.ProjectName, "Iteration 1", newIteration).Result;
+
+            var result = _client.DeleteAreaNode(Settings.Default.ProjectName, string.Format("Area 1/{0}", newArea.Name), area1).Result;
+            result = _client.DeleteIterationNode(Settings.Default.ProjectName, string.Format("Iteration 1/{0}", newIteration.Name), iteration1).Result;
         }
 
         [TestMethod]

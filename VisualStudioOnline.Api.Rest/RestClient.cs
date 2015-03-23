@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -59,10 +60,7 @@ namespace VisualStudioOnline.Api.Rest
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        throw JsonConvert.DeserializeObject<VsoException>(responseBody);
-                    }
+                    CheckResponse(response, responseBody);
 
                     return responseBody;
                 }
@@ -86,10 +84,7 @@ namespace VisualStudioOnline.Api.Rest
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        throw JsonConvert.DeserializeObject<VsoException>(responseBody);
-                    }
+                    CheckResponse(response, responseBody);
 
                     return responseBody;
                 }
@@ -113,10 +108,7 @@ namespace VisualStudioOnline.Api.Rest
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        throw JsonConvert.DeserializeObject<VsoException>(responseBody);
-                    }
+                    CheckResponse(response, responseBody);
 
                     return responseBody;
                 }
@@ -140,10 +132,7 @@ namespace VisualStudioOnline.Api.Rest
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        throw JsonConvert.DeserializeObject<VsoException>(responseBody);
-                    }
+                    CheckResponse(response, responseBody);
 
                     return responseBody;
                 }
@@ -154,22 +143,36 @@ namespace VisualStudioOnline.Api.Rest
         #region DELETE operation
         protected async Task<string> DeleteResponse(string path, string projectName = null)
         {
+            return await DeleteResponse(path, new Dictionary<string, object>(), projectName);
+        }
+
+        protected async Task<string> DeleteResponse(string path, IDictionary<string, object> arguments, string projectName = null)
+        {
             using (HttpClient client = GetHttpClient())
             {
-                using (HttpResponseMessage response = client.DeleteAsync(ConstructUrl(projectName, path)).Result)
+                using (HttpResponseMessage response = client.DeleteAsync(ConstructUrl(projectName, path, arguments)).Result)
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        throw JsonConvert.DeserializeObject<VsoException>(responseBody);
-                    }
+                    CheckResponse(response, responseBody);
 
                     return responseBody;
                 }
             }
         } 
         #endregion
+
+        private void CheckResponse(HttpResponseMessage response, string responseBody)
+        {
+            if (!response.IsSuccessStatusCode)
+            {
+                throw JsonConvert.DeserializeObject<VsoException>(responseBody);
+            }
+            else if (response.StatusCode == HttpStatusCode.NonAuthoritativeInformation)
+            {
+                throw new VsoException(HttpStatusCode.NonAuthoritativeInformation.ToString());
+            }
+        }
 
         private HttpClient GetHttpClient(string mediaType = JSON_MEDIA_TYPE)
         {
