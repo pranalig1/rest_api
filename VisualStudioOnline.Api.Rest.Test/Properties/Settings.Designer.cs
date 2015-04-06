@@ -138,5 +138,42 @@ namespace VisualStudioOnline.Api.Rest.Test.Properties {
                 this["WorkItemRevision"] = value;
             }
         }
+		
+	    [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00000000000000000000000000000000000000000")]
+        public string CommitId {
+            get {
+                return ((string)(this["CommitId"]));
+            }
+            set {
+                this["CommitId"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("/Folder/File.cs")]
+        public string FilePath {
+            get {
+                return ((string)(this["FilePath"]));
+            }
+            set {
+                this["FilePath"] = value;
+            }
+        }
+		
+	    [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("/Folder")]
+        public string FolderPath {
+            get {
+                return ((string)(this["FolderPath"]));
+            }
+            set {
+                this["FolderPath"] = value;
+            }
+        }
+
     }
 }

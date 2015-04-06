@@ -29,5 +29,14 @@
     <Setting Name="WorkItemRevision" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="CommitId" Type="System.String" Scope="User">
+      <Value Profile="(Default)">00000000000000000000000000000000000000000</Value>
+    </Setting>
+    <Setting Name="FilePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">/Folder/File.cs</Value>
+    </Setting>
+	<Setting Name="FolderPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">/Folder</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
