@@ -69,7 +69,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         /// <returns></returns>
         public async Task<TeamProject> UpdateTeamProject(TeamProject project)
         {
-            string response = await PatchResponse(project.Id.ToString(), new { description = project.Description }, null, JSON_MEDIA_TYPE);
+            string response = await PatchResponse(project.Id.ToString(), new { description = project.Description }, null, MediaType.JSON_MEDIA_TYPE);
             JsonConvert.PopulateObject(response, project);
             return project;
         }

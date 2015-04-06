@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -83,5 +84,76 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
 
         [JsonProperty("isBaseVersion")]
         public bool IsBaseVersion { get; set; }
+    }
+
+    public class ChangeCounts
+    {
+        [JsonProperty("Edit")]
+        public int Edit { get; set; }
+
+        [JsonProperty("Add")]
+        public int Add { get; set; }
+    }
+
+    [DebuggerDisplay("{Path}")]
+    public class GitItem : BaseObject
+    {
+        [JsonProperty("objectId")]
+        public string ObjectId { get; set; }
+
+        [JsonProperty("gitObjectType")]
+        public string GitObjectType { get; set; }
+
+        [JsonProperty("commitId")]
+        public string CommitId { get; set; }
+
+        [JsonProperty("latestProcessedChange")]
+        public Commit LatestProcessedChange { get; set; }
+
+        [JsonProperty("path")]
+        public string Path { get; set; }
+
+        [JsonProperty("contentMetadata")]
+        public ContentMetadata ContentMetadata { get; set; }
+
+        [JsonProperty("isFolder")]
+        public bool IsFolder { get; set; }
+    }
+
+    public enum ChangeType
+    {
+        add,
+        edit
+    }
+
+    public class GitChange
+    {
+        [JsonProperty("item")]
+        public GitItem Item { get; set; }
+
+        [JsonProperty("changeType")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ChangeType ChangeType { get; set; }
+    }
+
+    public class GitDiff
+    {
+        [JsonProperty("allChangesIncluded")]
+        public bool AllChangesIncluded { get; set; }
+
+        [JsonProperty("changeCounts")]
+        public ChangeCounts ChangeCounts { get; set; }
+
+        [JsonProperty("changes")]
+        public IList<GitChange> Changes { get; set; }
+
+        [JsonProperty("commonCommit")]
+        public string CommonCommit { get; set; }
+
+        [JsonProperty("aheadCount")]
+        public int AheadCount { get; set; }
+
+        [JsonProperty("behindCount")]
+        public int BehindCount { get; set; }
     }
 }

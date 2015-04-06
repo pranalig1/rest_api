@@ -75,6 +75,9 @@ namespace VisualStudioOnline.Api.Rest.V1.Model
 
         [JsonProperty(PropertyName = "extension")]
         public string Extension { get; set; }
+
+        [JsonProperty("vsLink")]
+        public string VsLink { get; set; }
     }
 
     [DebuggerDisplay("{Path}")]

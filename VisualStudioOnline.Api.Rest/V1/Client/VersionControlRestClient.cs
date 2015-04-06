@@ -358,8 +358,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         /// <returns></returns>
         public async Task<string> GetVersionControlItemContent(VersionSearchFilter filter)
         {
-            string response = await GetResponse(string.Format("items/{0}", filter.Path), AddVersionCriteria(filter, new Dictionary<string, object>()), null, HTML_MEDIA_TYPE);
-            return response;
+            return await GetResponse(string.Format("items/{0}", filter.Path), AddVersionCriteria(filter, new Dictionary<string, object>()), null, MediaType.HTML_MEDIA_TYPE);
         }
 
         /// <summary>

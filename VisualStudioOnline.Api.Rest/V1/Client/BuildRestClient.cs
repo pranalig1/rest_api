@@ -124,8 +124,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         /// <returns></returns>
         public async Task<string> AddBuildQuality(string projectName, string quality)
         {
-            string response = await PutResponse(string.Format("qualities/{0}", quality), content: null, projectName: projectName);
-            return response;
+            return await PutResponse(string.Format("qualities/{0}", quality), content: null, projectName: projectName);
         }
 
         /// <summary>
@@ -136,8 +135,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         /// <returns></returns>
         public async Task<string> DeleteBuildQuality(string projectName, string quality)
         {
-            string response = await DeleteResponse(string.Format("qualities/{0}", quality), projectName);
-            return response;
+            return await DeleteResponse(string.Format("qualities/{0}", quality), projectName);
         }
 
         /// <summary>
@@ -204,8 +202,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         /// <returns></returns>
         public async Task<string> UpdateBuildRequest(string projectName, int requestId, BuildStatus newStatus)
         {
-            string response = await PatchResponse(string.Format("requests/{0}", requestId), new { status = newStatus.ToString() }, projectName, JSON_MEDIA_TYPE);
-            return response;
+            return await PatchResponse(string.Format("requests/{0}", requestId), new { status = newStatus.ToString() }, projectName, MediaType.JSON_MEDIA_TYPE);
         }
 
         /// <summary>
@@ -216,8 +213,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         /// <returns></returns>
         public async Task<string> CancelBuildRequest(string projectName, int requestId)
         {
-            string response = await DeleteResponse(string.Format("requests/{0}", requestId), projectName);
-            return response;
+            return await DeleteResponse(string.Format("requests/{0}", requestId), projectName);
         }
 
         /// <summary>
@@ -282,7 +278,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
             string response = await PatchResponse(string.Format("builds/{0}", buildId), 
                 new { status = status, quality = quality, retainIndefinitely = retainIndefinitely }, 
                 projectName, 
-                JSON_MEDIA_TYPE);
+                MediaType.JSON_MEDIA_TYPE);
 
             return JsonConvert.DeserializeObject<Build>(response);
         }
@@ -295,8 +291,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         /// <returns></returns>
         public async Task<string> DeleteBuild(string projectName, int buildId)
         {
-            string response = await DeleteResponse(string.Format("builds/{0}", buildId), projectName);
-            return response;
+            return await DeleteResponse(string.Format("builds/{0}", buildId), projectName);
         }
     }
 }

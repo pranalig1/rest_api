@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
@@ -18,14 +19,36 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
 
         Task<string> DeleteRepository(string id);
 
+        Task<JsonCollection<GitItem>> GetItemMetadata(string repoId, string scopePath = "/", bool includeContentMetadata = false, bool latestProcessedChange = false);
+
+        Task<byte[]> GetItem(string repoId, string path);
+
+        Task<byte[]> GetFolder(string repoId, string path);
+
         Task<JsonCollection<GitReference>> GetRefs(string repoId, string filter = null);
+
+        Task<GitDiff> GetDiffs(string repoId, GitVersionType? baseVersionType = null, string baseVersion = null,
+            GitVersionType? targetVersionType = null, string targetVersion = null, int? top = null, int? skip = null);
 
         Task<JsonCollection<GitBranchInfo>> GetBranchStatistics(string repoId);
 
-        Task<GitBranchInfo> GetBranchStatistics(string repoId, string branchName, BaseVersionType? type = null, string baseVersion = null);
+        Task<GitBranchInfo> GetBranchStatistics(string repoId, string branchName, GitVersionType? type = null, string baseVersion = null);
+
+        Task<string> GetCommits(string repoId, string itemPath = "\\", CommitSearchFilter? filter = null, int? top = null, int? skip = null);
     }
 
-    public enum BaseVersionType 
+    public struct CommitSearchFilter
+    {
+        public string Commiter;
+
+        public string Author;
+
+        public DateTime? From;
+
+        public DateTime? To;
+    }
+
+    public enum GitVersionType 
     { 
         Branch, 
         Tag, 
@@ -85,7 +108,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         /// <returns></returns>
         public async Task<Repository> RenameRepository(string repoId, string newName)
         {
-            string response = await PatchResponse(string.Format("repositories/{0}", repoId), new { name = newName }, null, JSON_MEDIA_TYPE);
+            string response = await PatchResponse(string.Format("repositories/{0}", repoId), new { name = newName }, null, MediaType.JSON_MEDIA_TYPE);
             return JsonConvert.DeserializeObject<Repository>(response);
         }
 
@@ -98,6 +121,53 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         {
             string response = await DeleteResponse(string.Format("repositories/{0}", repoId));
             return response;
+        }
+
+        /// <summary>
+        /// Get file metadata
+        /// </summary>
+        /// <param name="repoId"></param>
+        /// <param name="scopePath"></param>
+        /// <param name="includeContentMetadata"></param>
+        /// <param name="latestProcessedChange"></param>
+        /// <returns></returns>
+        public async Task<JsonCollection<GitItem>> GetItemMetadata(string repoId, string scopePath = "/", bool includeContentMetadata = false, bool latestProcessedChange = false)
+        {
+            string response = await GetResponse(string.Format("repositories/{0}/items", repoId),  
+                new Dictionary<string, object>() { 
+                    { "scopePath", scopePath },
+                    { "includeContentMetadata", includeContentMetadata },
+                    { "latestProcessedChange", latestProcessedChange }
+                });
+            return JsonConvert.DeserializeObject<JsonCollection<GitItem>>(response);
+        }
+
+        /// <summary>
+        /// Get file content
+        /// </summary>
+        /// <param name="repoId"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public async Task<byte[]> GetItem(string repoId, string path)
+        {
+            return await GetByteResponse(string.Format("repositories/{0}/items", repoId),
+                new Dictionary<string, object>() { 
+                    { "scopePath", path },
+                }, null, MediaType.OCTET_STREAM);
+        }
+
+        /// <summary>
+        /// Get folder content as zip
+        /// </summary>
+        /// <param name="repoId"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public async Task<byte[]> GetFolder(string repoId, string path)
+        {
+            return await GetByteResponse(string.Format("repositories/{0}/items", repoId),
+                new Dictionary<string, object>() { 
+                    { "scopePath", path },
+                }, null, MediaType.ZIP);
         }
 
         /// <summary>
@@ -132,13 +202,40 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         /// <param name="type"></param>
         /// <param name="baseVersion"></param>
         /// <returns></returns>
-        public async Task<GitBranchInfo> GetBranchStatistics(string repoId, string branchName, BaseVersionType? type = null, string baseVersion = null)
+        public async Task<GitBranchInfo> GetBranchStatistics(string repoId, string branchName, GitVersionType? type = null, string baseVersion = null)
         {
             string response = await GetResponse(string.Format("repositories/{0}/stats/branches/{1}", repoId, branchName),
                  new Dictionary<string, object>() { 
                     { "baseVersionType", type != null ? type.Value.ToString() :  null},
                     { "baseVersion", baseVersion}});
             return JsonConvert.DeserializeObject<GitBranchInfo>(response);
+        }
+
+        /// <summary>
+        /// Get a list of differences
+        /// </summary>
+        /// <param name="repoId"></param>
+        /// <param name="baseVersionType"></param>
+        /// <param name="baseVersion"></param>
+        /// <param name="targetVersionType"></param>
+        /// <param name="targetVersion"></param>
+        /// <param name="top"></param>
+        /// <param name="skip"></param>
+        /// <returns></returns>
+        public async Task<GitDiff> GetDiffs(string repoId, 
+            GitVersionType? baseVersionType = null, string baseVersion = null,
+            GitVersionType? targetVersionType = null, string targetVersion = null,
+            int? top = null, int? skip = null)
+        {
+            string response = await GetResponse(string.Format("repositories/{0}/diffs/commits", repoId),
+                 new Dictionary<string, object>() { 
+                    { "baseVersionType", baseVersionType != null ? baseVersionType.Value.ToString() :  null},
+                    { "baseVersion", baseVersion},
+                    { "targetVersionType", targetVersionType != null ? targetVersionType.Value.ToString() :  null},
+                    { "targetVersion", targetVersion},
+                    { "$top", top }, { "$skip", skip }
+                 });
+            return JsonConvert.DeserializeObject<GitDiff>(response);
         }
 
         /// <summary>
@@ -165,6 +262,30 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         {
             string response = await GetResponse(string.Format("repositories/{0}/trees/{1}", repoId, objectId), 
                 new Dictionary<string, object>() { { "fileName", fileName}, { "$format", "zip"} });
+            return response;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="repoId"></param>
+        /// <param name="itemPath"></param>
+        /// <param name="filter"></param>
+        /// <param name="top"></param>
+        /// <param name="skip"></param>
+        /// <returns></returns>
+        public async Task<string> GetCommits(string repoId, string itemPath = "\\", CommitSearchFilter? filter = null, int? top = null, int? skip = null)
+        {
+            var arguments = new Dictionary<string, object>() { { "itempath", itemPath }, { "$top", top }, { "$skip", skip } };
+            if(filter != null)
+            {
+                arguments.Add("committer", filter.Value.Commiter);
+                arguments.Add("author", filter.Value.Author);
+                arguments.Add("fromDate", filter.Value.From);
+                arguments.Add("toDate", filter.Value.To);
+            }
+
+            string response = await GetResponse(string.Format("repositories/{0}/commits", repoId), arguments);
             return response;
         }
     }

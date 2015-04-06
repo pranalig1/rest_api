@@ -20,7 +20,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         #region WorkItem
         Task<WorkItem> CreateWorkItem(string projectName, string workItemTypeName, WorkItem workItem);
 
-        Task<WorkItem> UpdateWorkItem(WorkItem workItem);
+        Task<WorkItem> UpdateWorkItem(WorkItem workItem, bool bypassRules = false);
 
         Task<WorkItem> GetWorkItem(int workItemId, RevisionExpandOptions options = RevisionExpandOptions.none);
 
@@ -120,6 +120,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
     {
         none,
         all,
+        clauses,
         wiql,
     }
 
@@ -181,18 +182,18 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         }
 
         /// <summary>
-        /// TODO: not working now
+        /// Update work item
         /// </summary>
         /// <param name="workItem"></param>
         /// <returns></returns>
-        public async Task<WorkItem> UpdateWorkItem(WorkItem workItem)
+        public async Task<WorkItem> UpdateWorkItem(WorkItem workItem, bool bypassRules = false)
         {
             List<Update> updateList = new List<Update>();
 
             updateList.AddRange(workItem.FieldUpdates);
             updateList.AddRange(workItem.RelationUpdates);
 
-            string response = await PatchResponse(string.Format("workitems/{0}", workItem.Id), updateList);
+            string response = await PatchResponse(string.Format("workitems/{0}", workItem.Id), new Dictionary<string, object>() { { "bypassRules", bypassRules } }, updateList);
 
             workItem.Relations.Clear();            
 
@@ -478,7 +479,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         public async Task<ClassificationNode> UpdateNode(string projectName, string path, ClassificationNode node)
         {
             string response = await PatchResponse(string.Format("classificationnodes/{0}/{1}", node.StructureType == NodeType.area ? "areas" : "iterations", path),
-                new { name = node.Name, attributes = node.Attributes }, projectName, JSON_MEDIA_TYPE);
+                new { name = node.Name, attributes = node.Attributes }, projectName, MediaType.JSON_MEDIA_TYPE);
             JsonConvert.PopulateObject(response, node);
             return node;
         }
@@ -677,7 +678,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         /// <returns></returns>
         public async Task<Query> UpdateQuery(string projectName, Query query)
         {
-            string response = await PatchResponse(string.Format("queries/{0}", query.Path), new { wiql = query.Wiql, name = query.Name }, projectName, JSON_MEDIA_TYPE);
+            string response = await PatchResponse(string.Format("queries/{0}", query.Path), new { wiql = query.Wiql, name = query.Name }, projectName, MediaType.JSON_MEDIA_TYPE);
             JsonConvert.PopulateObject(response, query);
             return query;
         }
@@ -729,7 +730,7 @@ namespace VisualStudioOnline.Api.Rest.V1.Client
         {
             string response = await PatchResponse(string.Format("queries/{0}", query.Id),
                 new Dictionary<string, object>() { { "$undeletedescendants", undeleteDescendants } },
-                new { isDeleted = false }, projectName, JSON_MEDIA_TYPE);
+                new { isDeleted = false }, projectName, MediaType.JSON_MEDIA_TYPE);
             JsonConvert.PopulateObject(response, query);
             return query;
         }

@@ -18,15 +18,20 @@ namespace VisualStudioOnline.Api.Rest
         public const string Version1 = "1.0";
     }
 
+    public struct MediaType
+    {
+        public const string JSON_MEDIA_TYPE = "application/json";
+        public const string JSON_PATCH_MEDIA_TYPE = "application/json-patch+json";
+        public const string HTML_MEDIA_TYPE = "text/html";
+        public const string OCTET_STREAM = "application/octet-stream";
+        public const string ZIP = "application/zip";
+    }
+
     /// <summary>
     /// Base class for TFS subsystem REST API client
     /// </summary>
     public abstract class VsoRestClient
     {
-        protected const string JSON_MEDIA_TYPE = "application/json";
-        protected const string JSON_PATCH_MEDIA_TYPE = "application/json-patch+json";
-        protected const string HTML_MEDIA_TYPE = "text/html";
-
         private string _rootUrl;
         private IHttpRequestHeaderFilter _authProvider;
 
@@ -52,13 +57,28 @@ namespace VisualStudioOnline.Api.Rest
             return await GetResponse(path, new Dictionary<string, object>(), projectName);
         }
 
-        protected async Task<string> GetResponse(string path, IDictionary<string, object> arguments, string projectName = null, string mediaType = JSON_MEDIA_TYPE)
+        protected async Task<string> GetResponse(string path, IDictionary<string, object> arguments, string projectName = null, string mediaType = MediaType.JSON_MEDIA_TYPE)
         {
             using (HttpClient client = GetHttpClient(mediaType))
             {
                 using (HttpResponseMessage response = client.GetAsync(ConstructUrl(projectName, path, arguments)).Result)
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
+
+                    CheckResponse(response, responseBody);
+
+                    return responseBody;
+                }
+            }
+        }
+
+        protected async Task<byte[]> GetByteResponse(string path, IDictionary<string, object> arguments, string projectName = null, string mediaType = MediaType.JSON_MEDIA_TYPE)
+        {
+            using (HttpClient client = GetHttpClient(mediaType))
+            {
+                using (HttpResponseMessage response = client.GetAsync(ConstructUrl(projectName, path, arguments)).Result)
+                {
+                    byte[] responseBody = await response.Content.ReadAsByteArrayAsync();
 
                     CheckResponse(response, responseBody);
 
@@ -74,7 +94,7 @@ namespace VisualStudioOnline.Api.Rest
             return await PostResponse(path, new Dictionary<string, object>(), content, projectName);
         }
 
-        protected async Task<string> PostResponse(string path, IDictionary<string, object> arguments, object content, string projectName = null, string mediaType = JSON_MEDIA_TYPE)
+        protected async Task<string> PostResponse(string path, IDictionary<string, object> arguments, object content, string projectName = null, string mediaType = MediaType.JSON_MEDIA_TYPE)
         {
             var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, mediaType);
 
@@ -93,12 +113,12 @@ namespace VisualStudioOnline.Api.Rest
         #endregion
 
         #region PATCH operation
-        protected async Task<string> PatchResponse(string path, object content, string projectName = null, string mediaType = JSON_PATCH_MEDIA_TYPE)
+        protected async Task<string> PatchResponse(string path, object content, string projectName = null, string mediaType = MediaType.JSON_PATCH_MEDIA_TYPE)
         {
             return await PatchResponse(path, new Dictionary<string, object>(), content, projectName, mediaType);
         }
 
-        protected async Task<string> PatchResponse(string path, IDictionary<string, object> arguments, object content, string projectName = null, string mediaType = JSON_PATCH_MEDIA_TYPE)
+        protected async Task<string> PatchResponse(string path, IDictionary<string, object> arguments, object content, string projectName = null, string mediaType = MediaType.JSON_PATCH_MEDIA_TYPE)
         {
             var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, mediaType);
 
@@ -117,12 +137,12 @@ namespace VisualStudioOnline.Api.Rest
         #endregion
 
         #region PUT operation
-        protected async Task<string> PutResponse(string path, object content, string projectName = null, string mediaType = JSON_MEDIA_TYPE)
+        protected async Task<string> PutResponse(string path, object content, string projectName = null, string mediaType = MediaType.JSON_MEDIA_TYPE)
         {
             return await PutResponse(path, new Dictionary<string, object>(), content, projectName, mediaType);
         }
 
-        protected async Task<string> PutResponse(string path, IDictionary<string, object> arguments, object content, string projectName = null, string mediaType = JSON_MEDIA_TYPE)
+        protected async Task<string> PutResponse(string path, IDictionary<string, object> arguments, object content, string projectName = null, string mediaType = MediaType.JSON_MEDIA_TYPE)
         {
             var httpContent = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, mediaType);
 
@@ -162,11 +182,18 @@ namespace VisualStudioOnline.Api.Rest
         } 
         #endregion
 
-        private void CheckResponse(HttpResponseMessage response, string responseBody)
+        private void CheckResponse(HttpResponseMessage response, object responseBody)
         {
             if (!response.IsSuccessStatusCode)
             {
-                throw JsonConvert.DeserializeObject<VsoException>(responseBody);
+                if (responseBody is string)
+                {
+                    throw JsonConvert.DeserializeObject<VsoException>((string)responseBody);
+                }
+                else
+                {
+                    throw new VsoException(string.Format("{0}", response.StatusCode));
+                }
             }
             else if (response.StatusCode == HttpStatusCode.NonAuthoritativeInformation)
             {
@@ -174,7 +201,7 @@ namespace VisualStudioOnline.Api.Rest
             }
         }
 
-        private HttpClient GetHttpClient(string mediaType = JSON_MEDIA_TYPE)
+        private HttpClient GetHttpClient(string mediaType = MediaType.JSON_MEDIA_TYPE)
         {
             var client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
